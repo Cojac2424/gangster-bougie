@@ -17,7 +17,8 @@
     header{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-    .brand-mark{width:42px;height:42px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold-light);font-family:Georgia,serif;font-size:1.15rem;font-weight:800;box-shadow:0 0 22px rgba(244,207,99,.14);flex:0 0 auto}
+    .brand-mark{width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;overflow:visible}
+    .brand-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px rgba(244,207,99,.18))}
     .nav-links{display:flex;gap:28px;align-items:center;font-size:.92rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
     .nav-links a:hover{color:var(--gold-light)}
     .cart-link{border:1px solid var(--gold);padding:10px 14px;border-radius:999px;white-space:nowrap}
@@ -78,12 +79,10 @@
       .newsletter-form{flex-direction:column}
     }
 
-    /* iPad/tablet portrait: same logo size, nudged right to clear the text */
     @media(min-width:681px) and (max-width:900px) and (orientation:portrait){
       .hero-logo{width:min(620px,148%);margin:-18px auto 0;transform:translateX(1%) scale(1.18);transform-origin:52% 18%}
     }
 
-    /* iPad/tablet landscape: same visual size, nudged left to stay inside the screen */
     @media(min-width:901px) and (max-width:1200px) and (orientation:landscape){
       .hero-grid{grid-template-columns:minmax(0,1fr) minmax(360px,1fr)}
       .hero-logo{width:min(620px,148%);margin:-18px auto 0;transform:translateX(-8%) scale(1.18);transform-origin:52% 18%}
@@ -92,6 +91,7 @@
     @media(max-width:680px){
       .nav{justify-content:center;padding:8px 0 9px}
       .brand{width:100%;justify-content:center}
+      .brand-mark{width:44px;height:44px}
       .nav-links{font-size:.72rem;gap:6px;letter-spacing:.035em;justify-content:space-between;overflow-x:auto;white-space:nowrap;padding-bottom:1px}
       .nav-links a{flex:0 0 auto}
       .cart-link{padding:6px 9px}
@@ -104,7 +104,7 @@
 
     @media(max-width:560px){
       .topbar{font-size:.68rem;letter-spacing:.08em}
-      .nav{min-height:0}.brand{font-size:.88rem}.brand-mark{width:36px;height:36px}
+      .nav{min-height:0}.brand{font-size:.88rem}.brand-mark{width:40px;height:40px}
       .nav-links{font-size:.67rem;letter-spacing:.025em}
       .cart-link{padding:5px 8px}
       .hero-grid{padding-top:5px}
@@ -117,7 +117,7 @@
   <div class="topbar">Gangster Bougie — What Hustle Looks Like</div>
   <header>
     <div class="container nav">
-      <a class="brand" href="#"><div class="brand-mark">GB</div><div>Gangster Bougie</div></a>
+      <a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo" /></div><div>Gangster Bougie</div></a>
       <nav class="nav-links"><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav>
     </div>
   </header>
