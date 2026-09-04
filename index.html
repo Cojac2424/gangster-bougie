@@ -78,7 +78,14 @@
       .newsletter-form{flex-direction:column}
     }
 
-    @media(min-width:681px) and (max-width:900px){
+    /* iPad/tablet portrait: same logo size, nudged right to clear the text */
+    @media(min-width:681px) and (max-width:900px) and (orientation:portrait){
+      .hero-logo{width:min(620px,148%);margin:-18px auto 0;transform:translateX(1%) scale(1.18);transform-origin:52% 18%}
+    }
+
+    /* iPad/tablet landscape: same visual size, nudged left to stay inside the screen */
+    @media(min-width:901px) and (max-width:1200px) and (orientation:landscape){
+      .hero-grid{grid-template-columns:minmax(0,1fr) minmax(360px,1fr)}
       .hero-logo{width:min(620px,148%);margin:-18px auto 0;transform:translateX(-8%) scale(1.18);transform-origin:52% 18%}
     }
 
