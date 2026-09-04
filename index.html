@@ -49,6 +49,9 @@
     .hero-card::before,.hero-card::after{display:none}
     .hero-logo{position:relative;z-index:2;width:min(820px,165%);max-width:none;margin:-28px -26% 0 auto;transform:scale(1.18);transform-origin:50% 20%;filter:drop-shadow(0 18px 22px rgba(0,0,0,.34))}
 
+    .sound-toggle{position:fixed;right:18px;bottom:18px;z-index:50;border:1px solid var(--gold);border-radius:999px;background:rgba(5,5,5,.88);color:var(--gold-light);padding:10px 14px;font-family:'Bodoni Moda','Times New Roman',serif;font-weight:800;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 8px 24px rgba(0,0,0,.35);backdrop-filter:blur(8px);cursor:pointer}
+    .sound-toggle:hover{background:rgba(216,169,40,.12)}
+
     section{padding:82px 0}
     .section-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:34px}
     .section-heading h2{font-family:'Bodoni Moda','Times New Roman',serif;font-size:clamp(2rem,5vw,3.4rem);text-transform:uppercase;letter-spacing:-.03em}
@@ -114,6 +117,7 @@
       .hero-content::after{margin-top:14px;width:92%}
       .hero-card{width:100%;min-width:0;margin:0;padding:0;align-items:center;justify-content:center;overflow:visible}
       .hero-logo{width:162%;max-width:none;margin:0 -25% 0 -22%;transform:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
+      .sound-toggle{right:10px;bottom:10px;padding:8px 11px;font-size:.72rem}
     }
 
     @media(max-width:900px) and (max-height:520px) and (orientation:landscape){
@@ -180,5 +184,54 @@
     <section class="newsletter" id="contact"><div class="container"><div class="eyebrow">Stay in the loop</div><h2>Get first access to new drops.</h2><p>New hats, tees, hoodies and accessories are coming.</p><form class="newsletter-form"><input type="email" placeholder="Enter your email" /><button class="btn btn-gold" type="button">Join the list</button></form></div></section>
   </main>
   <footer><div class="container footer-inner"><div>© 2026 Gangster Bougie</div><div>What Hustle Looks Like</div></div></footer>
+
+  <audio id="bgMusic" loop preload="auto" playsinline>
+    <source src="Migos - Bad and Boujee ft. Lil Uzi Vert (Best Clean Version) - TheKobe1234.mp3" type="audio/mpeg" />
+  </audio>
+  <button class="sound-toggle" id="soundToggle" type="button" aria-label="Toggle background music">♪ Sound On</button>
+  <script>
+    const bgMusic = document.getElementById('bgMusic');
+    const soundToggle = document.getElementById('soundToggle');
+    bgMusic.volume = 0.22;
+    let musicWanted = true;
+
+    function syncSoundButton(){
+      soundToggle.textContent = bgMusic.paused ? '♪ Sound On' : '♪ Sound Off';
+    }
+
+    async function startMusic(){
+      if(!musicWanted) return;
+      try{
+        await bgMusic.play();
+        syncSoundButton();
+      }catch(e){
+        soundToggle.textContent = '♪ Tap for Sound';
+      }
+    }
+
+    window.addEventListener('load', startMusic);
+
+    const unlockAudio = () => {
+      startMusic();
+      document.removeEventListener('pointerdown', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+    document.addEventListener('pointerdown', unlockAudio, {passive:true});
+    document.addEventListener('touchstart', unlockAudio, {passive:true});
+    document.addEventListener('keydown', unlockAudio);
+
+    soundToggle.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      if(bgMusic.paused){
+        musicWanted = true;
+        await startMusic();
+      }else{
+        musicWanted = false;
+        bgMusic.pause();
+        syncSoundButton();
+      }
+    });
+  </script>
 </body>
 </html>
