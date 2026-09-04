@@ -16,9 +16,9 @@
     .topbar{background:linear-gradient(90deg,#8a6710,var(--gold),#8a6710);color:#111;text-align:center;padding:8px 14px;font-size:.83rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
     header{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-    .brand-mark{width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;overflow:visible}
-    .brand-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px rgba(244,207,99,.18))}
+    .brand{display:flex;align-items:center;gap:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+    .brand-mark{width:78px;height:78px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;overflow:visible}
+    .brand-mark img{width:100%;height:100%;object-fit:contain;transform:scale(1.28);transform-origin:center;filter:drop-shadow(0 0 12px rgba(244,207,99,.18))}
     .nav-links{display:flex;gap:28px;align-items:center;font-size:.92rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
     .nav-links a:hover{color:var(--gold-light)}
     .cart-link{border:1px solid var(--gold);padding:10px 14px;border-radius:999px;white-space:nowrap}
@@ -91,7 +91,7 @@
     @media(max-width:680px){
       .nav{justify-content:center;padding:8px 0 9px}
       .brand{width:100%;justify-content:center}
-      .brand-mark{width:44px;height:44px}
+      .brand-mark{width:68px;height:68px}
       .nav-links{font-size:.72rem;gap:6px;letter-spacing:.035em;justify-content:space-between;overflow-x:auto;white-space:nowrap;padding-bottom:1px}
       .nav-links a{flex:0 0 auto}
       .cart-link{padding:6px 9px}
@@ -104,7 +104,7 @@
 
     @media(max-width:560px){
       .topbar{font-size:.68rem;letter-spacing:.08em}
-      .nav{min-height:0}.brand{font-size:.88rem}.brand-mark{width:40px;height:40px}
+      .nav{min-height:0}.brand{font-size:.88rem}.brand-mark{width:62px;height:62px}
       .nav-links{font-size:.67rem;letter-spacing:.025em}
       .cart-link{padding:5px 8px}
       .hero-grid{padding-top:5px}
