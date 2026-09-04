@@ -88,18 +88,38 @@
       .hero-logo{width:min(620px,148%);margin:-18px auto 0;transform:translateX(-8%) scale(1.18);transform-origin:52% 18%}
     }
 
-    @media(max-width:680px){
+    /* Phone portrait: keep the story/text compact on the left and the crest beside it */
+    @media(max-width:680px) and (orientation:portrait){
       .nav{justify-content:center;padding:8px 0 9px}
       .brand{width:100%;justify-content:center}
       .brand-mark{width:68px;height:68px}
       .nav-links{font-size:.72rem;gap:6px;letter-spacing:.035em;justify-content:space-between;overflow-x:auto;white-space:nowrap;padding-bottom:1px}
       .nav-links a{flex:0 0 auto}
       .cart-link{padding:6px 9px}
-      .hero-grid{grid-template-columns:1fr;gap:0;padding:8px 0 14px}
-      .hero h1{font-size:clamp(3rem,14vw,5.2rem)}
-      .hero-copy{font-size:1rem}
-      .hero-card{width:100%;margin:0 auto;padding:0;justify-content:center;overflow:visible}
-      .hero-logo{width:min(430px,98vw);max-width:430px;margin:-4px auto 0;transform:scale(1.12);transform-origin:50% 20%;filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
+      .hero-grid{grid-template-columns:minmax(0,58%) minmax(0,42%);gap:4px;padding:10px 0 16px;align-items:center}
+      .hero-content{min-width:0}
+      .hero .eyebrow{font-size:.58rem;letter-spacing:.13em;margin-bottom:7px;white-space:normal}
+      .hero h1{font-size:clamp(2.05rem,10.5vw,2.75rem);line-height:.91;margin-bottom:10px}
+      .hero-copy{font-size:.78rem;line-height:1.42;margin-bottom:12px;max-width:100%}
+      .hero-actions{gap:7px}
+      .hero-actions .btn{padding:9px 10px;font-size:.62rem;letter-spacing:.045em}
+      .hero-content::after{margin-top:14px;width:92%}
+      .hero-card{width:100%;min-width:0;margin:0;padding:0;align-items:center;justify-content:center;overflow:visible}
+      .hero-logo{width:145%;max-width:none;margin:0 -18% 0 -20%;transform:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
+    }
+
+    /* Phone landscape: a separate two-column layout so neither side covers the other */
+    @media(max-width:900px) and (max-height:520px) and (orientation:landscape){
+      .hero-grid{grid-template-columns:minmax(0,56%) minmax(0,44%);gap:8px;padding:8px 0 14px;align-items:center}
+      .hero-content{min-width:0}
+      .hero .eyebrow{font-size:.58rem;letter-spacing:.12em;margin-bottom:6px}
+      .hero h1{font-size:clamp(2.25rem,7vw,3.25rem);line-height:.9;margin-bottom:9px}
+      .hero-copy{font-size:.78rem;line-height:1.38;margin-bottom:11px;max-width:100%}
+      .hero-actions{gap:7px}
+      .hero-actions .btn{padding:8px 10px;font-size:.62rem;letter-spacing:.04em}
+      .hero-content::after{margin-top:12px;width:88%}
+      .hero-card{width:100%;min-width:0;margin:0;padding:0;align-items:center;justify-content:center;overflow:visible}
+      .hero-logo{width:118%;max-width:none;margin:0 -9% 0 -5%;transform:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
     }
 
     @media(max-width:560px){
@@ -107,8 +127,6 @@
       .nav{min-height:0}.brand{font-size:.88rem}.brand-mark{width:62px;height:62px}
       .nav-links{font-size:.67rem;letter-spacing:.025em}
       .cart-link{padding:5px 8px}
-      .hero-grid{padding-top:5px}
-      .hero-logo{width:min(400px,96vw);max-width:400px;margin:0 auto;transform:scale(1.10)}
       section{padding:64px 0}
     }
   </style>
