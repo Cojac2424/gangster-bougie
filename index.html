@@ -7,7 +7,7 @@
   <meta name="description" content="Gangster Bougie streetwear — bold style, luxury energy, and what hustle looks like." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700;6..96,800;6..96,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700;6..96,800;6..96,900&family=Yellowtail&display=swap" rel="stylesheet">
   <style>
     :root{--black:#050505;--white:#fff;--muted:#b9b9b9;--gold:#d8a928;--gold-light:#f4cf63;--border:rgba(216,169,40,.28)}
     *{box-sizing:border-box;margin:0;padding:0}
@@ -34,7 +34,8 @@
     .hero-content::after{content:"";display:block;width:min(330px,76%);height:1px;margin-top:22px;background:linear-gradient(90deg,var(--gold),rgba(216,169,40,0));opacity:.55}
     .eyebrow{color:var(--gold-light);text-transform:uppercase;letter-spacing:.22em;font-weight:800;font-size:.78rem;margin-bottom:10px}
     .hero h1{font-family:'Bodoni Moda','Times New Roman',serif;font-size:clamp(3.2rem,7vw,6.4rem);line-height:.92;text-transform:uppercase;letter-spacing:-.04em;margin-bottom:14px}
-    .hero h1 span{display:block;color:var(--gold-light);font-family:Georgia,serif;font-style:italic;text-transform:none;font-weight:700;text-shadow:0 0 24px rgba(244,207,99,.12)}
+    .bougie-display{font-family:'Yellowtail','Brush Script MT',cursive!important;font-style:normal!important;text-transform:none!important;font-weight:400!important;letter-spacing:.01em;background:linear-gradient(180deg,#fff3b2 0%,#f6d66d 18%,#d6a52b 42%,#fff0a0 55%,#b7780d 73%,#f0c94c 88%,#7d4f04 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;text-shadow:0 1px 0 rgba(255,246,190,.18),0 3px 8px rgba(97,58,0,.48),0 0 18px rgba(227,176,47,.18);filter:drop-shadow(0 2px 1px rgba(0,0,0,.28))}
+    .hero h1 .bougie-display{display:block}
     .hero-copy{color:#d0d0d0;max-width:650px;font-size:1.06rem;margin-bottom:22px}
     .hero-actions{display:flex;flex-wrap:wrap;gap:14px}
     .btn{display:inline-block;padding:14px 22px;border-radius:4px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;font-size:.88rem;transition:.2s ease}
@@ -59,7 +60,7 @@
     .story-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:60px;align-items:center}
     .story-badge{width:min(340px,100%);aspect-ratio:1/1;border:2px solid var(--gold);border-radius:50%;margin:auto;display:grid;place-items:center;text-align:center;padding:30px;background:radial-gradient(circle,#191919,#090909 70%)}
     .story-badge strong{color:var(--gold-light);display:block;font-family:Georgia,serif;font-size:2rem;line-height:1.05}
-    .story-copy h2{font-family:'Bodoni Moda','Times New Roman',serif;font-size:clamp(2.2rem,5vw,4rem);text-transform:uppercase;margin-bottom:18px}.story-copy p{color:#c7c7c7;margin-bottom:16px;max-width:720px}
+    .story-copy h2{font-family:'Bodoni Moda','Times New Roman',serif;font-size:clamp(2.2rem,5vw,4rem);text-transform:uppercase;margin-bottom:18px}.story-copy h2 .bougie-display{display:inline-block;font-size:1.12em}.story-copy p{color:#c7c7c7;margin-bottom:16px;max-width:720px}
     .newsletter{text-align:center}.newsletter h2{font-family:'Bodoni Moda','Times New Roman',serif;font-size:clamp(2rem,5vw,3.2rem);margin-bottom:12px;text-transform:uppercase}.newsletter p{color:var(--muted);margin-bottom:24px}
     .newsletter-form{width:min(620px,100%);margin:0 auto;display:flex;gap:10px}.newsletter-form input{flex:1;padding:14px 16px;background:#111;border:1px solid #2b2b2b;color:white;outline:none}.newsletter-form input:focus{border-color:var(--gold)}
     footer{border-top:1px solid var(--border);padding:30px 0;color:#8d8d8d;font-size:.88rem}.footer-inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
@@ -145,7 +146,7 @@
       <div class="container hero-grid">
         <div class="hero-content">
           <div class="eyebrow">Luxury streetwear • Est. 2026</div>
-          <h1>Gangster<span>Bougie</span></h1>
+          <h1>Gangster<span class="bougie-display">Bougie</span></h1>
           <p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for people who hustle hard, move bold, and still like the finer things.</p>
           <div class="hero-actions"><a class="btn btn-gold" href="#shop">Shop the Drop</a><a class="btn btn-outline" href="#about">Our Story</a></div>
         </div>
@@ -167,7 +168,7 @@
     <section class="story" id="about">
       <div class="container story-grid">
         <div class="story-badge"><div><strong>What Hustle<br />Looks Like</strong></div></div>
-        <div class="story-copy"><div class="eyebrow">The brand</div><h2>Gangster meets bougie.</h2><p>Gangster Bougie is built around contrast: bold and polished, street and luxury, grind and taste.</p><p>The brand is about carrying yourself with confidence while still appreciating style, quality and individuality.</p><a class="btn btn-outline" href="#shop">See the collection</a></div>
+        <div class="story-copy"><div class="eyebrow">The brand</div><h2>Gangster meets <span class="bougie-display">Bougie</span>.</h2><p>Gangster Bougie is built around contrast: bold and polished, street and luxury, grind and taste.</p><p>The brand is about carrying yourself with confidence while still appreciating style, quality and individuality.</p><a class="btn btn-outline" href="#shop">See the collection</a></div>
       </div>
     </section>
 
