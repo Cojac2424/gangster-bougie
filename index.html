@@ -210,27 +210,53 @@
       background: rgba(216, 169, 40, 0.08);
     }
 
+    
+
+    
+
     .hero-card {
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, #121212, #090909);
-      min-height: 470px;
-      padding: 28px;
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-    }
+  position: relative;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  border: 1px solid rgba(216, 169, 40, 0.35);
+  border-radius: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(244, 207, 99, 0.20), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(216, 169, 40, 0.16), transparent 32%),
+    linear-gradient(145deg, rgba(24, 24, 24, 0.98), rgba(8, 8, 8, 0.98));
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.03);
+}
 
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      inset: 12%;
-      border-radius: 50%;
-      border: 1px solid rgba(216, 169, 40, 0.2);
-      box-shadow: 0 0 80px rgba(216, 169, 40, 0.16);
-    }
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 22px;
+  background:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.22;
+  pointer-events: none;
+}
 
-    .logo-placeholder {
+.hero-card::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(244, 207, 99, 0.24), rgba(244, 207, 99, 0) 70%);
+  filter: blur(12px);
+  z-index: 0;
+  pointer-events: none;
+}.logo-placeholder {
       position: relative;
       z-index: 2;
       text-align: center;
