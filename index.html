@@ -25,7 +25,7 @@
     .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border);background:radial-gradient(circle at 82% 26%,rgba(216,169,40,.16),transparent 26%),radial-gradient(circle at 14% 18%,rgba(255,255,255,.055),transparent 24%),linear-gradient(180deg,#070707 0%,#0b0b0b 100%)}
     .hero::before{content:"GB";position:absolute;right:-.05em;top:.02em;font-family:Georgia,serif;font-weight:900;font-style:italic;font-size:clamp(13rem,36vw,31rem);line-height:.9;letter-spacing:-.08em;color:transparent;-webkit-text-stroke:1px rgba(216,169,40,.08);opacity:.78;pointer-events:none;user-select:none}
     .hero::after{content:"";position:absolute;width:58%;height:1px;right:-8%;top:40%;background:linear-gradient(90deg,transparent,rgba(244,207,99,.25),transparent);transform:rotate(-12deg);pointer-events:none}
-    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(340px,.98fr);gap:8px;align-items:start;padding:18px 0 24px}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,1fr);gap:0;align-items:start;padding:18px 0 24px}
     .hero-content{position:relative;padding:0;align-self:start}
     .hero-content::after{content:"";display:block;width:min(330px,76%);height:1px;margin-top:22px;background:linear-gradient(90deg,var(--gold),rgba(216,169,40,0));opacity:.55}
     .eyebrow{color:var(--gold-light);text-transform:uppercase;letter-spacing:.22em;font-weight:800;font-size:.78rem;margin-bottom:10px}
@@ -40,7 +40,7 @@
     .btn-outline:hover{background:rgba(216,169,40,.08)}
     .hero-card{display:flex;align-items:flex-start;justify-content:center;min-height:0;padding:0;margin:0;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
     .hero-card::before,.hero-card::after{display:none}
-    .hero-logo{position:relative;z-index:2;width:min(650px,132%);max-width:none;margin:-12px -8% 0 auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.34))}
+    .hero-logo{position:relative;z-index:2;width:min(820px,165%);max-width:none;margin:-28px -26% 0 auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.34))}
 
     section{padding:82px 0}
     .section-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:34px}
@@ -64,14 +64,14 @@
       .nav{flex-wrap:wrap;gap:8px 14px;padding:9px 0 10px}
       .nav-links{display:flex;width:100%;justify-content:space-between;gap:12px;font-size:.82rem;letter-spacing:.055em;border-top:1px solid rgba(216,169,40,.16);padding-top:9px}
       .cart-link{padding:7px 11px}
-      .hero-grid{grid-template-columns:minmax(0,1.02fr) minmax(270px,.98fr);gap:0;padding:10px 0 18px;align-items:start}
+      .hero-grid{grid-template-columns:minmax(0,.96fr) minmax(300px,1.04fr);gap:0;padding:10px 0 18px;align-items:start}
       .hero-content{padding:0}
       .hero::before{right:-.18em;top:.08em;font-size:clamp(12rem,44vw,20rem);-webkit-text-stroke-color:rgba(216,169,40,.065)}
       .hero::after{top:36%;width:68%}
       .hero h1{font-size:clamp(2.65rem,7.6vw,4.7rem)}
       .hero-copy{max-width:620px;font-size:.98rem}
       .hero-card{align-items:flex-start;justify-content:center;padding:0;margin:0;min-height:0}
-      .hero-logo{width:min(560px,138%);margin:-14px -14% 0 auto}
+      .hero-logo{width:min(760px,172%);margin:-30px -36% 0 auto}
       .story-grid{grid-template-columns:1fr}
       .products{grid-template-columns:1fr}
       .section-heading{display:block}.section-heading p{margin-top:12px}
@@ -88,7 +88,7 @@
       .hero h1{font-size:clamp(3rem,14vw,5.2rem)}
       .hero-copy{font-size:1rem}
       .hero-card{width:100%;margin:0 auto;padding:0;justify-content:center}
-      .hero-logo{width:min(390px,92vw);max-width:390px;margin:-2px auto 0;filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
+      .hero-logo{width:min(470px,108vw);max-width:470px;margin:-10px auto -8px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
     }
 
     @media(max-width:560px){
@@ -97,7 +97,7 @@
       .nav-links{font-size:.67rem;letter-spacing:.025em}
       .cart-link{padding:5px 8px}
       .hero-grid{padding-top:5px}
-      .hero-logo{width:min(370px,94vw);max-width:370px}
+      .hero-logo{width:min(450px,110vw);max-width:450px;margin-left:-5vw;margin-right:-5vw}
       section{padding:64px 0}
     }
   </style>
