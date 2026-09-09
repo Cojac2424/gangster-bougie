@@ -112,6 +112,10 @@
       .section-heading{display:block}.section-heading p{margin-top:12px}
       .newsletter-form{flex-direction:column}
     }
+    @media(max-width:900px) and (orientation:landscape){
+      .hero-grid{grid-template-columns:minmax(0,1fr) minmax(260px,.72fr);gap:8px;padding:10px 0 18px;align-items:start}
+      .hero-logo{width:min(430px,118%);max-width:none;margin:-6px auto 0;transform:translateX(-2%) scale(1.02);transform-origin:52% 18%}
+    }
     @media(max-width:680px){
       .nav{justify-content:center;padding:8px 0 9px}
       .brand{width:100%;justify-content:center}
