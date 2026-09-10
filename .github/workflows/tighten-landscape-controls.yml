@@ -1,0 +1,29 @@
+name: Tighten landscape sports controls
+on:
+  push:
+    paths:
+      - '.github/workflows/tighten-landscape-controls.yml'
+jobs:
+  adjust:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply targeted landscape desktop adjustment
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          css='''\n/* Landscape iPad / desktop sports-bra spacing refinement */\n@media (min-width:901px) and (orientation:landscape){\n  .sports-info>.sports-buy-row{gap:8px;margin-top:8px}\n  .sports-size-block .sizes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%;padding:0 6px;flex-wrap:nowrap}\n  .sports-size-block .size{width:100%;min-width:0;height:42px}\n  .sports-add{display:block;width:min(430px,54%);min-width:0;height:48px;margin:0 auto}\n  .sports-info>.sports-preview-note{margin-top:3px}\n  .sports-gallery{margin-top:-8px}\n}\n'''
+          marker='</style>'
+          if 'Landscape iPad / desktop sports-bra spacing refinement' not in s:
+              s=s.replace(marker,css+marker,1)
+              p.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Tighten landscape sports bra controls'
+          git push
