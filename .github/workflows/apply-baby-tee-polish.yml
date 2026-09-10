@@ -1,0 +1,29 @@
+name: Apply Baby Tee responsive polish
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-baby-tee-polish.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply responsive CSS
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='/* Baby Tee responsive polish */'
+          css='''\n/* Baby Tee responsive polish */\n#babyTeeModal .baby-size{min-width:0;padding:0 2px;white-space:nowrap}\n@media (min-width:681px) and (max-width:900px){#babyTeeModal .sports-stage{aspect-ratio:auto;height:clamp(250px,36vw,320px)}#babyTeeModal .sports-stage img{width:100%;height:100%;object-fit:contain}#babyTeeModal .sports-info>.sports-divider{margin-top:6px}#babyTeeModal .sports-size-block .size{font-size:.78rem;padding:0 1px}}\n@media (min-width:901px) and (orientation:landscape){#babyTeeModal .sports-size-block .sizes{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}#babyTeeModal .sports-size-block .size{font-size:.76rem;padding:0;white-space:nowrap}}\n'''
+          if marker not in s:
+              s=s.replace('</style>',css+'</style>',1)
+          p.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Polish Baby Tee responsive layout'
+          git push
