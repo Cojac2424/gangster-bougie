@@ -1,4 +1,4 @@
-name: Fix Mens Muscle Tank Images
+name: Mix Mens Lookbook Ticker
 on:
   pull_request:
     types: [opened, reopened]
@@ -11,33 +11,33 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Correct White and Pink Muscle Tank images
+      - name: Mix mens ticker outfits
         shell: python
         run: |
           from pathlib import Path
+          import re
           p=Path('index.html')
           s=p.read_text()
-          start=s.index('<div class="modal" id="muscleTankModal">')
-          end=s.index('<div class="modal" id="leggingsModal">', start)
+          marker='<div class="lookbook-grid men-ticker">'
+          start=s.index(marker)
+          end=s.index('</div></div><div class="lookbook-hint">',start)
           block=s[start:end]
-          old_white_front='<button class="thumb sports-thumb muscle-thumb active" data-img="IMG_0349.jpeg" data-label="White front" data-colour="White"><img src="IMG_0349.jpeg" alt="White front"><span class="sports-thumb-label">White<br>Front</span></button>'
-          new_white_front='<button class="thumb sports-thumb muscle-thumb active" data-img="IMG_0357.jpeg" data-label="White front" data-colour="White"><img src="IMG_0357.jpeg" alt="White front"><span class="sports-thumb-label">White<br>Front</span></button>'
-          old_white_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_2108.jpeg" data-label="White back" data-colour="White"><img src="IMG_2108.jpeg" alt="White back"><span class="sports-thumb-label">White<br>Back</span></button>'
-          new_white_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0358.jpeg" data-label="White back" data-colour="White"><img src="IMG_0358.jpeg" alt="White back"><span class="sports-thumb-label">White<br>Back</span></button>'
-          old_pink_front='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0357.jpeg" data-label="Pink front" data-colour="Pink"><img src="IMG_0357.jpeg" alt="Pink front"><span class="sports-thumb-label">Pink<br>Front</span></button>'
-          new_pink_front='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0349.jpeg" data-label="Pink front" data-colour="Pink"><img src="IMG_0349.jpeg" alt="Pink front"><span class="sports-thumb-label">Pink<br>Front</span></button>'
-          old_pink_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0358.jpeg" data-label="Pink back" data-colour="Pink"><img src="IMG_0358.jpeg" alt="Pink back"><span class="sports-thumb-label">Pink<br>Back</span></button>'
-          new_pink_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_2108.jpeg" data-label="Pink back" data-colour="Pink"><img src="IMG_2108.jpeg" alt="Pink back"><span class="sports-thumb-label">Pink<br>Back</span></button>'
-          for old,new in [(old_white_front,new_white_front),(old_white_back,new_white_back),(old_pink_front,new_pink_front),(old_pink_back,new_pink_back)]:
-              if old not in block: raise SystemExit('Expected Muscle Tank gallery entry missing')
-              block=block.replace(old,new,1)
-          block=block.replace('id="muscleTankMain" src="IMG_0357.jpeg" alt="White front"','id="muscleTankMain" src="IMG_0357.jpeg" alt="White front"',1)
-          s=s[:start]+block+s[end:]
+          imgs=re.findall(r'IMG_20(?:21|22|23|24|25|26|28|29|30|31|32|33|34|35|36|37|40|42|43)\.jpeg',block)
+          unique=[]
+          for x in imgs:
+              if x not in unique: unique.append(x)
+          expected=['IMG_2021.jpeg','IMG_2022.jpeg','IMG_2023.jpeg','IMG_2024.jpeg','IMG_2025.jpeg','IMG_2026.jpeg','IMG_2028.jpeg','IMG_2029.jpeg','IMG_2030.jpeg','IMG_2031.jpeg','IMG_2032.jpeg','IMG_2033.jpeg','IMG_2034.jpeg','IMG_2035.jpeg','IMG_2036.jpeg','IMG_2037.jpeg','IMG_2040.jpeg','IMG_2042.jpeg','IMG_2043.jpeg']
+          if unique != expected: raise SystemExit('Unexpected men ticker image set')
+          # Mix the previously grouped outfit runs: 1–2 athletic/shorts looks, then 1–2 casual/outerwear looks.
+          order=['IMG_2021.jpeg','IMG_2022.jpeg','IMG_2031.jpeg','IMG_2032.jpeg','IMG_2023.jpeg','IMG_2024.jpeg','IMG_2033.jpeg','IMG_2034.jpeg','IMG_2025.jpeg','IMG_2035.jpeg','IMG_2036.jpeg','IMG_2026.jpeg','IMG_2028.jpeg','IMG_2037.jpeg','IMG_2040.jpeg','IMG_2029.jpeg','IMG_2030.jpeg','IMG_2042.jpeg','IMG_2043.jpeg']
+          item=lambda f:f'<div class="lookbook-item"><img src="{f}" alt="Gangster Bougie men\'s lookbook"></div>'
+          newblock=marker+''.join(item(f) for f in order+order)
+          s=s[:start]+newblock+s[end:]
           p.write_text(s)
-      - name: Commit fix
+      - name: Commit ticker order
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Correct White and Pink Muscle Tank images"
+          git commit -m "Mix men’s lookbook ticker outfits"
           git push origin main
