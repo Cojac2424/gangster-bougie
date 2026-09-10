@@ -1,0 +1,43 @@
+name: Add leggings product layout
+on:
+  push:
+    paths:
+      - '.github/workflows/add-leggings-product.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update leggings product
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old='<article class="product-card" data-category="activewear"><div class="product-accent"></div><div class="product-info"><div class="product-tag">Activewear</div><div class="product-name">High Waisted Yoga Leggings (AOP)</div><div class="product-status">Launch item</div></div></article>'
+          new='<article class="product-card" data-category="activewear"><div class="product-image"><img src="IMG_0281.jpeg" alt="Gangster Bougie High-Waisted Leggings"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Activewear • Drop 01</div><div class="product-name">Gangster Bougie High-Waisted Leggings</div><div class="product-status">8 colourways • US$69.99</div><button class="view-item" id="openLeggings">View Item</button></div></article>'
+          if old not in s: raise SystemExit('leggings card target not found')
+          s=s.replace(old,new,1)
+          css='''\n/* Leggings use the Sports Bra master product layout */\n.leggings-gallery{grid-template-columns:repeat(8,1fr)}\n.leggings-grey{background:#70746f}.leggings-lightblue{background:#71afe5}.leggings-navy{background:#2854a4}.leggings-brown{background:#875538}.leggings-red{background:#cf3544}.leggings-green{background:#3f9c61}\n#leggingsModal .sports-size-block .sizes{grid-template-columns:repeat(6,minmax(0,1fr))}\n@media(max-width:900px){.leggings-gallery{grid-template-columns:repeat(4,1fr)}}\n@media(max-width:680px){#leggingsModal .sports-size-block .sizes{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}#leggingsModal .sports-size-block .size{font-size:.72rem}}\n@media (min-width:901px) and (orientation:landscape){#leggingsModal .sports-size-block .sizes{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}#leggingsModal .sports-size-block .size{font-size:.76rem;padding:0;white-space:nowrap}}\n'''
+          s=s.replace('</style>',css+'</style>',1)
+          pairs=[('White','IMG_0281.jpeg','IMG_0282.jpeg','white'),('Black','IMG_0283.jpeg','IMG_0284.jpeg','black'),('Green','IMG_0285.jpeg','IMG_0286.jpeg','leggings-green'),('Grey','IMG_0287.jpeg','IMG_0288.jpeg','leggings-grey'),('Light Blue','IMG_0289.jpeg','IMG_0290.jpeg','leggings-lightblue'),('Navy','IMG_0291.jpeg','IMG_0292.jpeg','leggings-navy'),('Brown','IMG_0293.jpeg','IMG_0294.jpeg','leggings-brown'),('Red','IMG_0295.jpeg','IMG_0296.jpeg','leggings-red')]
+          colors=''.join(f'<button class="sports-color {cl}{" active" if i==0 else ""}" data-index="{i*2}" aria-label="{name}"></button>' for i,(name,a,b,cl) in enumerate(pairs))
+          thumbs=''.join(f'<button class="thumb sports-thumb leggings-thumb{" active" if i==0 and side==0 else ""}" data-img="{img}" data-label="{name} {"front" if side==0 else "back"}" data-colour="{name}"><img src="{img}" alt="{name} {"front" if side==0 else "back"}"><span class="sports-thumb-label">{name}<br>{"Front" if side==0 else "Back"}</span></button>' for i,(name,a,b,cl) in enumerate(pairs) for side,img in enumerate((a,b)))
+          modal=f'''<div class="modal" id="leggingsModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeLeggings">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage"><img id="leggingsMain" src="IMG_0281.jpeg" alt="White front"><button class="sports-arrow prev" id="leggingsPrev" aria-label="Previous leggings image">‹</button><button class="sports-arrow next" id="leggingsNext" aria-label="Next leggings image">›</button></div><div class="sports-info"><h2>Gangster Bougie High-Waisted Leggings</h2><div class="sports-price">US$69.99</div><p class="sports-description">A sleek high-waisted legging designed to move with you from workouts to everyday streetwear. Finished with signature Gangster Bougie branding for a clean, fitted activewear look.</p><ul class="sports-benefits"><li>Women’s high-waisted leggings</li><li>Form-fitting athletic cut</li><li>83% polyester, 17% spandex</li><li>Double-layer waistband with signature Gangster Bougie detail</li><li>Runs small — consider sizing up</li></ul><hr class="sports-divider"><div class="sports-colour-line">Colour: <strong id="leggingsColourName">White</strong></div><div class="sports-colors">{colors}</div><div class="sports-buy-row"><div class="sports-size-block"><span class="option-label">Size:</span><div class="sizes"><button class="size leggings-size">XS</button><button class="size leggings-size">S</button><button class="size leggings-size">M</button><button class="size leggings-size">L</button><button class="size leggings-size">XL</button><button class="size leggings-size">2XL</button></div></div><button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery leggings-gallery">{thumbs}</div></div></div></div>\n'''
+          if '<audio id="bgMusic"' not in s: raise SystemExit('audio insertion target not found')
+          s=s.replace('<audio id="bgMusic"',modal+'<audio id="bgMusic"',1)
+          js='''const leggingsModal=document.getElementById('leggingsModal'),leggingsMain=document.getElementById('leggingsMain'),leggingsThumbs=[...document.querySelectorAll('#leggingsModal .leggings-thumb')],leggingsColourName=document.getElementById('leggingsColourName'),leggingsColors=[...document.querySelectorAll('#leggingsModal .sports-color')];let leggingsIndex=0;function showLeggingsImage(i){leggingsIndex=(i+leggingsThumbs.length)%leggingsThumbs.length;const t=leggingsThumbs[leggingsIndex];leggingsMain.src=t.dataset.img;leggingsMain.alt=t.dataset.label||t.querySelector('img').alt;leggingsThumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active');const colour=t.dataset.colour||'';leggingsColourName.textContent=colour;leggingsColors.forEach(x=>x.classList.toggle('active',x.getAttribute('aria-label')===colour))}document.getElementById('openLeggings').onclick=()=>{leggingsModal.classList.add('open');document.body.style.overflow='hidden';showLeggingsImage(leggingsIndex)};function closeLeggingsModal(){leggingsModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeLeggings').onclick=closeLeggingsModal;leggingsModal.addEventListener('click',e=>{if(e.target===leggingsModal)closeLeggingsModal()});leggingsThumbs.forEach((t,i)=>t.onclick=()=>showLeggingsImage(i));leggingsColors.forEach(c=>c.onclick=()=>showLeggingsImage(Number(c.dataset.index)));document.getElementById('leggingsPrev').onclick=()=>showLeggingsImage(leggingsIndex-1);document.getElementById('leggingsNext').onclick=()=>showLeggingsImage(leggingsIndex+1);document.querySelectorAll('.leggings-size').forEach(b=>b.onclick=()=>{document.querySelectorAll('.leggings-size').forEach(x=>x.classList.remove('active'));b.classList.add('active')});'''
+          marker='const bgMusic=document.getElementById(\'bgMusic\')'
+          if marker not in s: raise SystemExit('script insertion target not found')
+          s=s.replace(marker,js+marker,1)
+          p.write_text(s)
+          PY
+      - name: Commit update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Add leggings product view with synchronized gallery"
+          git push
