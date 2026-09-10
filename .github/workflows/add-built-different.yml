@@ -1,4 +1,4 @@
-name: Add Mens Muscle Tank
+name: Fix Mens Muscle Tank Images
 on:
   pull_request:
     types: [opened, reopened]
@@ -11,33 +11,59 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Add Men’s Muscle Tank
+      - name: Correct Muscle Tank image mapping
         shell: python
         run: |
           from pathlib import Path
           p=Path('index.html')
           s=p.read_text()
-          if 'id="muscleTankModal"' in s:
-              raise SystemExit('Muscle Tank already present')
-          css='''\n/* Men’s Muscle Tank */\n#muscleTankModal .muscle-gallery{grid-template-columns:repeat(5,minmax(0,1fr))}\n#muscleTankModal .muscle-colors{grid-template-columns:repeat(5,minmax(0,1fr))!important}\n#muscleTankModal .sports-size-block .sizes{grid-template-columns:repeat(5,minmax(0,1fr))}\n.muscle-natural{background:#e8dfc8}.muscle-grey{background:#5c5b5d}.muscle-pink{background:#e6a6b8}\n@media(max-width:900px){#muscleTankModal .muscle-gallery{grid-template-columns:repeat(4,minmax(0,1fr))}}\n@media(max-width:680px){#muscleTankModal .muscle-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}#muscleTankModal .sports-size-block .sizes{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}#muscleTankModal .muscle-size{font-size:.72rem;padding:0}}\n'''
-          s=s.replace('</style>',css+'</style>',1)
-          anchor='<article class="product-card" data-category="mens activewear tops"><div class="product-image"><img src="IMG_0345.jpeg" alt="Black Gangster Bougie Built Different Basketball Jersey"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Men’s • Basketball</div><div class="product-name">Gangster Bougie “Built Different” Basketball Jersey</div><div class="product-status">Black • US$64.99</div><button class="view-item" id="openBuiltDifferentJersey">View Item</button></div></article>'
-          card='<article class="product-card" data-category="mens activewear tops"><div class="product-image"><img src="IMG_0349.jpeg" alt="White Gangster Bougie Men’s Muscle Tank"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Men’s • Tops</div><div class="product-name">Gangster Bougie Men’s Muscle Tank</div><div class="product-status">5 colourways • US$49.99</div><button class="view-item" id="openMuscleTank">View Item</button></div></article>'
-          if anchor not in s: raise SystemExit('Product anchor missing')
-          s=s.replace(anchor,anchor+card,1)
-          modal='''<div class="modal" id="muscleTankModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeMuscleTank">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage"><img id="muscleTankMain" src="IMG_0349.jpeg" alt="White front"><button class="sports-arrow prev" id="muscleTankPrev" aria-label="Previous muscle tank image">‹</button><button class="sports-arrow next" id="muscleTankNext" aria-label="Next muscle tank image">›</button></div><div class="sports-info"><h2>Gangster Bougie Men’s Muscle Tank</h2><div class="sports-price">US$49.99</div><p class="sports-description">A clean-cut muscle tank built for training, warm-weather streetwear, and everyday movement. Finished with signature Gangster Bougie branding and a relaxed athletic silhouette for a bold, masculine look.</p><ul class="sports-benefits"><li>Unisex jersey muscle tank with crew neck</li><li>Cutoff sleeves with wide armholes and retail fit</li><li>Lightweight, comfortable fabric</li><li>Front Gangster Bougie crest with back logo detail</li></ul><hr class="sports-divider"><div class="sports-colour-line">Colour: <strong id="muscleTankColourName">White</strong></div><div class="sports-colors muscle-colors"><button class="sports-color white active" data-index="0" aria-label="White"></button><button class="sports-color black" data-index="2" aria-label="Black"></button><button class="sports-color muscle-natural" data-index="4" aria-label="Natural"></button><button class="sports-color muscle-grey" data-index="6" aria-label="Dark Grey Heather"></button><button class="sports-color muscle-pink" data-index="8" aria-label="Pink"></button></div><div class="sports-buy-row"><div class="sports-size-block"><span class="option-label">Size:</span><div class="sizes"><button class="size muscle-size">S</button><button class="size muscle-size">M</button><button class="size muscle-size">L</button><button class="size muscle-size">XL</button><button class="size muscle-size">2XL</button></div></div><button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery muscle-gallery"><button class="thumb sports-thumb muscle-thumb active" data-img="IMG_0349.jpeg" data-label="White front" data-colour="White"><img src="IMG_0349.jpeg" alt="White front"><span class="sports-thumb-label">White<br>Front</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0350.jpeg" data-label="White back" data-colour="White"><img src="IMG_0350.jpeg" alt="White back"><span class="sports-thumb-label">White<br>Back</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0351.jpeg" data-label="Black front" data-colour="Black"><img src="IMG_0351.jpeg" alt="Black front"><span class="sports-thumb-label">Black<br>Front</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0352.jpeg" data-label="Black back" data-colour="Black"><img src="IMG_0352.jpeg" alt="Black back"><span class="sports-thumb-label">Black<br>Back</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0353.jpeg" data-label="Natural front" data-colour="Natural"><img src="IMG_0353.jpeg" alt="Natural front"><span class="sports-thumb-label">Natural<br>Front</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0354.jpeg" data-label="Natural back" data-colour="Natural"><img src="IMG_0354.jpeg" alt="Natural back"><span class="sports-thumb-label">Natural<br>Back</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0355.jpeg" data-label="Dark Grey Heather front" data-colour="Dark Grey Heather"><img src="IMG_0355.jpeg" alt="Dark Grey Heather front"><span class="sports-thumb-label">Dark Grey<br>Front</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0356.jpeg" data-label="Dark Grey Heather back" data-colour="Dark Grey Heather"><img src="IMG_0356.jpeg" alt="Dark Grey Heather back"><span class="sports-thumb-label">Dark Grey<br>Back</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0357.jpeg" data-label="Pink front" data-colour="Pink"><img src="IMG_0357.jpeg" alt="Pink front"><span class="sports-thumb-label">Pink<br>Front</span></button><button class="thumb sports-thumb muscle-thumb" data-img="IMG_0358.jpeg" data-label="Pink back" data-colour="Pink"><img src="IMG_0358.jpeg" alt="Pink back"><span class="sports-thumb-label">Pink<br>Back</span></button></div></div></div></div>\n'''
-          marker='<div class="modal" id="leggingsModal">'
-          if marker not in s: raise SystemExit('Modal anchor missing')
-          s=s.replace(marker,modal+marker,1)
-          js='''const muscleTankModal=document.getElementById('muscleTankModal'),muscleTankMain=document.getElementById('muscleTankMain'),muscleTankThumbs=[...document.querySelectorAll('#muscleTankModal .muscle-thumb')],muscleTankColourName=document.getElementById('muscleTankColourName'),muscleTankColors=[...document.querySelectorAll('#muscleTankModal .muscle-colors .sports-color')];let muscleTankIndex=0;function showMuscleTankImage(i){muscleTankIndex=(i+muscleTankThumbs.length)%muscleTankThumbs.length;const t=muscleTankThumbs[muscleTankIndex];muscleTankMain.src=t.dataset.img;muscleTankMain.alt=t.dataset.label||t.querySelector('img').alt;muscleTankThumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active');const colour=t.dataset.colour||'';muscleTankColourName.textContent=colour;muscleTankColors.forEach(x=>x.classList.toggle('active',x.getAttribute('aria-label')===colour))}document.getElementById('openMuscleTank').onclick=()=>{muscleTankModal.classList.add('open');document.body.style.overflow='hidden';showMuscleTankImage(muscleTankIndex)};function closeMuscleTankModal(){muscleTankModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeMuscleTank').onclick=closeMuscleTankModal;muscleTankModal.addEventListener('click',e=>{if(e.target===muscleTankModal)closeMuscleTankModal()});muscleTankThumbs.forEach((t,i)=>t.onclick=()=>showMuscleTankImage(i));muscleTankColors.forEach(c=>c.onclick=()=>showMuscleTankImage(Number(c.dataset.index)));document.getElementById('muscleTankPrev').onclick=()=>showMuscleTankImage(muscleTankIndex-1);document.getElementById('muscleTankNext').onclick=()=>showMuscleTankImage(muscleTankIndex+1);document.querySelectorAll('#muscleTankModal .muscle-size').forEach(b=>b.onclick=()=>{document.querySelectorAll('#muscleTankModal .muscle-size').forEach(x=>x.classList.remove('active'));b.classList.add('active')});'''
-          js_anchor="const bgMusic=document.getElementById('bgMusic')"
-          if js_anchor not in s: raise SystemExit('JS anchor missing')
-          s=s.replace(js_anchor,js+js_anchor,1)
+          start=s.index('<div class="modal" id="muscleTankModal">')
+          end=s.index('<div class="modal" id="leggingsModal">', start)
+          block=s[start:end]
+          # Correct mapping: White 0357/0358, Black 0355/0356, Natural 0353/0354,
+          # Dark Grey Heather 0351/0352, Pink 0349/2108.
+          mapping={
+            'IMG_0349.jpeg':'__PINK_FRONT__',
+            'IMG_0350.jpeg':'__PINK_BACK__',
+            'IMG_0351.jpeg':'__DG_FRONT__',
+            'IMG_0352.jpeg':'__DG_BACK__',
+            'IMG_0353.jpeg':'__NAT_FRONT__',
+            'IMG_0354.jpeg':'__NAT_BACK__',
+            'IMG_0355.jpeg':'__BLACK_FRONT__',
+            'IMG_0356.jpeg':'__BLACK_BACK__',
+            'IMG_0357.jpeg':'__WHITE_FRONT__',
+            'IMG_0358.jpeg':'__WHITE_BACK__'
+          }
+          for old,tmp in mapping.items(): block=block.replace(old,tmp)
+          final={
+            '__WHITE_FRONT__':'IMG_0357.jpeg','__WHITE_BACK__':'IMG_0358.jpeg',
+            '__BLACK_FRONT__':'IMG_0355.jpeg','__BLACK_BACK__':'IMG_0356.jpeg',
+            '__NAT_FRONT__':'IMG_0353.jpeg','__NAT_BACK__':'IMG_0354.jpeg',
+            '__DG_FRONT__':'IMG_0351.jpeg','__DG_BACK__':'IMG_0352.jpeg',
+            '__PINK_FRONT__':'IMG_0349.jpeg','__PINK_BACK__':'IMG_2108.jpeg'
+          }
+          for tmp,new in final.items(): block=block.replace(tmp,new)
+          # Reorder the ten gallery buttons by colour while preserving their correct labels.
+          import re
+          gallery_start=block.index('<div class="sports-gallery muscle-gallery">')
+          gallery_end=block.index('</div></div></div></div>', gallery_start)
+          gallery=block[gallery_start:gallery_end]
+          buttons=re.findall(r'<button class="thumb sports-thumb muscle-thumb.*?</button>', gallery)
+          by_label={re.search(r'data-label="([^"]+)"',b).group(1):b for b in buttons}
+          desired=['White front','White back','Black front','Black back','Natural front','Natural back','Dark Grey Heather front','Dark Grey Heather back','Pink front','Pink back']
+          if all(x in by_label for x in desired):
+              prefix='<div class="sports-gallery muscle-gallery">'
+              newgallery=prefix+''.join(by_label[x] for x in desired)
+              block=block[:gallery_start]+newgallery+block[gallery_end:]
+          # Ensure main image and card image start on White.
+          block=block.replace('id="muscleTankMain" src="IMG_0349.jpeg"','id="muscleTankMain" src="IMG_0357.jpeg"')
+          s=s[:start]+block+s[end:]
+          s=s.replace('<div class="product-image"><img src="IMG_0349.jpeg" alt="White Gangster Bougie Men’s Muscle Tank">','<div class="product-image"><img src="IMG_0357.jpeg" alt="White Gangster Bougie Men’s Muscle Tank">',1)
           p.write_text(s)
-      - name: Commit patch
+      - name: Commit fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Add Gangster Bougie Men’s Muscle Tank"
+          git commit -m "Fix Men’s Muscle Tank colour image mapping"
           git push origin main
