@@ -1,7 +1,7 @@
 name: Add Built Different Jersey
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened]
 permissions:
   contents: write
 jobs:
