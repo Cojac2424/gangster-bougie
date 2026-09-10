@@ -1,0 +1,31 @@
+name: Repair responsive layout
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: github.event.head_commit.message == 'Restore site and apply responsive sports control fix'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 4
+      - name: Restore site and add targeted responsive fix
+        shell: bash
+        run: |
+          git show HEAD~2:index.html > index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          css='''\n/* Keep expanded sports controls fully inside targeted viewports */\n@media (min-width:681px) and (max-width:900px), (min-width:901px) and (hover:hover){\n  .sports-info>.sports-divider,.sports-info>.sports-colour-line,.sports-info>.sports-colors,.sports-info>.sports-buy-row,.sports-info>.sports-preview-note{width:calc(200% + 18px);margin-left:calc(-100% - 18px);padding-left:18px;padding-right:18px}\n  .sports-info>.sports-colors{grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}\n  .sports-info>.sports-colors .sports-color{width:34px;height:34px;max-width:100%}\n  .sports-size-block .sizes{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:0 4px}\n  .sports-size-block .size{height:44px;min-width:0}\n  .sports-add{width:min(500px,68%)}\n}\n'''
+          s=s.replace('</style>',css+'</style>',1)
+          p.write_text(s)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Repair responsive sports controls"
+          git push
