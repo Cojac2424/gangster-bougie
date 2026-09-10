@@ -1,0 +1,39 @@
+name: Update sports bra backs
+on:
+  push:
+    paths:
+      - '.github/workflows/update-sports-bra-backs.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace old sports bra backs with branded backs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          replacements={
+            'IMG_0257.jpeg':'IMG_0273.jpeg',
+            'IMG_0256.jpeg':'IMG_0274.jpeg',
+            'IMG_0259.jpeg':'IMG_0275.jpeg',
+            'IMG_0261.jpeg':'IMG_0276.jpeg',
+            'IMG_0263.jpeg':'IMG_0277.jpeg',
+            'IMG_0265.jpeg':'IMG_0278.jpeg',
+            'IMG_0267.jpeg':'IMG_0279.jpeg',
+            'IMG_0269.jpeg':'IMG_0280.jpeg',
+          }
+          for old,new in replacements.items():
+              s=s.replace(old,new)
+          p.write_text(s)
+          PY
+      - name: Commit update
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Replace sports bra backs with What Hustle Looks Like versions'
+          git push
