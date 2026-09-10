@@ -1,0 +1,39 @@
+name: Add cap product
+on:
+  push:
+    paths:
+      - '.github/workflows/add-cap.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch cap product
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          old='<article class="product-card" data-category="accessories"><div class="product-accent"></div><div class="product-info"><div class="product-tag">Accessories</div><div class="product-name">Gangster Bougie Embroidered Flexfit Cap</div><div class="product-status">Launch item</div></div></article>'
+          new='<article class="product-card" data-category="accessories"><div class="product-image"><img src="IMG_0319.jpeg" alt="Gangster Bougie Embroidered Structured Cap"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Accessories • Drop 01</div><div class="product-name">Gangster Bougie Embroidered Structured Cap</div><div class="product-status">Black • US$39.99</div><button class="view-item" id="openCap">View Item</button></div></article>'
+          assert old in s
+          s=s.replace(old,new,1)
+          modal='<div class="modal" id="capModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeCap">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage"><img id="capMain" src="IMG_0319.jpeg" alt="Gangster Bougie cap front"><button class="sports-arrow prev" id="capPrev" aria-label="Previous cap image">‹</button><button class="sports-arrow next" id="capNext" aria-label="Next cap image">›</button></div><div class="sports-info"><h2>Gangster Bougie Embroidered Structured Cap</h2><div class="sports-price">US$39.99</div><p class="sports-description">A structured Gangster Bougie cap built for a clean, elevated streetwear look. Finished with signature embroidered branding and a gold “Baddie” detail for a bold luxury-street finish.</p><ul class="sports-benefits"><li>Structured 6-panel, mid-profile design</li><li>63% polyester, 34% cotton, 3% spandex twill</li><li>Signature Gangster Bougie front embroidery</li><li>Gold “Baddie” embroidery detail on the back</li></ul><hr class="sports-divider"><div class="sports-colour-line">Colour: <strong>Black</strong></div><div class="sports-buy-row"><div class="sports-size-block"><span class="option-label">Size:</span><div class="sizes cap-sizes"><button class="size cap-size">S/M</button><button class="size cap-size">L/XL</button></div></div><button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery cap-gallery"><button class="thumb sports-thumb cap-thumb active" data-img="IMG_0319.jpeg" data-label="Gangster Bougie cap front"><img src="IMG_0319.jpeg" alt="Gangster Bougie cap front"><span class="sports-thumb-label">Black<br>Front</span></button><button class="thumb sports-thumb cap-thumb" data-img="IMG_0320.jpeg" data-label="Gangster Bougie cap back"><img src="IMG_0320.jpeg" alt="Gangster Bougie cap back"><span class="sports-thumb-label">Black<br>Back</span></button></div></div></div></div>\n'
+          marker='<div class="modal" id="leggingsModal">'
+          assert marker in s
+          s=s.replace(marker,modal+marker,1)
+          js="const capModal=document.getElementById('capModal'),capMain=document.getElementById('capMain'),capThumbs=[...document.querySelectorAll('#capModal .cap-thumb')];let capIndex=0;function showCapImage(i){capIndex=(i+capThumbs.length)%capThumbs.length;const t=capThumbs[capIndex];capMain.src=t.dataset.img;capMain.alt=t.dataset.label||t.querySelector('img').alt;capThumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active')}document.getElementById('openCap').onclick=()=>{capModal.classList.add('open');document.body.style.overflow='hidden';showCapImage(capIndex)};function closeCapModal(){capModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeCap').onclick=closeCapModal;capModal.addEventListener('click',e=>{if(e.target===capModal)closeCapModal()});capThumbs.forEach((t,i)=>t.onclick=()=>showCapImage(i));document.getElementById('capPrev').onclick=()=>showCapImage(capIndex-1);document.getElementById('capNext').onclick=()=>showCapImage(capIndex+1);document.querySelectorAll('#capModal .cap-size').forEach(b=>b.onclick=()=>{document.querySelectorAll('#capModal .cap-size').forEach(x=>x.classList.remove('active'));b.classList.add('active')});"
+          marker2='const leggingsModal='
+          assert marker2 in s
+          s=s.replace(marker2,js+marker2,1)
+          css='\n/* Structured Cap uses product master layout */\n#capModal .cap-gallery{grid-template-columns:repeat(2,minmax(0,180px));justify-content:start}\n#capModal .cap-sizes{grid-template-columns:repeat(2,minmax(90px,160px));justify-content:start}\n#capModal .cap-size{width:100%;min-width:90px}\n@media(max-width:680px){#capModal .cap-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}#capModal .cap-sizes{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}}\n'
+          s=s.replace('</style>',css+'</style>',1)
+          p.write_text(s)
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git commit -m "Build structured cap product view"
+          git push
