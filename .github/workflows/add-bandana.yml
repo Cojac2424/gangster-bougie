@@ -1,0 +1,39 @@
+name: Add bandana product
+on:
+  push:
+    paths:
+      - '.github/workflows/add-bandana.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch bandana product
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          old='<article class="product-card" data-category="accessories"><div class="product-accent"></div><div class="product-info"><div class="product-tag">Accessories</div><div class="product-name">Gangster Bougie Mini Wrap Bandana</div><div class="product-status">Launch item</div></div></article>'
+          new='<article class="product-card" data-category="accessories"><div class="product-image"><img src="IMG_0321.jpeg" alt="Gangster Bougie Mini Wrap Bandana"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Accessories • Drop 01</div><div class="product-name">Gangster Bougie Mini Wrap Bandana</div><div class="product-status">27&quot; × 13&quot; • US$27.99</div><button class="view-item" id="openBandana">View Item</button></div></article>'
+          assert old in s
+          s=s.replace(old,new,1)
+          modal='<div class="modal" id="bandanaModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeBandana">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage"><img id="bandanaMain" src="IMG_0321.jpeg" alt="Gangster Bougie Mini Wrap Bandana view 1"><button class="sports-arrow prev" id="bandanaPrev" aria-label="Previous bandana image">‹</button><button class="sports-arrow next" id="bandanaNext" aria-label="Next bandana image">›</button></div><div class="sports-info"><h2>Gangster Bougie Mini Wrap Bandana</h2><div class="sports-price">US$27.99</div><p class="sports-description">A smaller take on the classic bandana, designed to be styled your way. Wear it around the wrist, upper arm, ankle, or tied around the neck for a bold Gangster Bougie finishing touch.</p><ul class="sports-benefits"><li>Approx. 27&quot; × 13&quot;</li><li>Lightweight triangular wrap design</li><li>Black, white and gold Gangster Bougie branding</li><li>Easy add-on piece for streetwear and activewear looks</li></ul><hr class="sports-divider"><div class="sports-colour-line">Design: <strong>Black • White • Gold</strong></div><div class="sports-buy-row bandana-buy-row"><div class="sports-size-block"><span class="option-label">Size:</span><div class="sizes bandana-sizes"><button class="size bandana-size active">27&quot; × 13&quot;</button></div></div><button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery bandana-gallery"><button class="thumb sports-thumb bandana-thumb active" data-img="IMG_0321.jpeg" data-label="Gangster Bougie Mini Wrap Bandana view 1"><img src="IMG_0321.jpeg" alt="Gangster Bougie Mini Wrap Bandana view 1"><span class="sports-thumb-label">View 1</span></button><button class="thumb sports-thumb bandana-thumb" data-img="IMG_0322.jpeg" data-label="Gangster Bougie Mini Wrap Bandana view 2"><img src="IMG_0322.jpeg" alt="Gangster Bougie Mini Wrap Bandana view 2"><span class="sports-thumb-label">View 2</span></button></div></div></div></div>\n'
+          marker='<div class="modal" id="leggingsModal">'
+          assert marker in s
+          s=s.replace(marker,modal+marker,1)
+          js="const bandanaModal=document.getElementById('bandanaModal'),bandanaMain=document.getElementById('bandanaMain'),bandanaThumbs=[...document.querySelectorAll('#bandanaModal .bandana-thumb')];let bandanaIndex=0;function showBandanaImage(i){bandanaIndex=(i+bandanaThumbs.length)%bandanaThumbs.length;const t=bandanaThumbs[bandanaIndex];bandanaMain.src=t.dataset.img;bandanaMain.alt=t.dataset.label||t.querySelector('img').alt;bandanaThumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active')}document.getElementById('openBandana').onclick=()=>{bandanaModal.classList.add('open');document.body.style.overflow='hidden';showBandanaImage(bandanaIndex)};function closeBandanaModal(){bandanaModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeBandana').onclick=closeBandanaModal;bandanaModal.addEventListener('click',e=>{if(e.target===bandanaModal)closeBandanaModal()});bandanaThumbs.forEach((t,i)=>t.onclick=()=>showBandanaImage(i));document.getElementById('bandanaPrev').onclick=()=>showBandanaImage(bandanaIndex-1);document.getElementById('bandanaNext').onclick=()=>showBandanaImage(bandanaIndex+1);"
+          marker2='const leggingsModal='
+          assert marker2 in s
+          s=s.replace(marker2,js+marker2,1)
+          css='\n/* Mini Wrap Bandana uses product master layout */\n#bandanaModal .bandana-gallery{grid-template-columns:repeat(2,minmax(0,180px));justify-content:start}\n#bandanaModal .bandana-sizes{display:grid;grid-template-columns:minmax(120px,190px);justify-content:start}\n#bandanaModal .bandana-size{width:100%;min-width:120px;padding:0 10px;white-space:nowrap}\n@media(max-width:680px){#bandanaModal .bandana-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}#bandanaModal .bandana-sizes{grid-template-columns:minmax(0,1fr);width:100%}#bandanaModal .bandana-size{width:100%;min-width:0}}\n'
+          s=s.replace('</style>',css+'</style>',1)
+          p.write_text(s)
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git commit -m "Build mini wrap bandana product view"
+          git push
