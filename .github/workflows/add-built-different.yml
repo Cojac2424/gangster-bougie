@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Correct Muscle Tank image mapping
+      - name: Correct White and Pink Muscle Tank images
         shell: python
         run: |
           from pathlib import Path
@@ -20,50 +20,24 @@ jobs:
           start=s.index('<div class="modal" id="muscleTankModal">')
           end=s.index('<div class="modal" id="leggingsModal">', start)
           block=s[start:end]
-          # Correct mapping: White 0357/0358, Black 0355/0356, Natural 0353/0354,
-          # Dark Grey Heather 0351/0352, Pink 0349/2108.
-          mapping={
-            'IMG_0349.jpeg':'__PINK_FRONT__',
-            'IMG_0350.jpeg':'__PINK_BACK__',
-            'IMG_0351.jpeg':'__DG_FRONT__',
-            'IMG_0352.jpeg':'__DG_BACK__',
-            'IMG_0353.jpeg':'__NAT_FRONT__',
-            'IMG_0354.jpeg':'__NAT_BACK__',
-            'IMG_0355.jpeg':'__BLACK_FRONT__',
-            'IMG_0356.jpeg':'__BLACK_BACK__',
-            'IMG_0357.jpeg':'__WHITE_FRONT__',
-            'IMG_0358.jpeg':'__WHITE_BACK__'
-          }
-          for old,tmp in mapping.items(): block=block.replace(old,tmp)
-          final={
-            '__WHITE_FRONT__':'IMG_0357.jpeg','__WHITE_BACK__':'IMG_0358.jpeg',
-            '__BLACK_FRONT__':'IMG_0355.jpeg','__BLACK_BACK__':'IMG_0356.jpeg',
-            '__NAT_FRONT__':'IMG_0353.jpeg','__NAT_BACK__':'IMG_0354.jpeg',
-            '__DG_FRONT__':'IMG_0351.jpeg','__DG_BACK__':'IMG_0352.jpeg',
-            '__PINK_FRONT__':'IMG_0349.jpeg','__PINK_BACK__':'IMG_2108.jpeg'
-          }
-          for tmp,new in final.items(): block=block.replace(tmp,new)
-          # Reorder the ten gallery buttons by colour while preserving their correct labels.
-          import re
-          gallery_start=block.index('<div class="sports-gallery muscle-gallery">')
-          gallery_end=block.index('</div></div></div></div>', gallery_start)
-          gallery=block[gallery_start:gallery_end]
-          buttons=re.findall(r'<button class="thumb sports-thumb muscle-thumb.*?</button>', gallery)
-          by_label={re.search(r'data-label="([^"]+)"',b).group(1):b for b in buttons}
-          desired=['White front','White back','Black front','Black back','Natural front','Natural back','Dark Grey Heather front','Dark Grey Heather back','Pink front','Pink back']
-          if all(x in by_label for x in desired):
-              prefix='<div class="sports-gallery muscle-gallery">'
-              newgallery=prefix+''.join(by_label[x] for x in desired)
-              block=block[:gallery_start]+newgallery+block[gallery_end:]
-          # Ensure main image and card image start on White.
-          block=block.replace('id="muscleTankMain" src="IMG_0349.jpeg"','id="muscleTankMain" src="IMG_0357.jpeg"')
+          old_white_front='<button class="thumb sports-thumb muscle-thumb active" data-img="IMG_0349.jpeg" data-label="White front" data-colour="White"><img src="IMG_0349.jpeg" alt="White front"><span class="sports-thumb-label">White<br>Front</span></button>'
+          new_white_front='<button class="thumb sports-thumb muscle-thumb active" data-img="IMG_0357.jpeg" data-label="White front" data-colour="White"><img src="IMG_0357.jpeg" alt="White front"><span class="sports-thumb-label">White<br>Front</span></button>'
+          old_white_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_2108.jpeg" data-label="White back" data-colour="White"><img src="IMG_2108.jpeg" alt="White back"><span class="sports-thumb-label">White<br>Back</span></button>'
+          new_white_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0358.jpeg" data-label="White back" data-colour="White"><img src="IMG_0358.jpeg" alt="White back"><span class="sports-thumb-label">White<br>Back</span></button>'
+          old_pink_front='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0357.jpeg" data-label="Pink front" data-colour="Pink"><img src="IMG_0357.jpeg" alt="Pink front"><span class="sports-thumb-label">Pink<br>Front</span></button>'
+          new_pink_front='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0349.jpeg" data-label="Pink front" data-colour="Pink"><img src="IMG_0349.jpeg" alt="Pink front"><span class="sports-thumb-label">Pink<br>Front</span></button>'
+          old_pink_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_0358.jpeg" data-label="Pink back" data-colour="Pink"><img src="IMG_0358.jpeg" alt="Pink back"><span class="sports-thumb-label">Pink<br>Back</span></button>'
+          new_pink_back='<button class="thumb sports-thumb muscle-thumb" data-img="IMG_2108.jpeg" data-label="Pink back" data-colour="Pink"><img src="IMG_2108.jpeg" alt="Pink back"><span class="sports-thumb-label">Pink<br>Back</span></button>'
+          for old,new in [(old_white_front,new_white_front),(old_white_back,new_white_back),(old_pink_front,new_pink_front),(old_pink_back,new_pink_back)]:
+              if old not in block: raise SystemExit('Expected Muscle Tank gallery entry missing')
+              block=block.replace(old,new,1)
+          block=block.replace('id="muscleTankMain" src="IMG_0357.jpeg" alt="White front"','id="muscleTankMain" src="IMG_0357.jpeg" alt="White front"',1)
           s=s[:start]+block+s[end:]
-          s=s.replace('<div class="product-image"><img src="IMG_0349.jpeg" alt="White Gangster Bougie Men’s Muscle Tank">','<div class="product-image"><img src="IMG_0357.jpeg" alt="White Gangster Bougie Men’s Muscle Tank">',1)
           p.write_text(s)
       - name: Commit fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Fix Men’s Muscle Tank colour image mapping"
+          git commit -m "Correct White and Pink Muscle Tank images"
           git push origin main
