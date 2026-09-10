@@ -1,1 +1,36 @@
-x
+name: Add Built Different Jersey
+on:
+  pull_request:
+    types: [opened]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch product
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          card='<article class="product-card" data-category="mens activewear tops"><div class="product-image"><img src="IMG_0345.jpeg" alt="Black Gangster Bougie Built Different Basketball Jersey"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Men’s • Basketball</div><div class="product-name">Gangster Bougie “Built Different” Basketball Jersey</div><div class="product-status">Black • US$64.99</div><button class="view-item" id="openBuiltDifferentJersey">View Item</button></div></article>'
+          anchor='</article></div></div></section>\n<section class="category-strip">'
+          if 'id="openBuiltDifferentJersey"' not in s: s=s.replace(anchor,'</article>'+card+'</div></div></section>\n<section class="category-strip">',1)
+          modal='''<div class="modal" id="builtDifferentJerseyModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeBuiltDifferentJersey">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage"><img id="builtDifferentJerseyMain" src="IMG_0345.jpeg" alt="Black front"><button class="sports-arrow prev" id="builtDifferentJerseyPrev">‹</button><button class="sports-arrow next" id="builtDifferentJerseyNext">›</button></div><div class="sports-info"><h2>Gangster Bougie “Built Different” Basketball Jersey</h2><div class="sports-price">US$64.99</div><p class="sports-description">A bold performance basketball jersey built for the court, the gym, and everyday streetwear. The single-colour black design combines lightweight performance construction with the Gangster Bougie “Built Different” attitude.</p><ul class="sports-benefits"><li>100% moisture-wicking polyester</li><li>Extra-light 4 oz/yd² (136 g/m²) performance fabric</li><li>Odor-resistant fabric</li><li>Sleeveless basketball cut with signature Gangster Bougie branding</li></ul><hr class="sports-divider"><div class="sports-colour-line">Colour: <strong>Black</strong></div><div class="sports-buy-row"><div class="sports-size-block"><span class="option-label">Size:</span><div class="sizes"><button class="size built-different-size">XS</button><button class="size built-different-size">S</button><button class="size built-different-size">M</button><button class="size built-different-size">L</button><button class="size built-different-size">XL</button><button class="size built-different-size">2XL</button></div></div><button class="sports-add" type="button"><span>🛒</span>Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery built-different-gallery"><button class="thumb sports-thumb built-different-thumb active" data-img="IMG_0345.jpeg" data-label="Black front"><img src="IMG_0345.jpeg" alt="Black front"><span class="sports-thumb-label">Black<br>Front</span></button><button class="thumb sports-thumb built-different-thumb" data-img="IMG_0346.jpeg" data-label="Black back"><img src="IMG_0346.jpeg" alt="Black back"><span class="sports-thumb-label">Black<br>Back</span></button></div></div></div></div>\n'''
+          if 'id="builtDifferentJerseyModal"' not in s: s=s.replace('<div class="modal" id="leggingsModal">',modal+'<div class="modal" id="leggingsModal">',1)
+          css='\n/* Built Different Basketball Jersey */\n#builtDifferentJerseyModal .built-different-gallery{grid-template-columns:repeat(2,minmax(0,180px));justify-content:start}\n#builtDifferentJerseyModal .sports-size-block .sizes{grid-template-columns:repeat(6,minmax(0,1fr))}\n@media(max-width:680px){#builtDifferentJerseyModal .built-different-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}#builtDifferentJerseyModal .sports-size-block .sizes{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}#builtDifferentJerseyModal .built-different-size{font-size:.72rem;padding:0}}\n'
+          if '/* Built Different Basketball Jersey */' not in s: s=s.replace('</style></head>',css+'</style></head>',1)
+          js="""const builtDifferentJerseyModal=document.getElementById('builtDifferentJerseyModal'),builtDifferentJerseyMain=document.getElementById('builtDifferentJerseyMain'),builtDifferentJerseyThumbs=[...document.querySelectorAll('#builtDifferentJerseyModal .built-different-thumb')];let builtDifferentJerseyIndex=0;function showBuiltDifferentJerseyImage(i){builtDifferentJerseyIndex=(i+builtDifferentJerseyThumbs.length)%builtDifferentJerseyThumbs.length;const t=builtDifferentJerseyThumbs[builtDifferentJerseyIndex];builtDifferentJerseyMain.src=t.dataset.img;builtDifferentJerseyMain.alt=t.dataset.label||t.querySelector('img').alt;builtDifferentJerseyThumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active')}document.getElementById('openBuiltDifferentJersey').onclick=()=>{builtDifferentJerseyModal.classList.add('open');document.body.style.overflow='hidden';showBuiltDifferentJerseyImage(builtDifferentJerseyIndex)};function closeBuiltDifferentJerseyModal(){builtDifferentJerseyModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeBuiltDifferentJersey').onclick=closeBuiltDifferentJerseyModal;builtDifferentJerseyModal.addEventListener('click',e=>{if(e.target===builtDifferentJerseyModal)closeBuiltDifferentJerseyModal()});builtDifferentJerseyThumbs.forEach((t,i)=>t.onclick=()=>showBuiltDifferentJerseyImage(i));document.getElementById('builtDifferentJerseyPrev').onclick=()=>showBuiltDifferentJerseyImage(builtDifferentJerseyIndex-1);document.getElementById('builtDifferentJerseyNext').onclick=()=>showBuiltDifferentJerseyImage(builtDifferentJerseyIndex+1);document.querySelectorAll('#builtDifferentJerseyModal .built-different-size').forEach(b=>b.onclick=()=>{document.querySelectorAll('#builtDifferentJerseyModal .built-different-size').forEach(x=>x.classList.remove('active'));b.classList.add('active')});"""
+          if 'const builtDifferentJerseyModal=' not in s: s=s.replace('const bgMusic=',js+'const bgMusic=',1)
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add Built Different basketball jersey"
+          git push origin main
