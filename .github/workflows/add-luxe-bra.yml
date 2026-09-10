@@ -1,0 +1,39 @@
+name: Add Luxe Bra product
+on:
+  push:
+    paths:
+      - '.github/workflows/add-luxe-bra.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch Luxe Bra product
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          old='<article class="product-card" data-category="activewear tops"><div class="product-accent"></div><div class="product-info"><div class="product-tag">Activewear</div><div class="product-name">Women’s Luxe Bra</div><div class="product-status">Launch item</div></div></article>'
+          new='<article class="product-card" data-category="activewear tops"><div class="product-image"><img src="IMG_0325.jpeg" alt="Charcoal Gangster Bougie Women’s Luxe Bra"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Activewear • Drop 01</div><div class="product-name">Gangster Bougie Women’s Luxe Bra</div><div class="product-status">Black • Charcoal • US$59.99</div><button class="view-item" id="openLuxeBra">View Item</button></div></article>'
+          assert old in s
+          s=s.replace(old,new,1)
+          modal='<div class="modal" id="luxeBraModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeLuxeBra">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage"><img id="luxeMain" src="IMG_0325.jpeg" alt="Charcoal front"><button class="sports-arrow prev" id="luxePrev" aria-label="Previous Luxe Bra image">‹</button><button class="sports-arrow next" id="luxeNext" aria-label="Next Luxe Bra image">›</button></div><div class="sports-info"><h2>Gangster Bougie Women’s Luxe Bra</h2><div class="sports-price">US$59.99</div><p class="sports-description">A sleek, fitted activewear top designed for gym sessions, everyday movement, and layered streetwear looks. Finished with signature Gangster Bougie branding for a clean, premium athletic style.</p><ul class="sports-benefits"><li>Women’s fitted activewear bra</li><li>Stretch performance fabric</li><li>Designed for movement and everyday wear</li><li>Pairs with Gangster Bougie leggings and workout shorts</li></ul><hr class="sports-divider"><div class="sports-colour-line">Colour: <strong id="luxeColourName">Charcoal</strong></div><div class="sports-colors luxe-colors"><button class="sports-color charcoal active" data-index="0" aria-label="Charcoal"></button><button class="sports-color black" data-index="2" aria-label="Black"></button></div><div class="sports-buy-row"><div class="sports-size-block"><span class="option-label">Size:</span><div class="sizes"><button class="size luxe-size">XS</button><button class="size luxe-size">S</button><button class="size luxe-size">M</button><button class="size luxe-size">L</button><button class="size luxe-size">XL</button><button class="size luxe-size">2XL</button></div></div><button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery luxe-gallery"><button class="thumb sports-thumb luxe-thumb active" data-img="IMG_0325.jpeg" data-label="Charcoal front" data-colour="Charcoal"><img src="IMG_0325.jpeg" alt="Charcoal front"><span class="sports-thumb-label">Charcoal<br>Front</span></button><button class="thumb sports-thumb luxe-thumb" data-img="IMG_0326.jpeg" data-label="Charcoal back" data-colour="Charcoal"><img src="IMG_0326.jpeg" alt="Charcoal back"><span class="sports-thumb-label">Charcoal<br>Back</span></button><button class="thumb sports-thumb luxe-thumb" data-img="IMG_0323.jpeg" data-label="Black front" data-colour="Black"><img src="IMG_0323.jpeg" alt="Black front"><span class="sports-thumb-label">Black<br>Front</span></button><button class="thumb sports-thumb luxe-thumb" data-img="IMG_0324.jpeg" data-label="Black back" data-colour="Black"><img src="IMG_0324.jpeg" alt="Black back"><span class="sports-thumb-label">Black<br>Back</span></button></div></div></div></div>\n'
+          marker='<div class="modal" id="sportsBraModal">'
+          assert marker in s
+          s=s.replace(marker,modal+marker,1)
+          js="const luxeModal=document.getElementById('luxeBraModal'),luxeMain=document.getElementById('luxeMain'),luxeColourName=document.getElementById('luxeColourName'),luxeThumbs=[...document.querySelectorAll('#luxeBraModal .luxe-thumb')],luxeColours=[...document.querySelectorAll('#luxeBraModal .luxe-colors .sports-color')],luxeSizes=[...document.querySelectorAll('#luxeBraModal .luxe-size')];let luxeIndex=0;function showLuxeImage(i){luxeIndex=(i+luxeThumbs.length)%luxeThumbs.length;const t=luxeThumbs[luxeIndex];luxeMain.src=t.dataset.img;luxeMain.alt=t.dataset.label||t.querySelector('img').alt;luxeColourName.textContent=t.dataset.colour;luxeThumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active');luxeColours.forEach(x=>x.classList.toggle('active',Number(x.dataset.index)===Math.floor(luxeIndex/2)*2))}document.getElementById('openLuxeBra').onclick=()=>{luxeModal.classList.add('open');document.body.style.overflow='hidden';showLuxeImage(luxeIndex)};function closeLuxeBraModal(){luxeModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeLuxeBra').onclick=closeLuxeBraModal;luxeModal.addEventListener('click',e=>{if(e.target===luxeModal)closeLuxeBraModal()});luxeThumbs.forEach((t,i)=>t.onclick=()=>showLuxeImage(i));luxeColours.forEach(t=>t.onclick=()=>showLuxeImage(Number(t.dataset.index)));luxeSizes.forEach(t=>t.onclick=()=>{luxeSizes.forEach(x=>x.classList.remove('active'));t.classList.add('active')});document.getElementById('luxePrev').onclick=()=>showLuxeImage(luxeIndex-1);document.getElementById('luxeNext').onclick=()=>showLuxeImage(luxeIndex+1);"
+          marker2="const sportsModal=document.getElementById('sportsBraModal')"
+          assert marker2 in s
+          s=s.replace(marker2,js+marker2,1)
+          css='\n/* Women’s Luxe Bra product view */\n#luxeBraModal .luxe-gallery{grid-template-columns:repeat(4,minmax(0,1fr))}\n@media(max-width:680px){#luxeBraModal .luxe-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}\n'
+          s=s.replace('</style>',css+'</style>',1)
+          p.write_text(s)
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git commit -m "Build Women’s Luxe Bra product view"
+          git push
