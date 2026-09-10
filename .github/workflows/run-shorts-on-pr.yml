@@ -1,0 +1,22 @@
+name: Run shorts patch
+on:
+  pull_request:
+    types: [opened]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply shorts patch
+        run: python .github/scripts/patch_shorts.py
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git commit -m "Build workout shorts product view"
+          git push origin main
