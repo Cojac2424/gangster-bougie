@@ -1,0 +1,39 @@
+name: One-time sports bra product page patch
+on:
+  push:
+    paths:
+      - '.github/workflows/one-time-sports-bra.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch sports bra card and modal
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old='<article class="product-card" data-category="activewear tops"><div class="product-accent"></div><div class="product-info"><div class="product-tag">Activewear</div><div class="product-name">Polyester Sports Bra (AOP)</div><div class="product-status">Launch item</div></div></article>'
+          new='<article class="product-card" data-category="activewear tops"><div class="product-image"><img src="IMG_0254.jpeg" alt="Gangster Bougie Sports Bra"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">Activewear • Drop 01</div><div class="product-name">Gangster Bougie Sports Bra</div><div class="product-status">Multiple colourways • US$39.99</div><button class="view-item" id="openSportsBra">View Item</button></div></article>'
+          if old not in s: raise SystemExit('Sports bra card target not found')
+          s=s.replace(old,new,1)
+          marker='<audio id="bgMusic"'
+          thumbs=''.join(f'<button class="thumb sports-thumb{" active" if i==254 else ""}" data-img="IMG_{i:04d}.jpeg"><img src="IMG_{i:04d}.jpeg" alt="Sports bra view"></button>' for i in range(254,269))
+          modal=f'<div class="modal" id="sportsBraModal"><div class="modal-box"><button class="modal-close" id="closeSportsBra">×</button><div class="product-detail"><div><div class="main-product-photo"><img id="sportsMain" src="IMG_0254.jpeg" alt="Gangster Bougie Sports Bra"></div><div class="thumbs">{thumbs}</div></div><div class="detail-copy"><div class="eyebrow">Activewear • Drop 01</div><h2>Gangster Bougie Sports Bra</h2><p>A sleek Gangster Bougie activewear top designed for workouts, movement and matching sets. Built to bring the brand’s street-luxe attitude into an athletic silhouette.</p><span class="option-label">Price</span><div style="font-family:\'Bodoni Moda\',serif;font-size:1.65rem;color:var(--gold-light);font-weight:800">US$39.99</div><span class="option-label">Colour</span><div class="product-status" style="padding-top:0">Multiple colourways — select a product image above to preview each look.</div><span class="option-label">Size</span><div class="sizes"><button class="size sports-size">S</button><button class="size sports-size">M</button><button class="size sports-size">L</button><button class="size sports-size">XL</button><button class="size sports-size">2XL</button></div><div class="detail-note">Product preview. Canadian pricing and live checkout will be added when the store purchasing system is connected.</div></div></div><div class="lifestyle-strip"><img src="IMG_0267.jpeg" alt="Gangster Bougie Sports Bra lifestyle"><img src="IMG_0268.jpeg" alt="Gangster Bougie Sports Bra lifestyle"></div></div></div>\n'
+          if marker not in s: raise SystemExit('Audio marker not found')
+          s=s.replace(marker,modal+marker,1)
+          jsmarker='const bgMusic=document.getElementById(\'bgMusic\')'
+          sports="const sportsModal=document.getElementById('sportsBraModal'),sportsMain=document.getElementById('sportsMain');document.getElementById('openSportsBra').onclick=()=>{sportsModal.classList.add('open');document.body.style.overflow='hidden'};function closeSportsModal(){sportsModal.classList.remove('open');document.body.style.overflow=''}document.getElementById('closeSportsBra').onclick=closeSportsModal;sportsModal.addEventListener('click',e=>{if(e.target===sportsModal)closeSportsModal()});document.querySelectorAll('.sports-thumb').forEach(t=>t.onclick=()=>{sportsMain.src=t.dataset.img;document.querySelectorAll('.sports-thumb').forEach(x=>x.classList.remove('active'));t.classList.add('active')});document.querySelectorAll('.sports-size').forEach(b=>b.onclick=()=>{document.querySelectorAll('.sports-size').forEach(x=>x.classList.remove('active'));b.classList.add('active')});"
+          if jsmarker not in s: raise SystemExit('JS marker not found')
+          s=s.replace(jsmarker,sports+jsmarker,1)
+          p.write_text(s)
+      - name: Commit product page
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Build sports bra product and View Item section"
+          git push
