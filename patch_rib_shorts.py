@@ -3,39 +3,36 @@ import re
 p=Path('index.html')
 s=p.read_text()
 
-# Reorder only the existing Shop filter buttons: Women's, Men's, Accessories, Tops, Outerwear, All.
-m=re.search(r'(<div class="filter-row"[^>]*>)(.*?)(</div>)',s,re.S)
-if not m:
-    raise SystemExit('Shop filter row not found')
-body=m.group(2)
-buttons=re.findall(r'<button class="filter-btn(?: active)?" data-filter="([^"]+)"[^>]*>.*?</button>',body,re.S)
-wanted=['womens','mens','accessories','tops','outerwear','all']
-if not all(x in buttons for x in wanted):
-    raise SystemExit('Expected Shop filters not found')
-parts={}
-for match in re.finditer(r'<button class="filter-btn(?: active)?" data-filter="([^"]+)"[^>]*>.*?</button>',body,re.S):
-    parts[match.group(1)]=match.group(0)
-ordered=[]
-for key in wanted:
-    b=re.sub(r'class="filter-btn active"', 'class="filter-btn"', parts[key])
-    if key=='womens':
-        b=b.replace('class="filter-btn"','class="filter-btn active"',1)
-    ordered.append(b)
-newbody='\n          '+'\n          '.join(ordered)+'\n        '
-s=s[:m.start(2)]+newbody+s[m.end(2):]
+# Remove only the Outerwear filter button. Outerwear products remain available in Women's and All.
+s=re.sub(r'\s*<button class="filter-btn(?: active)?" data-filter="outerwear"[^>]*>.*?</button>', '', s, count=1, flags=re.S)
 
-# The carousel should open immediately on Women's and follow whichever filter is selected afterward.
-old='''// Initial page load must always open with the full All collection already rendered.
- const initialBtn=filterRow.querySelector('.filter-btn[data-filter="all"]');
- filterRow.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
- if(initialBtn) initialBtn.classList.add('active');
- applyFilter('all');'''
-new='''// Initial page load opens immediately on the first Shop category: Women's.
- const initialBtn=filterRow.querySelector('.filter-btn[data-filter="womens"]');
- filterRow.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
- if(initialBtn) initialBtn.classList.add('active');
- applyFilter('womens');'''
+# Replace the carousel's category-click handling so one click owns the state completely.
+# Stop the site's older filter listener from also changing card display/classes after the carousel handles it.
+old='''filterRow.addEventListener('click',e=>{
+   const btn=e.target.closest('.filter-btn');if(!btn)return;
+   setTimeout(()=>applyFilter(btn.dataset.filter||'all'),0);
+ });'''
+new='''filterRow.addEventListener('click',e=>{
+   const btn=e.target.closest('.filter-btn');if(!btn)return;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   const filter=btn.dataset.filter||'all';
+   filterRow.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
+   // Reset every card before loading the new category so no scrolled/previous state can leak across.
+   allCards.forEach(card=>{
+     card.classList.remove('gb-center','gb-far');
+     card.style.transform='';
+     card.style.opacity='';
+     card.style.filter='';
+     card.style.zIndex='';
+     card.style.pointerEvents='';
+   });
+   startX=null;
+   dragged=false;
+   active=0;
+   applyFilter(filter);
+ },true);'''
 if old not in s:
-    raise SystemExit('Current carousel startup block not found')
+    raise SystemExit('Carousel filter listener not found')
 s=s.replace(old,new,1)
 p.write_text(s)
