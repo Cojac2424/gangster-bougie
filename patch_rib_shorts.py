@@ -10,9 +10,12 @@ swipe='''
 
 // Touch swipe for product View Item main-image stages. Existing arrow buttons remain unchanged.
 (function(){
- const stages=[...document.querySelectorAll('.sports-stage')];
+ const arrowSelector='.sports-arrow,.luxe-arrow,.leggings-arrow,.shorts-arrow,.cap-arrow,.bandana-arrow,.mens-jersey-arrow,.built-jersey-arrow,.muscle-tank-arrow,.sweatpants-arrow,.rib-shorts-arrow,.fashion-hoodie-arrow,.performance-tee-arrow,.gym-bottle-arrow,.travel-bag-arrow,.yoga-mat-arrow,.gym-bag-arrow,.gym-towel-arrow';
+ const stages=[...new Set([...document.querySelectorAll(arrowSelector)].map(a=>a.parentElement).filter(Boolean))];
  stages.forEach(stage=>{
    if(stage.dataset.gbSwipe==='1') return;
+   const arrows=[...stage.querySelectorAll(arrowSelector)];
+   if(arrows.length<2) return;
    stage.dataset.gbSwipe='1';
    stage.style.touchAction='pan-y';
    let startX=null,startY=null;
@@ -25,7 +28,7 @@ swipe='''
      const dx=e.clientX-startX,dy=e.clientY-startY;
      startX=null;startY=null;
      if(Math.abs(dx)<45||Math.abs(dx)<=Math.abs(dy)) return;
-     const arrow=stage.querySelector(dx<0?'.sports-arrow.next':'.sports-arrow.prev');
+     const arrow=dx<0?arrows[arrows.length-1]:arrows[0];
      if(arrow) arrow.click();
    });
    stage.addEventListener('pointercancel',()=>{startX=null;startY=null;});
