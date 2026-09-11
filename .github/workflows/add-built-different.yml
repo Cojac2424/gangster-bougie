@@ -18,16 +18,11 @@ jobs:
           p=Path('index.html')
           s=p.read_text()
           old='<article class="product-card" data-category="mens"><div class="product-image"><img src="IMG_0360.jpeg" alt="Gangster Bougie Embroidered Fleece Sweatpants"><button class="quick-view" id="openSweatpants">Quick View</button></div><div class="product-info"><h3>Gangster Bougie Embroidered Fleece Sweatpants</h3><p>8 colourways • US$69.99</p></div></article>'
-          # Match the same card/button structure used by the existing working men’s products.
           new='<article class="product-card" data-category="mens"><img src="IMG_0360.jpeg" alt="Gangster Bougie Embroidered Fleece Sweatpants"><div class="product-info"><h3>Gangster Bougie Embroidered Fleece Sweatpants</h3><p>8 colourways • US$69.99</p><button class="product-btn" id="openSweatpants">View Item</button></div></article>'
           if old not in s: raise SystemExit('Expected sweatpants card not found')
           s=s.replace(old,new,1)
-          # Bring the sweatpants modal onto the same modal-box/sports-layout classes as the working product views.
           s=s.replace('<div class="modal" id="sweatpantsModal"><div class="modal-panel sports-panel"><button class="modal-back" id="closeSweatpants">Back</button><div class="sports-top"><div class="sports-stage">','<div class="modal" id="sweatpantsModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeSweatpants">×</button><div class="sports-layout"><div class="main-product-photo sports-main-wrap sports-stage">',1)
           s=s.replace('</div><div class="sports-details"><h2>Gangster Bougie Embroidered Fleece Sweatpants</h2>','</div><div class="sports-info"><h2>Gangster Bougie Embroidered Fleece Sweatpants</h2>',1)
-          # Use the established modal opening class used elsewhere on the site.
-          s=s.replace("open&&open.addEventListener('click',()=>{modal.classList.add('open');show(0)})","open&&open.addEventListener('click',()=>{modal.classList.add('show');show(0)})",1)
-          s=s.replace("close&&close.addEventListener('click',()=>modal.classList.remove('open'))","close&&close.addEventListener('click',()=>modal.classList.remove('show'))",1)
           p.write_text(s)
       - name: Commit fix
         run: |
