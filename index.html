@@ -626,22 +626,6 @@
 })();
 
 (function(){
- const grid=document.querySelector('#shop .products');
- if(!grid) return;
- const cards=[...grid.querySelectorAll('.product-card')];
- const rank=card=>{
-   const cats=(card.dataset.category||'').split(/\s+/);
-   if(cats.includes('womens')) return 1;
-   if(cats.includes('mens')) return 2;
-   if(cats.includes('accessories')) return 3;
-   return 4;
- };
- cards.map((card,index)=>({card,index,rank:rank(card)}))
-      .sort((a,b)=>a.rank-b.rank||a.index-b.index)
-      .forEach(x=>grid.appendChild(x.card));
-})();
-
-(function(){
  const shop=document.getElementById('shop');
  const grid=shop&&shop.querySelector('.products');
  const filterRow=shop&&shop.querySelector('.filter-row');
@@ -706,34 +690,49 @@
    const idx=visible.indexOf(card);
    if(idx!==active){e.preventDefault();e.stopPropagation();active=idx;render();}
  });
- grid.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;startX=e.clientX;dragged=false;});
+ let gestureToken=0;
+ grid.addEventListener('pointerdown',e=>{
+   if(e.pointerType==='mouse'&&e.button!==0)return;
+   startX=e.clientX;dragged=false;
+   grid.dataset.gesture=String(++gestureToken);
+ });
  grid.addEventListener('pointermove',e=>{if(startX===null)return;if(Math.abs(e.clientX-startX)>12)dragged=true;});
- grid.addEventListener('pointerup',e=>{if(startX===null)return;const dx=e.clientX-startX;startX=null;if(Math.abs(dx)>45)move(dx<0?1:-1);});
- grid.addEventListener('pointercancel',()=>{startX=null});
+ grid.addEventListener('pointerup',e=>{
+   if(startX===null)return;
+   const dx=e.clientX-startX;
+   startX=null;
+   if(Math.abs(dx)>45)move(dx<0?1:-1);
+ });
+ grid.addEventListener('pointercancel',()=>{startX=null;dragged=false;++gestureToken;});
 
- // Use the site's existing filter buttons, but render matching cards in the carousel.
- // Own category selection at the button level so the older filter-row handler cannot
- // run first and leave the previously scrolled Accessories cards visible.
+ // Category changes are atomic: cancel any unfinished carousel gesture first,
+ // then rebuild the selected category exactly once.
+ function selectCategory(btn){
+   const filter=btn.dataset.filter||'all';
+   startX=null;
+   dragged=false;
+   ++gestureToken;
+   filterRow.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
+   allCards.forEach(card=>{
+     card.classList.remove('gb-center','gb-far');
+     card.style.display='none';
+     card.style.transform='';
+     card.style.opacity='';
+     card.style.filter='';
+     card.style.zIndex='';
+     card.style.pointerEvents='';
+   });
+   active=0;
+   applyFilter(filter);
+ }
  filterRow.querySelectorAll('.filter-btn').forEach(btn=>{
+   // pointerdown runs before click on touch devices. Cancel the old carousel gesture here,
+   // before the category tap can inherit the last swipe state.
+   btn.addEventListener('pointerdown',()=>{startX=null;dragged=false;++gestureToken;},true);
    btn.addEventListener('click',e=>{
      e.preventDefault();
      e.stopImmediatePropagation();
-     const filter=btn.dataset.filter||'all';
-     filterRow.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
-     // Hard reset the complete carousel before building the newly selected category.
-     allCards.forEach(card=>{
-       card.classList.remove('gb-center','gb-far');
-       card.style.display='none';
-       card.style.transform='';
-       card.style.opacity='';
-       card.style.filter='';
-       card.style.zIndex='';
-       card.style.pointerEvents='';
-     });
-     startX=null;
-     dragged=false;
-     active=0;
-     applyFilter(filter);
+     selectCategory(btn);
    },true);
  });
  // Initial page load opens immediately on the first Shop category: Women's.
