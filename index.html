@@ -710,7 +710,11 @@
    const btn=e.target.closest('.filter-btn');if(!btn)return;
    setTimeout(()=>applyFilter(btn.dataset.filter||'all'),0);
  });
- applyFilter((filterRow.querySelector('.filter-btn.active')||{}).dataset||'all');
+ // Initial page load must always open with the full All collection already rendered.
+ const initialBtn=filterRow.querySelector('.filter-btn[data-filter="all"]');
+ filterRow.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+ if(initialBtn) initialBtn.classList.add('active');
+ applyFilter('all');
 })();
 </script>
 </body></html>
