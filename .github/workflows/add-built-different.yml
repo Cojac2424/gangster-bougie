@@ -1,4 +1,4 @@
-name: Fix Sweatpants Exact Card Template
+name: Add Basketball Rib Shorts
 on:
   pull_request:
     types: [opened, reopened]
@@ -11,24 +11,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Rebuild sweatpants exterior card with established product classes
+      - name: Add rib shorts using established product template
         shell: python
         run: |
           from pathlib import Path
           p=Path('index.html'); s=p.read_text()
+          # Duplicate the exact established Sweatpants exterior card and replace product data only.
           marker='<button class="view-item" id="openSweatpants">VIEW ITEM</button>'
-          pos=s.index(marker)
-          start=s.rfind('<article',0,pos)
-          end=s.index('</article>',pos)+len('</article>')
-          # These are the exact site classes that control the working cards:
-          # product-image + product-accent + product-tag + product-name + product-status + view-item.
-          new='''<article class="product-card" data-category="mens"><div class="product-image"><img src="IMG_0367.jpeg" alt="Gangster Bougie Embroidered Fleece Sweatpants"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">MEN’S • BOTTOMS</div><h3 class="product-name">GANGSTER BOUGIE EMBROIDERED FLEECE SWEATPANTS</h3><p class="product-status">8 colourways • US$69.99</p><button class="view-item" id="openSweatpants">VIEW ITEM</button></div></article>'''
-          s=s[:start]+new+s[end:]
+          pos=s.index(marker); start=s.rfind('<article',0,pos); end=s.index('</article>',pos)+len('</article>')
+          template=s[start:end]
+          card=(template.replace('IMG_0367.jpeg','IMG_0375.jpeg')
+              .replace('Gangster Bougie Embroidered Fleece Sweatpants','Gangster Bougie Basketball Rib Shorts (Men’s)')
+              .replace('GANGSTER BOUGIE EMBROIDERED FLEECE SWEATPANTS','GANGSTER BOUGIE BASKETBALL RIB SHORTS')
+              .replace('8 colourways • US$69.99','7 colourways • US$59.99')
+              .replace('openSweatpants','openRibShorts'))
+          s=s[:end]+card+s[end:]
+          # Add product viewer immediately before body close, using established sports product classes.
+          modal='''
+<div class="modal" id="ribShortsModal"><div class="modal-box sports-modal-box"><button class="modal-close" id="closeRibShorts">Close</button><div class="sports-layout"><div><div class="sports-main-wrap"><div class="main-product-photo sports-stage"><img id="ribShortsMain" src="IMG_0375.jpeg" alt="Gangster Bougie Basketball Rib Shorts"></div></div></div><div class="sports-info"><h2>Gangster Bougie Basketball Rib Shorts (Men’s)</h2><div class="sports-price">US$59.99</div><p class="sports-description">Gangster Bougie Basketball Rib Shorts are built for comfort, movement, and statement style. Made for training, casual wear, or everyday streetwear, these shorts combine lightweight performance with the signature Gangster Bougie look. Designed with a relaxed athletic fit, breathable material, and bold branding, they’re made for those cut from a different cloth.</p><ul class="sports-benefits"><li>100% moisture-wicking polyester</li><li>Standard fit</li><li>White interior</li><li>Two side pockets</li><li>Black detailing</li><li>Seam thread colour automatically matched to design</li></ul><hr class="sports-divider"><div class="sports-colour-line">Colour: <strong id="ribShortsColour">Red</strong></div><div class="sports-colors" id="ribShortsColors"></div><div class="sports-buy-row"><div class="sports-size-block"><span class="option-label">Size</span><div class="sizes" id="ribShortsSizes"></div></div><button class="sports-add"><span>＋</span> Add to Cart</button></div><div class="sports-preview-note">Cart connection coming soon.</div></div><div class="sports-gallery" id="ribShortsGallery"></div></div></div></div>
+<script>
+(()=>{const data=[['Red','IMG_0375.jpeg','#b52b35'],['Dark Blue','IMG_0374.jpeg','#233f78'],['Black','IMG_0373.jpeg','#222'],['Dark Yellow','IMG_0372.jpeg','#c59b20'],['Dark Green','IMG_0371.jpeg','#315e42'],['White','IMG_0370.jpeg','#f4f4f1'],['Dark Grey','IMG_0368.jpeg','#555b5b']];const modal=document.getElementById('ribShortsModal'),main=document.getElementById('ribShortsMain'),label=document.getElementById('ribShortsColour'),colors=document.getElementById('ribShortsColors'),gallery=document.getElementById('ribShortsGallery'),sizes=document.getElementById('ribShortsSizes');data.forEach((d,i)=>{const b=document.createElement('button');b.className='sports-color'+(i===0?' active':'');b.style.background=d[2];b.title=d[0];b.onclick=()=>select(i);colors.appendChild(b);const t=document.createElement('button');t.className='thumb sports-thumb'+(i===0?' active':'');t.innerHTML='<img src="'+d[1]+'" alt="'+d[0]+'"><span class="sports-thumb-label">'+d[0]+'</span>';t.onclick=()=>select(i);gallery.appendChild(t)});['XS','S','M','L','XL','2XL','3XL','4XL'].forEach((x,i)=>{const b=document.createElement('button');b.className='size'+(i===0?' active':'');b.textContent=x;b.onclick=()=>{sizes.querySelectorAll('.size').forEach(z=>z.classList.remove('active'));b.classList.add('active')};sizes.appendChild(b)});function select(i){main.src=data[i][1];label.textContent=data[i][0];colors.querySelectorAll('.sports-color').forEach((b,j)=>b.classList.toggle('active',j===i));gallery.querySelectorAll('.sports-thumb').forEach((b,j)=>b.classList.toggle('active',j===i))}document.getElementById('openRibShorts').onclick=()=>modal.classList.add('open');document.getElementById('closeRibShorts').onclick=()=>modal.classList.remove('open');modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')})})();
+</script>
+'''
+          s=s.replace('</body>',modal+'</body>',1)
           p.write_text(s)
-      - name: Commit exact card fix
+      - name: Commit rib shorts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Use exact established classes for sweatpants card"
+          git commit -m "Add Gangster Bougie basketball rib shorts"
           git push origin main
