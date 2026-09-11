@@ -96,6 +96,18 @@
 .muscle-natural{background:#e8dfc8}.muscle-grey{background:#5c5b5d}.muscle-pink{background:#e6a6b8}
 @media(max-width:900px){#muscleTankModal .muscle-gallery{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:680px){#muscleTankModal .muscle-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}#muscleTankModal .sports-size-block .sizes{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}#muscleTankModal .muscle-size{font-size:.72rem;padding:0}}
+
+/* GB_SHOP_CAROUSEL_V1 */
+#shop .products.gb-coverflow{display:block;position:relative;height:590px;max-width:1160px;margin:0 auto;perspective:1400px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#shop .products.gb-coverflow .product-card{position:absolute;left:50%;top:18px;width:min(300px,72vw);height:520px;margin:0;transition:transform .48s cubic-bezier(.2,.75,.2,1),opacity .4s ease,filter .4s ease;transform-origin:center center;will-change:transform,opacity;box-shadow:0 24px 50px rgba(0,0,0,.55);border-color:#292929;cursor:grab}
+#shop .products.gb-coverflow .product-card.gb-center{border-color:var(--gold);box-shadow:0 28px 65px rgba(0,0,0,.72),0 0 0 1px rgba(244,207,99,.18),0 0 30px rgba(216,169,40,.12);cursor:default}
+#shop .products.gb-coverflow .product-card.gb-far{pointer-events:none}
+#shop .products.gb-coverflow .product-image{flex:0 0 auto}
+#shop .products.gb-coverflow .product-info{min-height:190px}
+.gb-carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:12;width:48px;height:48px;border-radius:50%;border:1px solid var(--gold);background:rgba(5,5,5,.92);color:var(--gold-light);font-size:1.9rem;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 22px rgba(0,0,0,.55)}
+.gb-carousel-arrow:hover{background:var(--gold-light);color:#111}.gb-carousel-arrow.prev{left:8px}.gb-carousel-arrow.next{right:8px}
+.gb-carousel-count{text-align:center;color:#8f8f8f;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-top:-4px;margin-bottom:18px}
+@media(max-width:680px){#shop .products.gb-coverflow{height:555px;width:100vw;margin-left:calc(50% - 50vw);overflow:hidden}#shop .products.gb-coverflow .product-card{width:min(270px,70vw);height:495px;top:12px}#shop .products.gb-coverflow .product-info{min-height:175px;padding:15px}.gb-carousel-arrow{width:40px;height:40px;font-size:1.55rem}.gb-carousel-arrow.prev{left:4px}.gb-carousel-arrow.next{right:4px}}
 </style></head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo"></div></div></section>
@@ -621,6 +633,84 @@
  cards.map((card,index)=>({card,index,rank:rank(card)}))
       .sort((a,b)=>a.rank-b.rank||a.index-b.index)
       .forEach(x=>grid.appendChild(x.card));
+})();
+
+(function(){
+ const shop=document.getElementById('shop');
+ const grid=shop&&shop.querySelector('.products');
+ const filterRow=shop&&shop.querySelector('.filter-row');
+ if(!grid||!filterRow) return;
+ grid.classList.add('gb-coverflow');
+ const allCards=[...grid.querySelectorAll('.product-card')];
+ let visible=[];
+ let active=0;
+ let startX=null;
+ let dragged=false;
+
+ const prev=document.createElement('button');
+ prev.type='button';prev.className='gb-carousel-arrow prev';prev.setAttribute('aria-label','Previous product');prev.textContent='‹';
+ const next=document.createElement('button');
+ next.type='button';next.className='gb-carousel-arrow next';next.setAttribute('aria-label','Next product');next.textContent='›';
+ grid.append(prev,next);
+ const count=document.createElement('div');count.className='gb-carousel-count';grid.after(count);
+
+ function ordered(cards){
+   return cards.map((card,index)=>({card,index,cat:(card.dataset.category||'').split(/\s+/)}))
+     .sort((a,b)=>{
+       const rank=x=>x.cat.includes('womens')?1:x.cat.includes('mens')?2:x.cat.includes('accessories')?3:4;
+       return rank(a)-rank(b)||a.index-b.index;
+     }).map(x=>x.card);
+ }
+ function render(){
+   const n=visible.length;
+   if(!n){count.textContent='No products in this category';return;}
+   active=((active%n)+n)%n;
+   allCards.forEach(card=>{
+     card.classList.remove('gb-center','gb-far');
+     if(!visible.includes(card)){card.style.display='none';return;}
+     card.style.display='flex';
+     const i=visible.indexOf(card);
+     let d=i-active;
+     if(d>n/2)d-=n;if(d<-n/2)d+=n;
+     const ad=Math.abs(d);
+     if(ad>3){card.style.opacity='0';card.style.pointerEvents='none';card.style.transform='translateX(-50%) translateX('+(d*185)+'px) scale(.5)';card.style.zIndex='0';card.classList.add('gb-far');return;}
+     const x=d*205;
+     const scale=d===0?1:Math.max(.62,1-ad*.13);
+     const rotate=d===0?0:(d<0?48:-48);
+     card.style.transform=`translateX(-50%) translateX(${x}px) rotateY(${rotate}deg) scale(${scale})`;
+     card.style.opacity=d===0?'1':String(Math.max(.28,.78-ad*.16));
+     card.style.filter=d===0?'none':`brightness(${Math.max(.38,.72-ad*.08)})`;
+     card.style.zIndex=String(10-ad);
+     card.style.pointerEvents=ad<=2?'auto':'none';
+     if(d===0)card.classList.add('gb-center');
+   });
+   count.textContent=(active+1)+' / '+n;
+ }
+ function applyFilter(filter){
+   const cards=allCards.filter(card=>filter==='all'||(card.dataset.category||'').split(/\s+/).includes(filter));
+   visible=filter==='all'?ordered(cards):cards;
+   active=0;render();
+ }
+ function move(step){if(!visible.length)return;active=(active+step+visible.length)%visible.length;render();}
+ prev.onclick=e=>{e.stopPropagation();move(-1)};next.onclick=e=>{e.stopPropagation();move(1)};
+
+ grid.addEventListener('click',e=>{
+   const card=e.target.closest('.product-card');
+   if(!card||!visible.includes(card))return;
+   const idx=visible.indexOf(card);
+   if(idx!==active){e.preventDefault();e.stopPropagation();active=idx;render();}
+ });
+ grid.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;startX=e.clientX;dragged=false;});
+ grid.addEventListener('pointermove',e=>{if(startX===null)return;if(Math.abs(e.clientX-startX)>12)dragged=true;});
+ grid.addEventListener('pointerup',e=>{if(startX===null)return;const dx=e.clientX-startX;startX=null;if(Math.abs(dx)>45)move(dx<0?1:-1);});
+ grid.addEventListener('pointercancel',()=>{startX=null});
+
+ // Use the site's existing filter buttons, but render matching cards in the carousel.
+ filterRow.addEventListener('click',e=>{
+   const btn=e.target.closest('.filter-btn');if(!btn)return;
+   setTimeout(()=>applyFilter(btn.dataset.filter||'all'),0);
+ });
+ applyFilter((filterRow.querySelector('.filter-btn.active')||{}).dataset||'all');
 })();
 </script>
 </body></html>
