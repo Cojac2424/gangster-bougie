@@ -1,4 +1,4 @@
-name: Match Sweatpants Card Template
+name: Fix Sweatpants Exact Card Template
 on:
   pull_request:
     types: [opened, reopened]
@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Match sweatpants card to muscle tank structure
+      - name: Rebuild sweatpants exterior card with established product classes
         shell: python
         run: |
           from pathlib import Path
@@ -20,18 +20,15 @@ jobs:
           pos=s.index(marker)
           start=s.rfind('<article',0,pos)
           end=s.index('</article>',pos)+len('</article>')
-          old=s[start:end]
-          # Use the same card markup/classes as the established men’s cards.
-          new='''<article class="product-card" data-category="mens"><img src="IMG_0367.jpeg" alt="Gangster Bougie Embroidered Fleece Sweatpants"><div class="product-info"><div class="product-tag">MEN’S • BOTTOMS</div><h3>GANGSTER BOUGIE EMBROIDERED FLEECE SWEATPANTS</h3><p>8 colourways • US$69.99</p><button class="view-item" id="openSweatpants">VIEW ITEM</button></div></article>'''
+          # These are the exact site classes that control the working cards:
+          # product-image + product-accent + product-tag + product-name + product-status + view-item.
+          new='''<article class="product-card" data-category="mens"><div class="product-image"><img src="IMG_0367.jpeg" alt="Gangster Bougie Embroidered Fleece Sweatpants"></div><div class="product-accent"></div><div class="product-info"><div class="product-tag">MEN’S • BOTTOMS</div><h3 class="product-name">GANGSTER BOUGIE EMBROIDERED FLEECE SWEATPANTS</h3><p class="product-status">8 colourways • US$69.99</p><button class="view-item" id="openSweatpants">VIEW ITEM</button></div></article>'''
           s=s[:start]+new+s[end:]
-          # Remove the sweatpants-only overrides from the previous patch so this card inherits the normal site styles.
-          extra='''\n<style>\n.sweatpants-card-info{display:flex;flex-direction:column;flex:1}\n.sweatpants-card-info p{font-size:.92rem!important;font-weight:400!important;line-height:1.5!important;margin-top:auto!important;margin-bottom:18px!important}\n.sweatpants-card-info #openSweatpants{margin-top:0!important;width:100%}\n</style>\n'''
-          s=s.replace(extra,'',1)
           p.write_text(s)
-      - name: Commit fix
+      - name: Commit exact card fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Match sweatpants card to men product template"
+          git commit -m "Use exact established classes for sweatpants card"
           git push origin main
