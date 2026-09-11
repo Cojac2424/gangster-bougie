@@ -1,4 +1,4 @@
-name: Fix Sweatpants Card Button
+name: Fix Sweatpants Card Alignment
 on:
   pull_request:
     types: [opened, reopened]
@@ -11,20 +11,28 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Match sweatpants View Item button to product cards
+      - name: Match sweatpants card typography and alignment
         shell: python
         run: |
           from pathlib import Path
           p=Path('index.html'); s=p.read_text()
-          old='<button class="product-btn" id="openSweatpants">View Item</button>'
-          new='<button class="view-item" id="openSweatpants">VIEW ITEM</button>'
-          if old not in s: raise SystemExit('Expected sweatpants button not found')
-          s=s.replace(old,new,1)
+          # Scope this adjustment to the exterior sweatpants card only.
+          marker='<button class="view-item" id="openSweatpants">VIEW ITEM</button>'
+          pos=s.index(marker)
+          card_start=s.rfind('<article',0,pos)
+          card_end=s.index('</article>',pos)+len('</article>')
+          card=s[card_start:card_end]
+          # Give this card the same explicit product-card content classes used by the established cards.
+          card=card.replace('<div class="product-info"><h3>Gangster Bougie Embroidered Fleece Sweatpants</h3><p>8 colourways • US$69.99</p><button class="view-item" id="openSweatpants">VIEW ITEM</button></div>', '<div class="product-info sweatpants-card-info"><h3>Gangster Bougie Embroidered Fleece Sweatpants</h3><p>8 colourways • US$69.99</p><button class="view-item" id="openSweatpants">VIEW ITEM</button></div>',1)
+          s=s[:card_start]+card+s[card_end:]
+          # Only normalize the sweatpants card: match the metadata typography and anchor its button to the card bottom.
+          css='''\n<style>\n.sweatpants-card-info{display:flex;flex-direction:column;flex:1}\n.sweatpants-card-info p{font-size:.92rem!important;font-weight:400!important;line-height:1.5!important;margin-top:auto!important;margin-bottom:18px!important}\n.sweatpants-card-info #openSweatpants{margin-top:0!important;width:100%}\n</style>\n'''
+          s=s.replace('</head>',css+'</head>',1)
           p.write_text(s)
       - name: Commit fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Match sweatpants View Item button styling"
+          git commit -m "Align sweatpants card text and View Item button"
           git push origin main
