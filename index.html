@@ -131,6 +131,20 @@
 @media(max-width:760px){.byf-model{width:min(250px,44vh,68vw);height:auto;min-height:0;max-height:none}.byf-shell{gap:18px}.byf-swipe-hint{margin-top:8px}}
 @media(min-width:761px){.byf-model{width:min(270px,47vh,32vw)}}
 
+
+/* Build Your Fit — shared full-body coordinate system v2 */
+.byf-model{--byf-split:43%;position:relative;width:min(150px,25vw,14.5vh);height:auto;aspect-ratio:1/6;min-height:0!important;max-height:none!important;background:#ddd;overflow:hidden}
+.byf-half{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background-repeat:no-repeat!important;background-size:400% 100%!important;background-position:left top!important;touch-action:pan-y;cursor:grab}
+.byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0);z-index:1}
+.byf-bottom{clip-path:inset(var(--byf-split) 0 0 0);z-index:2;background-image:var(--byf-bottom-image)!important}
+.byf-bottom::before{display:none!important;content:none!important}
+.byf-seam{top:var(--byf-split)!important;height:0!important;background:transparent!important}
+.byf-top .byf-arrow{top:24%!important}.byf-bottom .byf-arrow{top:70%!important}
+.byf-top .byf-label{top:calc(var(--byf-split) - 44px)!important;bottom:auto!important}
+.byf-bottom .byf-label{top:auto!important;bottom:12px!important}
+@media(max-width:760px){#build-your-fit{padding-top:28px;padding-bottom:28px}.byf-shell{grid-template-columns:1fr;gap:16px}.byf-model{width:min(150px,36vw,14vh)}.byf-swipe-hint{margin-top:7px}}
+@media(min-width:761px){.byf-model{width:min(150px,22vw,14.5vh)}}
+
 </style></head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo"></div></div></section>
@@ -823,7 +837,7 @@
   ['Bougie Houndstooth Leggings','DB0194B3-AF6E-4964-B2F9-266330DB0A6D.jpeg'],['Bougie Houndstooth Workout Shorts','794DD1D2-8663-4830-9612-93E0EC9E5B03.jpeg']
  ];
  let ti=0,bi=0;
- function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
+ function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);bottomEl.style.backgroundImage=`url('${bottoms[bi][1]}')`;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
  function move(which,dir){if(which==='top')ti=(ti+dir+tops.length)%tops.length;else bi=(bi+dir+bottoms.length)%bottoms.length;render()}
  topEl.querySelector('.prev').onclick=()=>move('top',-1);topEl.querySelector('.next').onclick=()=>move('top',1);bottomEl.querySelector('.prev').onclick=()=>move('bottom',-1);bottomEl.querySelector('.next').onclick=()=>move('bottom',1);
  function swipe(el,which){let x=null,y=null;el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;x=e.clientX;y=e.clientY});el.addEventListener('pointerup',e=>{if(x===null)return;const dx=e.clientX-x,dy=e.clientY-y;x=y=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(which,dx<0?1:-1)});el.addEventListener('pointercancel',()=>{x=y=null})}
