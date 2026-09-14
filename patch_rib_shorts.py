@@ -4,32 +4,36 @@ s=p.read_text()
 if 'id="build-your-fit"' not in s:
     raise SystemExit('Build Your Fit not present')
 
-# Override the prototype's original independent crop system. Both halves now
-# share one coordinate system: identical full-board dimensions and position,
-# clipped at the exact same seam. The whole assembly also scales to viewport.
+# The source boards are four equal vertical views. At background-size 400% auto,
+# the first/front panel is exactly one model-width wide and six model-widths tall
+# (1024x1536 board => 256x1536 front panel). Keep BOTH selectable images on the
+# same full-body 1:6 coordinate system and clip them at one shared waist seam.
 css=r'''
-/* Build Your Fit — continuous model alignment fix */
-.byf-model{--byf-split:43%;width:min(270px,46.5vh,72vw);height:auto;aspect-ratio:1/4;max-height:none;min-height:0;background:#ddd}
-.byf-half{left:0;width:100%;background-size:400% auto;background-position-x:left;background-position-y:top}
-.byf-top{top:0;height:var(--byf-split)}
-.byf-bottom{top:var(--byf-split);height:calc(100% - var(--byf-split));background-position-y:top}
-.byf-bottom::before{content:"";position:absolute;z-index:0;left:0;top:calc(-1 * var(--byf-split) / (1 - var(--byf-split)) * 100%);width:100%;height:calc(100% / (1 - var(--byf-split)));background-image:inherit;background-repeat:no-repeat;background-size:400% auto;background-position:left top;pointer-events:none}
-.byf-bottom{background-image:none!important}
-.byf-bottom .byf-arrow,.byf-bottom .byf-label{z-index:6}
-.byf-seam{top:var(--byf-split);background:transparent}
-@media(max-width:760px){.byf-model{width:min(250px,44vh,68vw);height:auto;min-height:0;max-height:none}.byf-shell{gap:18px}.byf-swipe-hint{margin-top:8px}}
-@media(min-width:761px){.byf-model{width:min(270px,47vh,32vw)}}
+/* Build Your Fit — shared full-body coordinate system v2 */
+.byf-model{--byf-split:43%;position:relative;width:min(150px,25vw,14.5vh);height:auto;aspect-ratio:1/6;min-height:0!important;max-height:none!important;background:#ddd;overflow:hidden}
+.byf-half{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background-repeat:no-repeat!important;background-size:400% 100%!important;background-position:left top!important;touch-action:pan-y;cursor:grab}
+.byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0);z-index:1}
+.byf-bottom{clip-path:inset(var(--byf-split) 0 0 0);z-index:2;background-image:var(--byf-bottom-image)!important}
+.byf-bottom::before{display:none!important;content:none!important}
+.byf-seam{top:var(--byf-split)!important;height:0!important;background:transparent!important}
+.byf-top .byf-arrow{top:24%!important}.byf-bottom .byf-arrow{top:70%!important}
+.byf-top .byf-label{top:calc(var(--byf-split) - 44px)!important;bottom:auto!important}
+.byf-bottom .byf-label{top:auto!important;bottom:12px!important}
+@media(max-width:760px){#build-your-fit{padding-top:28px;padding-bottom:28px}.byf-shell{grid-template-columns:1fr;gap:16px}.byf-model{width:min(150px,36vw,14vh)}.byf-swipe-hint{margin-top:7px}}
+@media(min-width:761px){.byf-model{width:min(150px,22vw,14.5vh)}}
 '''
 s=s.replace('</style>',css+'\n</style>',1)
 
-# The bottom needs the same source image on its pseudo-element. Store it in a
-# CSS custom property instead of assigning a separately cropped background.
-old="function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.backgroundImage=`url('${bottoms[bi][1]}')`;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
-new="function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
-if old not in s:
+# Keep the selected bottom board available to CSS while the element itself
+# occupies the SAME full model rectangle as the top board.
+old_direct="function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.backgroundImage=`url('${bottoms[bi][1]}')`;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
+old_var="function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
+new="function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);bottomEl.style.backgroundImage=`url('${bottoms[bi][1]}')`;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
+if old_var in s:
+    s=s.replace(old_var,new,1)
+elif old_direct in s:
+    s=s.replace(old_direct,new,1)
+elif new not in s:
     raise SystemExit('Build Your Fit render marker not found')
-s=s.replace(old,new,1)
-# pseudo-element cannot directly read JS background-image because bottom itself
-# is deliberately blank; bind the variable here.
-s=s.replace('.byf-bottom::before{content:', '.byf-bottom::before{background-image:var(--byf-bottom-image)!important;content:',1)
+
 p.write_text(s)
