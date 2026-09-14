@@ -253,13 +253,14 @@
 
 
 
-/* Build Your Fit — shared bare-torso splice v15 */
-#build-your-fit .byf-model{--byf-split:38.4%!important}
-#build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
+
+/* Build Your Fit — true bare-abdomen handoff v16 */
+#build-your-fit .byf-model{--byf-split:42.2%!important}
+#build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important;background-position:0 0!important}
 #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-image:var(--byf-bottom-image)!important;background-position:0 0!important}
 @media (min-width:700px){
- #build-your-fit .byf-model{--byf-split:38.4%!important}
- #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
+ #build-your-fit .byf-model{--byf-split:42.2%!important}
+ #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important;background-position:0 0!important}
  #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-position:0 0!important}
 }
 
@@ -955,7 +956,7 @@
   ['Bougie Houndstooth Leggings','648F1080-1C4C-4FFD-BA17-C79CBE5D7309.jpeg'],['Bougie Houndstooth Workout Shorts','D2DC5FB5-3654-4B80-978B-238C3C4974F0.jpeg']
  ];
  let ti=0,bi=0;
- function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split','38.4%','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
+ function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split','42.2%','important');topEl.style.setProperty('background-position','0 0','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
  function move(which,dir){if(which==='top')ti=(ti+dir+tops.length)%tops.length;else bi=(bi+dir+bottoms.length)%bottoms.length;render()}
  topEl.querySelector('.prev').onclick=()=>move('top',-1);topEl.querySelector('.next').onclick=()=>move('top',1);bottomEl.querySelector('.prev').onclick=()=>move('bottom',-1);bottomEl.querySelector('.next').onclick=()=>move('bottom',1);
  function swipe(el,which){let x=null,y=null;el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;x=e.clientX;y=e.clientY});el.addEventListener('pointerup',e=>{if(x===null)return;const dx=e.clientX-x,dy=e.clientY-y;x=y=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(which,dx<0?1:-1)});el.addEventListener('pointercancel',()=>{x=y=null})}
