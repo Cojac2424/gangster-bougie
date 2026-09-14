@@ -270,12 +270,15 @@
 
 
 
-/* Build Your Fit — synchronized equal-scale restore v22 */
-#build-your-fit .byf-model-pair{position:relative!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;gap:0!important;background:#efede9!important;overflow:hidden!important;border-radius:16px!important;padding:0 42px!important}
+
+/* Build Your Fit — responsive joined viewer + shared controls v23 */
+#build-your-fit .byf-shell{grid-template-columns:minmax(250px,330px) minmax(0,1fr)!important;gap:28px!important;align-items:start!important}
+#build-your-fit .byf-copy{min-width:0!important;padding-right:4px!important}
+#build-your-fit .byf-builder{min-width:0!important;width:100%!important}
+#build-your-fit .byf-model-pair{position:relative!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;gap:0!important;width:max-content!important;max-width:100%!important;margin:0 auto!important;background:#efede9!important;overflow:hidden!important;border-radius:16px!important;padding:0 38px!important}
 #build-your-fit .byf-view{display:flex!important;flex-direction:column!important;align-items:center!important;gap:0!important;overflow:visible!important;width:auto!important}
 #build-your-fit .byf-view-name{display:none!important}
-#build-your-fit .byf-model-pair .byf-model{border:0!important;border-radius:0!important;overflow:visible!important;box-shadow:none!important;max-width:none!important}
-#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{margin:0!important;width:var(--byf-model-width,230px)!important}
+#build-your-fit .byf-model-pair .byf-model{border:0!important;border-radius:0!important;overflow:visible!important;box-shadow:none!important;max-width:none!important;margin:0!important;width:clamp(150px,18vw,210px)!important}
 #build-your-fit .byf-back-model .byf-half{background-position:33.333333% 0!important}
 #build-your-fit .byf-back-model .byf-top,#build-your-fit .byf-back-model .byf-bottom{pointer-events:none!important}
 #build-your-fit .byf-back-model .byf-arrow,#build-your-fit .byf-back-model .byf-label{display:none!important}
@@ -284,7 +287,8 @@
 #build-your-fit .byf-model-pair #byfTop .byf-arrow.next,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{right:max(10px,calc(50vw - min(360px,46vw)))!important;left:auto!important}
 #build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfTop .byf-arrow.next{top:42%!important}
 #build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{top:66%!important}
-@media(max-width:760px){#build-your-fit .byf-model-pair{gap:0!important;padding:0 30px!important}#build-your-fit .byf-model-pair .byf-model,#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{width:min(154px,38vw,14svh)!important}#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev{left:8px!important}#build-your-fit .byf-model-pair #byfTop .byf-arrow.next,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{right:8px!important}}
+@media(min-width:761px) and (max-width:1180px){#build-your-fit .byf-shell{grid-template-columns:minmax(220px,30%) minmax(0,70%)!important;gap:18px!important}#build-your-fit .byf-model-pair{padding:0 34px!important}#build-your-fit .byf-model-pair .byf-model{width:min(190px,18vw,22svh)!important}}
+@media(max-width:760px){#build-your-fit{padding-top:20px!important;padding-bottom:20px!important}#build-your-fit .byf-shell{grid-template-columns:1fr!important;gap:12px!important}#build-your-fit .byf-model-pair{width:max-content!important;max-width:100%!important;padding:0 12px!important}#build-your-fit .byf-model-pair .byf-model,#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{width:min(154px,42vw,14svh)!important}#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev{left:8px!important}#build-your-fit .byf-model-pair #byfTop .byf-arrow.next,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{right:8px!important}}
 
 </style></head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav></div></header>
@@ -982,7 +986,9 @@
  function move(which,dir){if(which==='top')ti=(ti+dir+tops.length)%tops.length;else bi=(bi+dir+bottoms.length)%bottoms.length;render()}
  topEl.querySelector('.prev').onclick=()=>move('top',-1);topEl.querySelector('.next').onclick=()=>move('top',1);bottomEl.querySelector('.prev').onclick=()=>move('bottom',-1);bottomEl.querySelector('.next').onclick=()=>move('bottom',1);
  function swipe(el,which){let x=null,y=null;el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;x=e.clientX;y=e.clientY});el.addEventListener('pointerup',e=>{if(x===null)return;const dx=e.clientX-x,dy=e.clientY-y;x=y=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(which,dx<0?1:-1)});el.addEventListener('pointercancel',()=>{x=y=null})}
- swipe(topEl,'top');swipe(bottomEl,'bottom');render();
+ const pair=document.querySelector('#build-your-fit .byf-model-pair');
+ if(pair){let sx=null,sy=null,which=null;pair.style.touchAction='pan-y';pair.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const r=pair.getBoundingClientRect();sx=e.clientX;sy=e.clientY;which=((e.clientY-r.top)/r.height)<0.5?'top':'bottom'});pair.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx,dy=e.clientY-sy,w=which;sx=sy=which=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(w,dx<0?1:-1)});pair.addEventListener('pointercancel',()=>{sx=sy=which=null})}
+ render();
 })();
 </script>
 </body></html>
