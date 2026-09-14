@@ -118,6 +118,19 @@
 .byf-arrow{position:absolute;z-index:6;width:42px;height:42px;border-radius:50%;border:1px solid var(--gold);background:rgba(5,5,5,.88);color:var(--gold-light);display:grid;place-items:center;font-size:1.55rem;cursor:pointer}.byf-top .byf-arrow{top:52%}.byf-bottom .byf-arrow{top:38%}.byf-arrow.prev{left:8px}.byf-arrow.next{right:8px}.byf-label{position:absolute;z-index:6;left:50%;transform:translateX(-50%);background:rgba(5,5,5,.88);border:1px solid rgba(216,169,40,.55);color:#fff;padding:7px 12px;white-space:nowrap;font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.byf-top .byf-label{bottom:10px}.byf-bottom .byf-label{bottom:12px}.byf-swipe-hint{text-align:center;color:#888;font-size:.72rem;margin-top:12px;letter-spacing:.08em;text-transform:uppercase}
 @media(max-width:760px){.byf-shell{grid-template-columns:1fr;gap:28px}.byf-copy{text-align:center}.byf-copy p{margin-left:auto;margin-right:auto}.byf-model{width:min(230px,62vw);min-height:720px;max-height:none;height:920px}}
 
+
+/* Build Your Fit — continuous model alignment fix */
+.byf-model{--byf-split:43%;width:min(270px,46.5vh,72vw);height:auto;aspect-ratio:1/4;max-height:none;min-height:0;background:#ddd}
+.byf-half{left:0;width:100%;background-size:400% auto;background-position-x:left;background-position-y:top}
+.byf-top{top:0;height:var(--byf-split)}
+.byf-bottom{top:var(--byf-split);height:calc(100% - var(--byf-split));background-position-y:top}
+.byf-bottom::before{background-image:var(--byf-bottom-image)!important;content:"";position:absolute;z-index:0;left:0;top:calc(-1 * var(--byf-split) / (1 - var(--byf-split)) * 100%);width:100%;height:calc(100% / (1 - var(--byf-split)));background-image:inherit;background-repeat:no-repeat;background-size:400% auto;background-position:left top;pointer-events:none}
+.byf-bottom{background-image:none!important}
+.byf-bottom .byf-arrow,.byf-bottom .byf-label{z-index:6}
+.byf-seam{top:var(--byf-split);background:transparent}
+@media(max-width:760px){.byf-model{width:min(250px,44vh,68vw);height:auto;min-height:0;max-height:none}.byf-shell{gap:18px}.byf-swipe-hint{margin-top:8px}}
+@media(min-width:761px){.byf-model{width:min(270px,47vh,32vw)}}
+
 </style></head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo"></div></div></section>
@@ -810,7 +823,7 @@
   ['Bougie Houndstooth Leggings','DB0194B3-AF6E-4964-B2F9-266330DB0A6D.jpeg'],['Bougie Houndstooth Workout Shorts','794DD1D2-8663-4830-9612-93E0EC9E5B03.jpeg']
  ];
  let ti=0,bi=0;
- function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.backgroundImage=`url('${bottoms[bi][1]}')`;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
+ function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
  function move(which,dir){if(which==='top')ti=(ti+dir+tops.length)%tops.length;else bi=(bi+dir+bottoms.length)%bottoms.length;render()}
  topEl.querySelector('.prev').onclick=()=>move('top',-1);topEl.querySelector('.next').onclick=()=>move('top',1);bottomEl.querySelector('.prev').onclick=()=>move('bottom',-1);bottomEl.querySelector('.next').onclick=()=>move('bottom',1);
  function swipe(el,which){let x=null,y=null;el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;x=e.clientX;y=e.clientY});el.addEventListener('pointerup',e=>{if(x===null)return;const dx=e.clientX-x,dy=e.clientY-y;x=y=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(which,dx<0?1:-1)});el.addEventListener('pointercancel',()=>{x=y=null})}
