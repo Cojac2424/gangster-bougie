@@ -4,36 +4,32 @@ s=p.read_text()
 if 'id="build-your-fit"' not in s:
     raise SystemExit('Build Your Fit not present')
 
-# v17: keep the proven 42.2% splice for every bottom except the two Onyx
-# bottoms. Their source boards leave a tiny sports-bra sliver at 42.2%, so only
-# those two get a fractionally lower-on-body clip at 42.8%. No image is shifted.
+# v18: preserve the proven front compositor exactly and add a synchronized
+# back-view compositor beside it. Each standardized source board contains
+# front/back/left/right views; front is quarter 1 and back is quarter 2.
 css=r'''
-/* Build Your Fit — bare-abdomen handoff with Onyx-only trim v17 */
-#build-your-fit .byf-model{--byf-split:42.2%!important}
-#build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important;background-position:0 0!important}
-#build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-image:var(--byf-bottom-image)!important;background-position:0 0!important}
-@media (min-width:700px){
- #build-your-fit .byf-model{--byf-split:42.2%!important}
- #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important;background-position:0 0!important}
- #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-position:0 0!important}
-}
+/* Build Your Fit — synchronized front + back v18 */
+#build-your-fit .byf-builder>div{width:100%}
+#build-your-fit .byf-model-pair{display:flex;justify-content:center;align-items:flex-start;gap:12px}
+#build-your-fit .byf-view{display:flex;flex-direction:column;align-items:center;gap:5px}
+#build-your-fit .byf-view-name{color:#8f8f8f;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800}
+#build-your-fit .byf-back-model .byf-half{background-position:33.333333% 0!important}
+#build-your-fit .byf-back-model .byf-top,#build-your-fit .byf-back-model .byf-bottom{pointer-events:none!important}
+#build-your-fit .byf-back-model .byf-arrow,#build-your-fit .byf-back-model .byf-label{display:none!important}
+@media(max-width:760px){#build-your-fit .byf-model-pair{gap:8px}#build-your-fit .byf-model-pair .byf-model{width:min(145px,35vw,13.2svh)!important}}
 '''
-for marker in [
- '/* Build Your Fit — true bare-abdomen handoff v16 */',
- '/* Build Your Fit — shared bare-torso splice v15 */']:
-    if marker in s:
-        start=s.index(marker)
-        end=s.index('</style>',start)
-        s=s[:start]+s[end:]
-        break
-if '/* Build Your Fit — bare-abdomen handoff with Onyx-only trim v17 */' not in s:
+if '/* Build Your Fit — synchronized front + back v18 */' not in s:
     s=s.replace('</style>',css+'\n</style>',1)
 
-s=s.replace('D2DC5EB5-3654-4B80-978B-238C3C4974F0.jpeg','D2DC5FB5-3654-4B80-978B-238C3C4974F0.jpeg')
+old_html='<div class="byf-builder"><div><div class="byf-model" id="byfModel"><div class="byf-half byf-top" id="byfTop"><button class="byf-arrow prev" type="button" aria-label="Previous top">‹</button><button class="byf-arrow next" type="button" aria-label="Next top">›</button><span class="byf-label" id="byfTopLabel">Onyx Sports Bra</span></div><div class="byf-half byf-bottom" id="byfBottom"><button class="byf-arrow prev" type="button" aria-label="Previous bottom">‹</button><button class="byf-arrow next" type="button" aria-label="Next bottom">›</button><span class="byf-label" id="byfBottomLabel">Onyx Leggings</span></div><div class="byf-seam"></div></div><div class="byf-swipe-hint">Swipe top and bottom independently</div></div></div>'
+new_html='<div class="byf-builder"><div><div class="byf-model-pair"><div class="byf-view"><div class="byf-view-name">Front</div><div class="byf-model" id="byfModel"><div class="byf-half byf-top" id="byfTop"><button class="byf-arrow prev" type="button" aria-label="Previous top">‹</button><button class="byf-arrow next" type="button" aria-label="Next top">›</button><span class="byf-label" id="byfTopLabel">Onyx Sports Bra</span></div><div class="byf-half byf-bottom" id="byfBottom"><button class="byf-arrow prev" type="button" aria-label="Previous bottom">‹</button><button class="byf-arrow next" type="button" aria-label="Next bottom">›</button><span class="byf-label" id="byfBottomLabel">Onyx Leggings</span></div><div class="byf-seam"></div></div></div><div class="byf-view"><div class="byf-view-name">Back</div><div class="byf-model byf-back-model" id="byfBackModel"><div class="byf-half byf-top" id="byfBackTop"></div><div class="byf-half byf-bottom" id="byfBackBottom"></div><div class="byf-seam"></div></div></div></div><div class="byf-swipe-hint">Swipe top and bottom independently — front &amp; back change together</div></div></div>'
+if old_html not in s:
+    raise SystemExit('Expected current Build Your Fit HTML not found')
+s=s.replace(old_html,new_html,1)
 
-old="function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split','42.2%','important');topEl.style.setProperty('background-position','0 0','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
-new="function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const bottomName=bottoms[bi][0];const isOnyxBottom=bottomName==='Onyx Leggings'||bottomName==='Onyx Workout Shorts';const split=isOnyxBottom?'42.8%':'42.2%';const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split',split,'important');topEl.style.setProperty('background-position','0 0','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottomName}"
-if old not in s:
-    raise SystemExit('Expected v16 Build Your Fit render function not found')
-s=s.replace(old,new,1)
+old_render="function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const bottomName=bottoms[bi][0];const isOnyxBottom=bottomName==='Onyx Leggings'||bottomName==='Onyx Workout Shorts';const split=isOnyxBottom?'42.8%':'42.2%';const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split',split,'important');topEl.style.setProperty('background-position','0 0','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottomName}"
+new_render="function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const bottomName=bottoms[bi][0];const isOnyxBottom=bottomName==='Onyx Leggings'||bottomName==='Onyx Workout Shorts';const split=isOnyxBottom?'42.8%':'42.2%';const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split',split,'important');topEl.style.setProperty('background-position','0 0','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');const backModel=document.getElementById('byfBackModel'),backTop=document.getElementById('byfBackTop'),backBottom=document.getElementById('byfBackBottom');if(backModel)backModel.style.setProperty('--byf-split',split,'important');if(backTop){backTop.style.backgroundImage=topUrl;backTop.style.setProperty('background-position','33.333333% 0','important')}if(backBottom){backBottom.style.setProperty('--byf-bottom-image',bottomUrl);backBottom.style.backgroundImage=bottomUrl;backBottom.style.setProperty('background-position','33.333333% 0','important')}document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottomName}"
+if old_render not in s:
+    raise SystemExit('Expected v17 Build Your Fit render function not found')
+s=s.replace(old_render,new_render,1)
 p.write_text(s)
