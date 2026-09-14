@@ -1,44 +1,34 @@
 from pathlib import Path
+import re
+
 p=Path('index.html')
 s=p.read_text()
 if 'id="build-your-fit"' not in s: raise SystemExit('Build Your Fit not present')
 
-# v31: Safe loading optimization only. Do not alter layout, Build Your Fit geometry, or image sources.
-# Native browser lazy-loading is applied to ordinary below-fold <img> elements.
-# Keep header/hero/brand imagery and Build Your Fit compositor backgrounds unchanged.
-if '/* Safe native lazy loading v31 */' not in s:
-    marker='</body>'
-    js=r'''
-<script>
-/* Safe native lazy loading v31 */
-(function(){
-  const imgs=[...document.querySelectorAll('img')];
-  imgs.forEach((img,index)=>{
-    const inHeader=!!img.closest('header');
-    const inHero=!!img.closest('.hero');
-    const inBuild=!!img.closest('#build-your-fit');
-    if(inHeader||inHero){
-      img.loading='eager';
-      img.fetchPriority='high';
-      return;
-    }
-    if(inBuild){
-      /* Signature Fit product thumbnails may be below fold, but keep the model compositor untouched. */
-      if(img.closest('.byf-fit-panel')){
-        img.loading='lazy';
-        img.decoding='async';
-        img.fetchPriority='low';
-      }
-      return;
-    }
-    img.loading='lazy';
-    img.decoding='async';
-    img.fetchPriority='low';
-  });
-})();
-</script>
-'''
-    s=s.replace(marker,js+'\n'+marker,1)
-    # Marker comment is inside the injected script above.
+# v32: Parse-time native lazy loading. Performance only — no layout, image-source,
+# Build Your Fit compositor, sizing, crop, arrow, or visual changes.
+# Keep the header brand image eager. CSS background images (header/hero and BYF boards)
+# are intentionally untouched.
+
+def optimize_img(m):
+    tag=m.group(0)
+    # Never rewrite an already-optimized tag.
+    if re.search(r'\bloading\s*=', tag, re.I):
+        return tag
+    # Brand/header image is above the fold and should stay eager.
+    if 'IMG_1849.jpeg' in tag:
+        return tag[:-1] + ' loading="eager" fetchpriority="high">'
+    # All ordinary HTML images are safe to defer until near the viewport.
+    return tag[:-1] + ' loading="lazy" decoding="async">'
+
+s=re.sub(r'<img\b[^>]*>', optimize_img, s, flags=re.I)
+
+# Remove the older end-of-body JS lazy-loader because parse-time attributes now do the job.
+s=re.sub(
+    r'\n?<script>\s*/\* Safe native lazy loading v31 \*/.*?</script>\s*',
+    '\n',
+    s,
+    flags=re.S
+)
 
 p.write_text(s)
