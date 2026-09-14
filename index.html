@@ -159,6 +159,68 @@
 .byf-bottom .byf-label{top:auto!important;bottom:8px!important}
 @media(max-width:760px){.byf-arrow{width:30px!important;height:30px!important;font-size:1.15rem!important}.byf-arrow.prev{left:3px!important}.byf-arrow.next{right:3px!important}.byf-label{font-size:.5rem!important;letter-spacing:.025em!important}}
 
+
+/* Build Your Fit — authoritative compositor v4 */
+#build-your-fit .byf-model{
+  --byf-split:40.4%;
+  position:relative!important;
+  width:min(170px,27vw,14.2svh)!important;
+  aspect-ratio:1/6!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  background:#ddd!important;
+}
+#build-your-fit .byf-half{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  background-repeat:no-repeat!important;
+  background-size:400% 100%!important;
+  background-position:0 0!important;
+  touch-action:pan-y;
+}
+#build-your-fit .byf-top{
+  clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important;
+  z-index:1!important;
+}
+#build-your-fit .byf-bottom{
+  clip-path:inset(var(--byf-split) 0 0 0)!important;
+  z-index:2!important;
+  background-image:var(--byf-bottom-image)!important;
+}
+#build-your-fit .byf-bottom::before{display:none!important;content:none!important}
+#build-your-fit .byf-seam{display:none!important}
+#build-your-fit .byf-arrow{
+  position:absolute!important;
+  width:30px!important;height:30px!important;
+  margin:0!important;transform:translateY(-50%)!important;
+  border-radius:50%!important;z-index:8!important;
+  font-size:1.12rem!important;
+}
+#build-your-fit .byf-arrow.prev{left:3px!important;right:auto!important}
+#build-your-fit .byf-arrow.next{right:3px!important;left:auto!important}
+#build-your-fit .byf-top .byf-arrow{top:27%!important}
+#build-your-fit .byf-bottom .byf-arrow{top:65%!important}
+#build-your-fit .byf-label{
+  position:absolute!important;left:5px!important;right:5px!important;
+  width:auto!important;max-width:none!important;transform:none!important;
+  z-index:9!important;text-align:center!important;white-space:normal!important;
+  overflow:visible!important;padding:5px 3px!important;
+  font-size:clamp(.46rem,1.7vw,.58rem)!important;line-height:1.08!important;
+  letter-spacing:.025em!important;
+}
+#build-your-fit .byf-top .byf-label{top:5px!important;bottom:auto!important}
+#build-your-fit .byf-bottom .byf-label{top:auto!important;bottom:5px!important}
+@media(max-width:760px){
+  #build-your-fit{padding-top:24px!important;padding-bottom:24px!important}
+  #build-your-fit .byf-shell{grid-template-columns:1fr!important;gap:14px!important}
+  #build-your-fit .byf-model{width:min(158px,38vw,13.8svh)!important}
+  #build-your-fit .byf-label{font-size:.48rem!important}
+}
+
 </style></head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo"></div></div></section>
@@ -851,7 +913,7 @@
   ['Bougie Houndstooth Leggings','DB0194B3-AF6E-4964-B2F9-266330DB0A6D.jpeg'],['Bougie Houndstooth Workout Shorts','794DD1D2-8663-4830-9612-93E0EC9E5B03.jpeg']
  ];
  let ti=0,bi=0;
- function render(){topEl.style.backgroundImage=`url('${tops[ti][1]}')`;bottomEl.style.setProperty('--byf-bottom-image',`url('${bottoms[bi][1]}')`);bottomEl.style.backgroundImage=`url('${bottoms[bi][1]}')`;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
+ function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
  function move(which,dir){if(which==='top')ti=(ti+dir+tops.length)%tops.length;else bi=(bi+dir+bottoms.length)%bottoms.length;render()}
  topEl.querySelector('.prev').onclick=()=>move('top',-1);topEl.querySelector('.next').onclick=()=>move('top',1);bottomEl.querySelector('.prev').onclick=()=>move('bottom',-1);bottomEl.querySelector('.next').onclick=()=>move('bottom',1);
  function swipe(el,which){let x=null,y=null;el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;x=e.clientX;y=e.clientY});el.addEventListener('pointerup',e=>{if(x===null)return;const dx=e.clientX-x,dy=e.clientY-y;x=y=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(which,dx<0?1:-1)});el.addEventListener('pointercancel',()=>{x=y=null})}
