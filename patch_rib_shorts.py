@@ -4,22 +4,23 @@ s=p.read_text()
 if 'id="build-your-fit"' not in s:
     raise SystemExit('Build Your Fit not present')
 
-# Build Your Fit v8: keep the standardized boards on one shared coordinate
-# system, move the join slightly lower through the exposed torso, and correct
-# the Houndstooth workout-shorts filename so that bottom actually renders.
+# Build Your Fit v9: the standardized boards all share one coordinate system.
+# Put the image-change seam in the exposed midriff, above every waistband, so
+# the selected bottom supplies the torso-to-waistband transition and no bottom
+# garment from the selected top board can leak into the composite.
 css=r'''
-/* Build Your Fit — standardized 12-board compositor v8 */
-#build-your-fit .byf-model{--byf-split:46.4%!important}
+/* Build Your Fit — midriff seam calibration v9 */
+#build-your-fit .byf-model{--byf-split:42%!important}
 #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
 #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important}
 '''
-if '/* Build Your Fit — standardized 12-board compositor v8 */' not in s:
+if '/* Build Your Fit — midriff seam calibration v9 */' not in s:
     s=s.replace('</style>',css+'\n</style>',1)
 
-# The uploaded file is D2DC5FB5... (FB5), not D2DC5EB5... (EB5).
+# Keep the corrected uploaded Houndstooth workout-shorts filename.
 s=s.replace('D2DC5EB5-3654-4B80-978B-238C3C4974F0.jpeg','D2DC5FB5-3654-4B80-978B-238C3C4974F0.jpeg')
 
-# Keep every bottom on the same source coordinates. No per-item Houndstooth offset.
+# Every standardized bottom uses the exact same source coordinates.
 old="bottomEl.style.setProperty('background-position',isHoundShort?'0 -2.15%':'0 0','important');"
 new="bottomEl.style.setProperty('background-position','0 0','important');"
 if old in s:
