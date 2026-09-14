@@ -4,11 +4,11 @@ s=p.read_text()
 if 'id="build-your-fit"' not in s:
     raise SystemExit('Build Your Fit not present')
 
-# v24: keep v23 responsive layout/shared swipe and LOCKED compositor geometry.
-# Only fix arrow presentation: four visible controls centered directly on the
-# left/right panel edges, upper pair = tops, lower pair = bottoms.
+# v25: keep v24 layout, shared front+back swipe zones, synchronization and
+# LOCKED compositor geometry. Re-anchor the four existing buttons to the OUTER
+# edges of the complete two-model panel (not the front model), outside border.
 css=r'''
-/* Build Your Fit — responsive joined viewer + edge controls v24 */
+/* Build Your Fit — responsive joined viewer + outer panel controls v25 */
 #build-your-fit .byf-shell{grid-template-columns:minmax(250px,330px) minmax(0,1fr)!important;gap:28px!important;align-items:start!important}
 #build-your-fit .byf-copy{min-width:0!important;padding-right:4px!important}
 #build-your-fit .byf-builder{min-width:0!important;width:100%!important}
@@ -19,22 +19,30 @@ css=r'''
 #build-your-fit .byf-back-model .byf-half{background-position:33.333333% 0!important}
 #build-your-fit .byf-back-model .byf-top,#build-your-fit .byf-back-model .byf-bottom{pointer-events:none!important}
 #build-your-fit .byf-back-model .byf-arrow,#build-your-fit .byf-back-model .byf-label{display:none!important}
-#build-your-fit .byf-model-pair #byfModel .byf-arrow{display:flex!important;position:absolute!important;z-index:30!important;width:42px!important;height:42px!important;align-items:center!important;justify-content:center!important;background:#111!important;color:#d9a11e!important;border:1.5px solid #d9a11e!important;border-radius:50%!important;font-size:1.65rem!important;line-height:1!important;margin:0!important;transform:translateY(-50%)!important;box-shadow:0 2px 8px rgba(0,0,0,.35)!important}
-#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev{left:-21px!important;right:auto!important}
-#build-your-fit .byf-model-pair #byfTop .byf-arrow.next,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{right:-21px!important;left:auto!important}
-#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfTop .byf-arrow.next{top:28%!important}
-#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{top:68%!important}
+#build-your-fit .byf-model-pair #byfModel .byf-arrow{display:flex!important;position:fixed!important;z-index:30!important;width:42px!important;height:42px!important;align-items:center!important;justify-content:center!important;background:#111!important;color:#d9a11e!important;border:1.5px solid #d9a11e!important;border-radius:50%!important;font-size:1.65rem!important;line-height:1!important;margin:0!important;transform:translate(-50%,-50%)!important;box-shadow:0 2px 8px rgba(0,0,0,.35)!important}
+#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev{left:var(--byf-panel-left)!important;right:auto!important}
+#build-your-fit .byf-model-pair #byfTop .byf-arrow.next,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{left:var(--byf-panel-right)!important;right:auto!important}
+#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfTop .byf-arrow.next{top:var(--byf-panel-top-control)!important}
+#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{top:var(--byf-panel-bottom-control)!important}
 @media(min-width:761px) and (max-width:1180px){#build-your-fit .byf-shell{grid-template-columns:minmax(220px,30%) minmax(0,70%)!important;gap:18px!important}#build-your-fit .byf-model-pair{padding:0 34px!important}#build-your-fit .byf-model-pair .byf-model{width:min(190px,18vw,22svh)!important}}
-@media(max-width:760px){#build-your-fit{padding-top:20px!important;padding-bottom:20px!important}#build-your-fit .byf-shell{grid-template-columns:1fr!important;gap:12px!important}#build-your-fit .byf-model-pair{width:max-content!important;max-width:calc(100% - 24px)!important;padding:0 12px!important}#build-your-fit .byf-model-pair .byf-model,#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{width:min(154px,40vw,14svh)!important}#build-your-fit .byf-model-pair #byfModel .byf-arrow{width:38px!important;height:38px!important;font-size:1.5rem!important}#build-your-fit .byf-model-pair #byfTop .byf-arrow.prev,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.prev{left:-19px!important}#build-your-fit .byf-model-pair #byfTop .byf-arrow.next,#build-your-fit .byf-model-pair #byfBottom .byf-arrow.next{right:-19px!important}}
+@media(max-width:760px){#build-your-fit{padding-top:20px!important;padding-bottom:20px!important}#build-your-fit .byf-shell{grid-template-columns:1fr!important;gap:12px!important}#build-your-fit .byf-model-pair{width:max-content!important;max-width:calc(100% - 24px)!important;padding:0 12px!important}#build-your-fit .byf-model-pair .byf-model,#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{width:min(154px,40vw,14svh)!important}#build-your-fit .byf-model-pair #byfModel .byf-arrow{width:38px!important;height:38px!important;font-size:1.5rem!important}}
 '''
-for marker in ['/* Build Your Fit — responsive joined viewer + shared controls v23 */']:
+for marker in ['/* Build Your Fit — responsive joined viewer + edge controls v24 */']:
     if marker in s:
         start=s.index(marker)
         end=s.index('</style>',start)
         s=s[:start]+s[end:]
         break
-if '/* Build Your Fit — responsive joined viewer + edge controls v24 */' not in s:
+if '/* Build Your Fit — responsive joined viewer + outer panel controls v25 */' not in s:
     s=s.replace('</style>',css+'\n</style>',1)
 
-# Preserve v23 shared front+back swipe zones exactly.
+# Position existing arrow elements from the COMPLETE panel rectangle so right
+# controls sit beside the back model, not at the front-model boundary.
+needle="const pair=document.querySelector('#build-your-fit .byf-model-pair');"
+replacement="""const pair=document.querySelector('#build-your-fit .byf-model-pair');
+ function placeByfEdgeControls(){if(!pair)return;const r=pair.getBoundingClientRect();pair.style.setProperty('--byf-panel-left',r.left+'px');pair.style.setProperty('--byf-panel-right',r.right+'px');pair.style.setProperty('--byf-panel-top-control',(r.top+r.height*.28)+'px');pair.style.setProperty('--byf-panel-bottom-control',(r.top+r.height*.68)+'px')}
+ placeByfEdgeControls();window.addEventListener('resize',placeByfEdgeControls,{passive:true});window.addEventListener('scroll',placeByfEdgeControls,{passive:true});"""
+if needle in s and 'function placeByfEdgeControls()' not in s:
+    s=s.replace(needle,replacement,1)
+
 p.write_text(s)
