@@ -233,6 +233,12 @@
 #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
 #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important}
 
+
+/* Build Your Fit — standardized 12-board compositor v7 */
+#build-your-fit .byf-model{--byf-split:45.8%!important}
+#build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
+#build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important}
+
 </style></head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo"></div></div></section>
@@ -914,7 +920,7 @@
   ['Oxblood Sports Bra','9BDD8A40-2E5B-4FEC-9F3B-1230228AE272.jpeg'],
   ['Heritage Plaid Sports Bra','4AC0E501-7790-4599-95A0-A3C03ACF75FF.jpeg'],
   ['Vault Sports Bra','E7B6B7E4-0AE0-4B06-934F-B86D40991E04.jpeg'],
-  ['Bougie Houndstooth Sports Bra','DB0194B3-AF6E-4964-B2F9-266330DB0A6D.jpeg']
+  ['Bougie Houndstooth Sports Bra','648F1080-1C4C-4FFD-BA17-C79CBE5D7309.jpeg']
  ];
  const bottoms=[
   ['Onyx Leggings','AB4D5CF7-F989-484D-8D0C-CB45C5C978F1.jpeg'],['Onyx Workout Shorts','EF619902-FCBF-4544-A37C-5E2D9524430A.jpeg'],
@@ -922,10 +928,10 @@
   ['Oxblood Leggings','9BDD8A40-2E5B-4FEC-9F3B-1230228AE272.jpeg'],['Oxblood Workout Shorts','E65C197F-ACC4-425B-A093-DE5434320D6E.jpeg'],
   ['Heritage Plaid Leggings','4AC0E501-7790-4599-95A0-A3C03ACF75FF.jpeg'],['Heritage Plaid Workout Shorts','75EA90E3-7637-406D-BB67-1D52B365AA54.jpeg'],
   ['Vault Leggings','E7B6B7E4-0AE0-4B06-934F-B86D40991E04.jpeg'],['Vault Workout Shorts','6475C168-80DB-4112-A004-708F8A4EECCA.jpeg'],
-  ['Bougie Houndstooth Leggings','DB0194B3-AF6E-4964-B2F9-266330DB0A6D.jpeg'],['Bougie Houndstooth Workout Shorts','794DD1D2-8663-4830-9612-93E0EC9E5B03.jpeg']
+  ['Bougie Houndstooth Leggings','648F1080-1C4C-4FFD-BA17-C79CBE5D7309.jpeg'],['Bougie Houndstooth Workout Shorts','D2DC5EB5-3654-4B80-978B-238C3C4974F0.jpeg']
  ];
  let ti=0,bi=0;
- function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const isHoundShort=bottoms[bi][0].toUpperCase().includes('HOUNDSTOOTH')&&bottoms[bi][0].toUpperCase().includes('SHORTS');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position',isHoundShort?'0 -2.15%':'0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
+ function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const isHoundShort=bottoms[bi][0].toUpperCase().includes('HOUNDSTOOTH')&&bottoms[bi][0].toUpperCase().includes('SHORTS');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}
  function move(which,dir){if(which==='top')ti=(ti+dir+tops.length)%tops.length;else bi=(bi+dir+bottoms.length)%bottoms.length;render()}
  topEl.querySelector('.prev').onclick=()=>move('top',-1);topEl.querySelector('.next').onclick=()=>move('top',1);bottomEl.querySelector('.prev').onclick=()=>move('bottom',-1);bottomEl.querySelector('.next').onclick=()=>move('bottom',1);
  function swipe(el,which){let x=null,y=null;el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;x=e.clientX;y=e.clientY});el.addEventListener('pointerup',e=>{if(x===null)return;const dx=e.clientX-x,dy=e.clientY-y;x=y=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(which,dx<0?1:-1)});el.addEventListener('pointercancel',()=>{x=y=null})}
