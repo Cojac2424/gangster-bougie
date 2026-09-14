@@ -23,6 +23,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Refine Build Your Fit waist controls and labels" || exit 0
+          git commit -m "Rebuild Build Your Fit compositor geometry" || exit 0
           git push origin main
-# alignment-v3
+# compositor-v4
