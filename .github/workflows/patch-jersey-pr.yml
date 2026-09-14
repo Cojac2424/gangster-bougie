@@ -1,4 +1,4 @@
-name: Build Your Fit Prototype
+name: Build Your Fit Alignment Fix
 on:
   push:
     branches: [main]
@@ -23,5 +23,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Add Build Your Fit Signature prototype" || exit 0
+          git commit -m "Fix Build Your Fit alignment and viewport sizing" || exit 0
           git push origin main
