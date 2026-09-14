@@ -4,35 +4,37 @@ s=p.read_text()
 if 'id="build-your-fit"' not in s:
     raise SystemExit('Build Your Fit not present')
 
-# Build Your Fit v13: standardized boards use one bare-torso handoff.
-# The previous 39% splice was still close enough to garment edges that some
-# high-waisted bottoms could intrude upward. Move the shared cut slightly toward
-# the center of the exposed abdomen, and explicitly keep the same calibration
-# at tablet/desktop widths so responsive CSS cannot restore an older split.
+# v14: keep the good shared torso seam, but give only the two Onyx bottoms a
+# slightly lower handoff so their higher waist does not intrude into the bra.
 css=r'''
-/* Build Your Fit — centered bare-torso splice calibration v13 */
+/* Build Your Fit — centered torso splice v14 */
 #build-your-fit .byf-model{--byf-split:38.4%!important}
 #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
 #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-image:var(--byf-bottom-image)!important;background-position:0 0!important}
-@media (min-width:700px){
-  #build-your-fit .byf-model{--byf-split:38.4%!important}
-  #build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
-  #build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-position:0 0!important}
-}
+@media (min-width:700px){#build-your-fit .byf-model{--byf-split:38.4%!important}}
 '''
-old=r'''/* Build Your Fit — bare-torso splice calibration v12 */
-#build-your-fit .byf-model{--byf-split:39%!important}
-#build-your-fit .byf-top{clip-path:inset(0 0 calc(100% - var(--byf-split)) 0)!important}
-#build-your-fit .byf-bottom{clip-path:inset(var(--byf-split) 0 0 0)!important;background-image:var(--byf-bottom-image)!important;background-position:0 0!important}
-'''
-if old in s:
-    s=s.replace(old,css,1)
-elif '/* Build Your Fit — centered bare-torso splice calibration v13 */' not in s:
+# Remove any prior calibration block we added; otherwise append after legacy rules.
+for marker in [
+ '/* Build Your Fit — centered bare-torso splice calibration v13 */',
+ '/* Build Your Fit — bare-torso splice calibration v12 */',
+ '/* Build Your Fit — clean midriff seam calibration v11 */',
+ '/* Build Your Fit — mid-torso seam calibration v10 */']:
+    if marker in s:
+        start=s.index(marker)
+        end=s.index('</style>',start)
+        # prior generated calibration is the final block before </style>
+        s=s[:start]+s[end:]
+        break
+if '/* Build Your Fit — centered torso splice v14 */' not in s:
     s=s.replace('</style>',css+'\n</style>',1)
 
+# Correct Houndstooth asset spelling if an old reference remains.
 s=s.replace('D2DC5EB5-3654-4B80-978B-238C3C4974F0.jpeg','D2DC5FB5-3654-4B80-978B-238C3C4974F0.jpeg')
-oldpos="bottomEl.style.setProperty('background-position',isHoundShort?'0 -2.15%':'0 0','important');"
-newpos="bottomEl.style.setProperty('background-position','0 0','important');"
-if oldpos in s:
-    s=s.replace(oldpos,newpos,1)
+
+# Per-bottom seam: only Onyx leggings/shorts get the lower handoff.
+old="function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const isHoundShort=bottoms[bi][0].toUpperCase().includes('HOUNDSTOOTH')&&bottoms[bi][0].toUpperCase().includes('SHORTS');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
+new="function render(){const topUrl=`url('${tops[ti][1]}')`;const bottomUrl=`url('${bottoms[bi][1]}')`;const isOnyxBottom=bottoms[bi][0]==='Onyx Leggings'||bottoms[bi][0]==='Onyx Workout Shorts';const modelEl=document.getElementById('byfModel');if(modelEl)modelEl.style.setProperty('--byf-split',isOnyxBottom?'39.2%':'38.4%','important');topEl.style.backgroundImage=topUrl;bottomEl.style.setProperty('--byf-bottom-image',bottomUrl);bottomEl.style.backgroundImage=bottomUrl;bottomEl.style.setProperty('background-position','0 0','important');document.getElementById('byfTopLabel').textContent=tops[ti][0];document.getElementById('byfBottomLabel').textContent=bottoms[bi][0]}"
+if old not in s:
+    raise SystemExit('Expected Build Your Fit render function not found')
+s=s.replace(old,new,1)
 p.write_text(s)
