@@ -1057,4 +1057,12 @@
 })();
 </script>
 
+
+<script>/* Deferred modal images v35 */
+(function(){
+ function loadModal(modal){if(!modal)return;modal.querySelectorAll('img[data-src]').forEach(function(img){if(!img.getAttribute('src'))img.setAttribute('src',img.dataset.src);});}
+ document.addEventListener('click',function(){requestAnimationFrame(function(){document.querySelectorAll('.modal.open').forEach(loadModal);});},true);
+ new MutationObserver(function(ms){ms.forEach(function(m){var el=m.target;if(el.classList&&el.classList.contains('modal')&&el.classList.contains('open'))loadModal(el);});}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+})();
+</script>
 </body></html>
