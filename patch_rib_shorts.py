@@ -3,38 +3,40 @@ from pathlib import Path
 p=Path('index.html')
 s=p.read_text()
 
-# v48 — Cream and Oxblood workout-short photos were mapped to the opposite product.
-# Swap only those two front/back image pairs and their cart thumbnails.
-# No Build Your Fit geometry, joins, sizing, arrows, prices, descriptions or layout changed.
-if 'Cream Oxblood shorts image swap v48' not in s:
-    # Signature Fit product-photo mapping from v46.
-    s=s.replace("'Cream Workout Shorts':{front:'IMG_0555.jpeg',back:'IMG_0556.jpeg'", "'Cream Workout Shorts':{front:'IMG_0557.jpeg',back:'IMG_0558.jpeg'")
-    s=s.replace("'Oxblood Workout Shorts':{front:'IMG_0557.jpeg',back:'IMG_0558.jpeg'", "'Oxblood Workout Shorts':{front:'IMG_0555.jpeg',back:'IMG_0556.jpeg'")
-
-    # Any existing shorts thumbnail maps from v46/v47.
-    s=s.replace("'Cream Workout Shorts':'IMG_0555.jpeg','Oxblood Workout Shorts':'IMG_0557.jpeg'", "'Cream Workout Shorts':'IMG_0557.jpeg','Oxblood Workout Shorts':'IMG_0555.jpeg'")
-
-    # Final lightweight override also guarantees the correct pair on the current live selection.
+# v49 — make the established Product Details dropdown template visible for every Signature Fit product.
+# The existing product-data scripts continue supplying each selected item's own details.
+# No Build Your Fit geometry, joins, sizing, arrows, images, prices or layout measurements changed.
+if 'Signature Fit Product Details template v49' not in s:
     js=r'''
-<script>/* Cream Oxblood shorts image swap v48 */
+<script>/* Signature Fit Product Details template v49 */
 (function(){
- const pairs={
-  'Cream Workout Shorts':['IMG_0557.jpeg','IMG_0558.jpeg'],
-  'Oxblood Workout Shorts':['IMG_0555.jpeg','IMG_0556.jpeg']
- };
- function sync(){
-  const nameEl=document.getElementById('byfShopBottomName'),pair=document.getElementById('byfBottomRealProductPair');
-  if(!nameEl||!pair)return;
-  const name=(nameEl.textContent||'').trim(),imgs=pairs[name];
-  if(!imgs)return;
-  const nodes=pair.querySelectorAll('img');
-  if(nodes[0]&&nodes[0].getAttribute('src')!==imgs[0])nodes[0].src=imgs[0];
-  if(nodes[1]&&nodes[1].getAttribute('src')!==imgs[1])nodes[1].src=imgs[1];
+ function ensure(itemId,detailsId){
+  const name=document.getElementById(itemId);if(!name)return null;
+  const item=name.closest('.byf-fit-item');if(!item)return null;
+  let details=document.getElementById(detailsId)||item.querySelector('details.byf-product-details');
+  if(!details){
+   details=document.createElement('details');details.className='byf-product-details';details.id=detailsId;
+   const summary=document.createElement('summary');summary.textContent='Product Details';
+   const body=document.createElement('div');body.className='byf-details-body';
+   details.appendChild(summary);details.appendChild(body);
+   const pair=item.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair');
+   item.insertBefore(details,pair||null);
+  }
+  details.style.display='block';
+  return details;
  }
- const nameEl=document.getElementById('byfShopBottomName');
- if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
- const root=document.getElementById('build-your-fit');if(root)root.addEventListener('click',function(){requestAnimationFrame(sync)});
- sync();
+ function sync(){
+  ensure('byfShopTopName','byfTopDetails');
+  ensure('byfShopBottomName','byfBottomDetails');
+  // Nudge the existing per-product data handlers after the dropdown is guaranteed to exist.
+  const root=document.getElementById('build-your-fit');
+  if(root)root.dispatchEvent(new Event('pointerup',{bubbles:false}));
+ }
+ function install(){
+  ensure('byfShopTopName','byfTopDetails');ensure('byfShopBottomName','byfBottomDetails');
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){ensure(id,id==='byfShopTopName'?'byfTopDetails':'byfBottomDetails')}).observe(el,{childList:true,characterData:true,subtree:true})});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
 '''
