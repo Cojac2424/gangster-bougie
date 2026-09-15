@@ -3,44 +3,41 @@ from pathlib import Path
 p=Path('index.html')
 s=p.read_text()
 
-# v47 — stop the shorts cart thumbnail observer from recursively rewriting its own DOM.
-# Cart/performance fix only. No Build Your Fit geometry, joins, sizing, arrows or layout changed.
-if 'Shorts cart freeze fix v47' not in s:
+# v48 — Cream and Oxblood workout-short photos were mapped to the opposite product.
+# Swap only those two front/back image pairs and their cart thumbnails.
+# No Build Your Fit geometry, joins, sizing, arrows, prices, descriptions or layout changed.
+if 'Cream Oxblood shorts image swap v48' not in s:
+    # Signature Fit product-photo mapping from v46.
+    s=s.replace("'Cream Workout Shorts':{front:'IMG_0555.jpeg',back:'IMG_0556.jpeg'", "'Cream Workout Shorts':{front:'IMG_0557.jpeg',back:'IMG_0558.jpeg'")
+    s=s.replace("'Oxblood Workout Shorts':{front:'IMG_0557.jpeg',back:'IMG_0558.jpeg'", "'Oxblood Workout Shorts':{front:'IMG_0555.jpeg',back:'IMG_0556.jpeg'")
+
+    # Any existing shorts thumbnail maps from v46/v47.
+    s=s.replace("'Cream Workout Shorts':'IMG_0555.jpeg','Oxblood Workout Shorts':'IMG_0557.jpeg'", "'Cream Workout Shorts':'IMG_0557.jpeg','Oxblood Workout Shorts':'IMG_0555.jpeg'")
+
+    # Final lightweight override also guarantees the correct pair on the current live selection.
     js=r'''
-<script>/* Shorts cart freeze fix v47 */
+<script>/* Cream Oxblood shorts image swap v48 */
 (function(){
- const thumbMap={
-  'Cream Workout Shorts':'IMG_0555.jpeg','Oxblood Workout Shorts':'IMG_0557.jpeg','Onyx Workout Shorts':'IMG_0543.jpeg',
-  'Bougie Houndstooth Workout Shorts':'IMG_0536.jpeg','Vault Workout Shorts':'IMG_0529.jpeg','Heritage Plaid Workout Shorts':'IMG_0515.jpeg'
+ const pairs={
+  'Cream Workout Shorts':['IMG_0557.jpeg','IMG_0558.jpeg'],
+  'Oxblood Workout Shorts':['IMG_0555.jpeg','IMG_0556.jpeg']
  };
- function repair(){
-  document.querySelectorAll('.gb-cart-line').forEach(function(row){
-   const nameEl=row.querySelector('.gb-cart-line-name'),slot=row.querySelector('.gb-cart-thumb-slot');
-   if(!nameEl||!slot)return;
-   const name=(nameEl.textContent||'').trim(),src=thumbMap[name];
-   if(!src)return;
-   let img=slot.querySelector('img.gb-cart-thumb');
-   if(!img){img=document.createElement('img');img.className='gb-cart-thumb';img.loading='lazy';img.decoding='async';slot.appendChild(img)}
-   if(img.getAttribute('src')!==src)img.src=src;
-   if(img.alt!==name)img.alt=name;
-  });
+ function sync(){
+  const nameEl=document.getElementById('byfShopBottomName'),pair=document.getElementById('byfBottomRealProductPair');
+  if(!nameEl||!pair)return;
+  const name=(nameEl.textContent||'').trim(),imgs=pairs[name];
+  if(!imgs)return;
+  const nodes=pair.querySelectorAll('img');
+  if(nodes[0]&&nodes[0].getAttribute('src')!==imgs[0])nodes[0].src=imgs[0];
+  if(nodes[1]&&nodes[1].getAttribute('src')!==imgs[1])nodes[1].src=imgs[1];
  }
- // Disconnect the v46 body-wide observer by replacing its mutation target before it can self-loop.
- // A lightweight observer watches only cart line additions and never clears/rebuilds existing thumbnail DOM.
- const lines=document.getElementById('gbCartLines');
- if(lines&&window.MutationObserver){
-   let queued=false;
-   new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;repair()})}).observe(lines,{childList:true});
- }
- const link=document.getElementById('gbCartLink');if(link)link.addEventListener('click',function(){requestAnimationFrame(repair)});
- const add=document.getElementById('byfAddFit');if(add)add.addEventListener('click',function(){requestAnimationFrame(function(){requestAnimationFrame(repair)})});
- repair();
+ const nameEl=document.getElementById('byfShopBottomName');
+ if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');if(root)root.addEventListener('click',function(){requestAnimationFrame(sync)});
+ sync();
 })();
 </script>
 '''
-    # Remove the dangerous v46 body-wide observer line so it cannot recursively fire on its own thumbnail writes.
-    s=s.replace(" document.addEventListener('click',()=>setTimeout(repairCartThumbs,0),true);\n new MutationObserver(repairCartThumbs).observe(document.body,{childList:true,subtree:true});",
-                " // v47: body-wide self-mutating observer removed; cart thumbnails are handled by the lightweight cart observer below.")
     s=s.replace('</body>',js+'</body>')
 
 p.write_text(s)
