@@ -5,62 +5,57 @@ p=Path('index.html')
 s=p.read_text()
 if 'id="build-your-fit"' not in s: raise SystemExit('Build Your Fit not present')
 
-# v36 performance cleanup. Appearance and Build Your Fit geometry are untouched.
-women_keep=['09D6C9A9-6759-4A5E-8C29-87A00A34A157.png','55CF2A2E-AA03-4D2F-9D7B-2E523AEC0041.png','C30C5493-EC0F-4DC6-B74D-FC2CC515FEB4.png','ECA29DBD-304E-493E-8A51-76E7CB5E4BC8.png']
-men_keep=['IMG_2021.jpeg','IMG_2028.jpeg','IMG_2029.jpeg','IMG_2030.jpeg']
-lookbook=s.index('<section class="lookbook"')
-shop=s.index('<section id="shop"',lookbook) if '<section id="shop"' in s[lookbook:] else s.index('<section',lookbook+30)
-block=s[lookbook:shop]
-first_window=block.find('<div class="lookbook-window">')
-if first_window!=-1:
-    hint=block.find('<div class="lookbook-hint">',first_window)
-    if hint!=-1:
-        prefix,suffix=block[:first_window],block[hint:]
-        def row(files,cls=''):
-            c=(' '+cls) if cls else ''
-            imgs=''.join(f'<div class="lookbook-item"><img src="{f}" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div>' for f in files)
-            return f'<div class="lookbook-window"><div class="lookbook-grid{c}">{imgs}{imgs}</div></div>'
-        block=prefix+row(women_keep)+row(men_keep,'men-ticker')+suffix
-        s=s[:lookbook]+block+s[shop:]
+# v37: finish the first Build Your Fit purchasing template without touching compositor geometry.
+# Remove the now-redundant View Items button only; View This Fit remains.
+s=re.sub(r'\s*<button[^>]*id="byfViewProducts"[^>]*>.*?</button>','',s,flags=re.S|re.I)
+# Remove old scroll-to-Shop handler if present.
+s=re.sub(r'\s*const viewProducts=document\.getElementById\([\'\"]byfViewProducts[\'\"]\);\s*if\(viewProducts\)viewProducts\.onclick=\(\)=>\{.*?\};','',s,flags=re.S)
 
-# Native lazy loading on all normal images first.
-def optimize_img(m):
-    tag=m.group(0)
-    if re.search(r'\bloading\s*=',tag,re.I): return tag
-    return tag[:-1]+' loading="lazy" decoding="async">'
-s=re.sub(r'<img\b[^>]*>',optimize_img,s,flags=re.I)
+# Upgrade existing local cart behavior: retain the site's own cart, store exact product/size/price,
+# and make repeated adds update quantities instead of creating confusing duplicate rows.
+old="""const cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
+cart.push(...items);
+localStorage.setItem('gbCart',JSON.stringify(cart));"""
+new="""const cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
+items.forEach(function(item){
+ const hit=cart.find(function(x){return x.name===item.name&&x.size===item.size;});
+ if(hit)hit.qty=(hit.qty||1)+1;
+ else cart.push(Object.assign({qty:1},item));
+});
+localStorage.setItem('gbCart',JSON.stringify(cart));"""
+if old in s:s=s.replace(old,new)
 
-# True below-fold deferral: remove src from ordinary images after the hero and before
-# the modal markup. The browser therefore cannot request them until IntersectionObserver
-# sees them approaching the viewport. Build Your Fit uses CSS background boards and is
-# deliberately excluded from this transformation.
-main_start=s.find('<section class="lookbook"')
-modal_start=s.find('<div class="modal"')
-if main_start!=-1 and modal_start!=-1:
-    region=s[main_start:modal_start]
-    # Keep Build Your Fit block exactly as-is.
-    byf_start=region.find('<section id="build-your-fit"')
-    byf_end=region.find('</section>',byf_start)+10 if byf_start!=-1 else -1
-    def defer_html(chunk):
-        return re.sub(r'<img\b([^>]*?)\bsrc="([^"]+)"([^>]*)>',lambda x:'<img'+x.group(1)+'data-src="'+x.group(2)+'"'+x.group(3)+'>',chunk,flags=re.I)
-    if byf_start!=-1 and byf_end>byf_start:
-        region=defer_html(region[:byf_start])+region[byf_start:byf_end]+defer_html(region[byf_end:])
-    else:
-        region=defer_html(region)
-    s=s[:main_start]+region+s[modal_start:]
+# Make sure the first approved outfit has its exact real-product content/details in the inline panel.
+# Existing v30 elements are reused so the visual architecture stays stable.
+oxblood_details='''<details class="byf-product-details" id="byfTopDetails"><summary>Product Details</summary><div class="byf-details-body"><p>Bold, elevated and unmistakably Gangster Bougie. The Gangster Bougie Signature Essentials Oxblood Sports Bra combines a rich Oxblood red foundation with understated gold GB detailing for a luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature gold crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or mix effortlessly with pieces throughout the GB Signature Collection.</p><ul><li>Rich Oxblood red</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across GB Signature Collection</li><li>Made to order</li></ul><p><strong>Material:</strong> 100% polyester</p><p><strong>Back:</strong> U-shaped back</p><p><strong>Size tolerance:</strong> up to 1.2 in (3 cm)</p></div></details>'''
+cream_details='''<details class="byf-product-details" id="byfBottomDetails"><summary>Product Details</summary><div class="byf-details-body"><p>Clean luxury built for movement. The Gangster Bougie Signature Essentials Cream High-Waisted Leggings feature a soft Cream foundation finished with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while the signature gold crown finishes the back for a minimal, elevated look designed to coordinate effortlessly across the GB Signature Collection.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order</li></ul><p><strong>Runs small — consider sizing up.</strong></p><p><strong>Material:</strong> 83% polyester, 17% spandex</p><p><strong>Fit:</strong> Skinny fit; double-layer waistband</p><p>Outside seam thread is colour-matched to the design; interior seam thread is white.</p><p>Slightly see-through when stretched. Some undyed white underneath material may become visible at seams or where sewn.</p><p>Assembled in the USA from globally sourced parts.</p></div></details>'''
+s=re.sub(r'<details class="byf-product-details" id="byfTopDetails">.*?</details>',oxblood_details,s,flags=re.S)
+s=re.sub(r'<details class="byf-product-details" id="byfBottomDetails">.*?</details>',cream_details,s,flags=re.S)
 
-# Hidden product modal images are also true-deferred until the modal opens.
-def defer_modal(m):
-    block=m.group(0)
-    block=re.sub(r'<img\b([^>]*?)\bsrc="([^"]+)"([^>]*)>',lambda x:'<img'+x.group(1)+'data-src="'+x.group(2)+'"'+x.group(3)+'>',block,flags=re.I)
-    return block
-s=re.sub(r'<div class="modal"\b.*?(?=<div class="modal"\b|<script\b)',defer_modal,s,flags=re.S|re.I)
+# Ensure real Oxblood and Cream product pairs are present if earlier versions were partially applied.
+if 'id="byfTopRealProductPair"' not in s:
+    anchor='<div class="byf-fit-price">US$39.99</div>'
+    pair='<div class="byf-real-product-pair" id="byfTopRealProductPair"><img src="IMG_0547.jpeg" alt="Oxblood Sports Bra front" loading="lazy" decoding="async"><img src="IMG_0548.jpeg" alt="Oxblood Sports Bra back" loading="lazy" decoding="async"></div>'
+    s=s.replace(anchor,anchor+pair,1)
+if 'id="byfBottomRealProductPair"' not in s:
+    anchor='<div class="byf-fit-price" id="byfShopBottomPrice"></div>'
+    pair='<div class="byf-real-product-pair" id="byfBottomRealProductPair"><img src="IMG_0553.jpeg" alt="Cream High-Waisted Leggings product view 1" loading="lazy" decoding="async"><img src="IMG_0554.jpeg" alt="Cream High-Waisted Leggings product view 2" loading="lazy" decoding="async"></div>'
+    s=s.replace(anchor,anchor+pair,1)
 
-# Remove previous performance loaders so the patch stays idempotent.
-s=re.sub(r'\n?<script>\s*/\* Deferred modal images v35 \*/.*?</script>\s*','\n',s,flags=re.S)
-s=re.sub(r'\n?<script>\s*/\* Near-viewport image loader v36 \*/.*?</script>\s*','\n',s,flags=re.S)
-s=re.sub(r'\n?<script>\s*/\* Safe native lazy loading v31 \*/.*?</script>\s*','\n',s,flags=re.S)
+# Add safe inline details styling only if absent. No model/viewer selectors are changed.
+if 'Build Your Fit product details v37' not in s:
+    css='''\n<style>/* Build Your Fit product details v37 */
+#build-your-fit .byf-product-details{margin-top:14px;border-top:1px solid rgba(216,169,40,.28);padding-top:10px;text-align:left}
+#build-your-fit .byf-product-details summary{cursor:pointer;color:#f4cf63;font-weight:900;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;list-style:none}
+#build-your-fit .byf-product-details summary::-webkit-details-marker{display:none}
+#build-your-fit .byf-product-details summary:after{content:' +';float:right}
+#build-your-fit .byf-product-details[open] summary:after{content:' −'}
+#build-your-fit .byf-details-body{padding-top:10px;color:#d2d2d2;font-size:.84rem;line-height:1.5}
+#build-your-fit .byf-details-body p{margin:0 0 9px}
+#build-your-fit .byf-details-body ul{margin:0 0 10px 18px;padding:0}
+#build-your-fit .byf-real-product-pair{display:flex;gap:8px;margin-top:10px;max-width:190px}
+#build-your-fit .byf-real-product-pair img{width:calc(50% - 4px);aspect-ratio:1;object-fit:cover;background:#eee;border-radius:6px}
+</style>\n'''
+    s=s.replace('</head>',css+'</head>')
 
-loader='''\n<script>/* Near-viewport image loader v36 */\n(function(){\n function load(img){if(img&&img.dataset.src&&!img.getAttribute('src'))img.setAttribute('src',img.dataset.src);}\n var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){load(e.target);io.unobserve(e.target);}});},{rootMargin:'700px 0px'}):null;\n document.querySelectorAll('main img[data-src]').forEach(function(img){if(io)io.observe(img);else load(img);});\n function loadModal(modal){if(!modal)return;modal.querySelectorAll('img[data-src]').forEach(load);}\n document.addEventListener('click',function(){requestAnimationFrame(function(){document.querySelectorAll('.modal.open').forEach(loadModal);});},true);\n new MutationObserver(function(ms){ms.forEach(function(m){var el=m.target;if(el.classList&&el.classList.contains('modal')&&el.classList.contains('open'))loadModal(el);});}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});\n})();\n</script>\n'''
-s=s.replace('</body>',loader+'</body>')
 p.write_text(s)
