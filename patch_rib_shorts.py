@@ -1,32 +1,17 @@
 from pathlib import Path
-import re
 
 p=Path('index.html')
 s=p.read_text()
 if 'id="build-your-fit"' not in s: raise SystemExit('Build Your Fit not present')
 
-# v40 — only show the real Oxblood pair when Oxblood is the selected top.
-# This intentionally mirrors the existing bottom behavior: unknown products stay blank until their real Printify images are supplied.
-if 'Build Your Fit top real-image guard v40' not in s:
-    js='''\n<script>/* Build Your Fit top real-image guard v40 */
-(function(){
- function syncTopRealImages(){
-  var name=document.getElementById('byfShopTopName');
-  var pair=document.getElementById('byfTopRealProductPair');
-  if(!name||!pair)return;
-  var isOxblood=(name.textContent||'').trim()==='Oxblood Sports Bra';
-  pair.style.display=isOxblood?'flex':'none';
- }
- var root=document.getElementById('build-your-fit');
- if(root){
-  root.addEventListener('click',function(){setTimeout(syncTopRealImages,0)});
-  root.addEventListener('pointerup',function(){setTimeout(syncTopRealImages,0)});
- }
- var name=document.getElementById('byfShopTopName');
- if(name&&window.MutationObserver)new MutationObserver(syncTopRealImages).observe(name,{childList:true,characterData:true,subtree:true});
- syncTopRealImages();
-})();
-</script>\n'''
-    s=s.replace('</body>',js+'</body>')
+# v41 — stacking fix only. Keep Build Your Fit arrows below the sticky site header.
+# No model dimensions, positions, split points, arrow coordinates, or compositor geometry are changed.
+if 'Build Your Fit arrow stacking v41' not in s:
+    css='''\n<style>/* Build Your Fit arrow stacking v41 */
+/* Header is z-index:20. The arrows only need to sit above the models, not above the site navigation. */
+#build-your-fit .byf-model-pair{z-index:1!important}
+#build-your-fit .byf-outer-arrow{z-index:10!important}
+</style>\n'''
+    s=s.replace('</head>',css+'</head>')
 
 p.write_text(s)
