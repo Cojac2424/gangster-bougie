@@ -372,6 +372,11 @@
 #build-your-fit .byf-model-pair{z-index:1!important}
 #build-your-fit .byf-outer-arrow{z-index:10!important}
 </style>
+
+<style>/* Clear Cart control v45 */
+.gb-cart-clear{display:block;margin:0 0 12px auto;padding:7px 0;border:0;background:transparent;color:#aaa;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:.78rem;cursor:pointer}
+.gb-cart-clear:hover,.gb-cart-clear:focus{color:#fff}
+</style>
 </head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#" id="gbCartLink">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div></div></section>
@@ -1260,6 +1265,29 @@
  const root=document.getElementById('build-your-fit');if(root){root.addEventListener('click',()=>setTimeout(sync,0));root.addEventListener('pointerup',()=>setTimeout(sync,0))}sync();
  function cart(){document.querySelectorAll('.gb-cart-line').forEach(row=>{const n=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(),p=products[n],slot=row.querySelector('.gb-cart-thumb-slot');if(!p||!slot)return;let im=slot.querySelector('img');if(!im){im=document.createElement('img');im.className='gb-cart-thumb';im.loading='lazy';im.decoding='async';slot.appendChild(im)}if(im.getAttribute('src')!==p.front)im.src=p.front;im.alt=n})}
  const lines=document.getElementById('gbCartLines');if(lines&&window.MutationObserver)new MutationObserver(cart).observe(lines,{childList:true,subtree:true});cart();
+})();
+</script>
+
+<script>/* Clear Cart control v45 */
+(function(){
+ const KEY='gbCart';
+ function install(){
+  const footer=document.getElementById('gbCartFooter');
+  if(!footer||document.getElementById('gbCartClear'))return;
+  const b=document.createElement('button');
+  b.type='button'; b.id='gbCartClear'; b.className='gb-cart-clear'; b.textContent='Clear Cart';
+  b.addEventListener('click',function(){
+   const cart=(()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}})();
+   if(!cart.length)return;
+   if(!window.confirm('Remove all items from your cart?'))return;
+   localStorage.setItem(KEY,'[]');
+   if(window.gbCartRefresh)window.gbCartRefresh();
+   else window.dispatchEvent(new Event('storage'));
+  });
+  const subtotal=footer.querySelector('.gb-cart-subtotal');
+  footer.insertBefore(b,subtotal||footer.firstChild);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
 </body></html>
