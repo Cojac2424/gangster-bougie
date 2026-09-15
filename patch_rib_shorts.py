@@ -5,57 +5,65 @@ p=Path('index.html')
 s=p.read_text()
 if 'id="build-your-fit"' not in s: raise SystemExit('Build Your Fit not present')
 
-# v37: finish the first Build Your Fit purchasing template without touching compositor geometry.
-# Remove the now-redundant View Items button only; View This Fit remains.
+# v38 — working site cart. No Build Your Fit compositor/viewer geometry changes.
+# Keep v37's removal of redundant View Items.
 s=re.sub(r'\s*<button[^>]*id="byfViewProducts"[^>]*>.*?</button>','',s,flags=re.S|re.I)
-# Remove old scroll-to-Shop handler if present.
 s=re.sub(r'\s*const viewProducts=document\.getElementById\([\'\"]byfViewProducts[\'\"]\);\s*if\(viewProducts\)viewProducts\.onclick=\(\)=>\{.*?\};','',s,flags=re.S)
 
-# Upgrade existing local cart behavior: retain the site's own cart, store exact product/size/price,
-# and make repeated adds update quantities instead of creating confusing duplicate rows.
-old="""const cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
-cart.push(...items);
-localStorage.setItem('gbCart',JSON.stringify(cart));"""
-new="""const cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
-items.forEach(function(item){
- const hit=cart.find(function(x){return x.name===item.name&&x.size===item.size;});
- if(hit)hit.qty=(hit.qty||1)+1;
- else cart.push(Object.assign({qty:1},item));
-});
-localStorage.setItem('gbCart',JSON.stringify(cart));"""
-if old in s:s=s.replace(old,new)
+# Ensure the header Cart control has a stable hook while preserving its existing appearance.
+s=re.sub(r'(<a\b[^>]*class="[^"]*cart-link[^"]*"[^>]*)(>)',lambda m:m.group(1)+(' id="gbCartLink"' if 'id=' not in m.group(1) else '')+m.group(2),s,count=1,flags=re.I)
 
-# Make sure the first approved outfit has its exact real-product content/details in the inline panel.
-# Existing v30 elements are reused so the visual architecture stays stable.
-oxblood_details='''<details class="byf-product-details" id="byfTopDetails"><summary>Product Details</summary><div class="byf-details-body"><p>Bold, elevated and unmistakably Gangster Bougie. The Gangster Bougie Signature Essentials Oxblood Sports Bra combines a rich Oxblood red foundation with understated gold GB detailing for a luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature gold crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or mix effortlessly with pieces throughout the GB Signature Collection.</p><ul><li>Rich Oxblood red</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across GB Signature Collection</li><li>Made to order</li></ul><p><strong>Material:</strong> 100% polyester</p><p><strong>Back:</strong> U-shaped back</p><p><strong>Size tolerance:</strong> up to 1.2 in (3 cm)</p></div></details>'''
-cream_details='''<details class="byf-product-details" id="byfBottomDetails"><summary>Product Details</summary><div class="byf-details-body"><p>Clean luxury built for movement. The Gangster Bougie Signature Essentials Cream High-Waisted Leggings feature a soft Cream foundation finished with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while the signature gold crown finishes the back for a minimal, elevated look designed to coordinate effortlessly across the GB Signature Collection.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order</li></ul><p><strong>Runs small — consider sizing up.</strong></p><p><strong>Material:</strong> 83% polyester, 17% spandex</p><p><strong>Fit:</strong> Skinny fit; double-layer waistband</p><p>Outside seam thread is colour-matched to the design; interior seam thread is white.</p><p>Slightly see-through when stretched. Some undyed white underneath material may become visible at seams or where sewn.</p><p>Assembled in the USA from globally sourced parts.</p></div></details>'''
-s=re.sub(r'<details class="byf-product-details" id="byfTopDetails">.*?</details>',oxblood_details,s,flags=re.S)
-s=re.sub(r'<details class="byf-product-details" id="byfBottomDetails">.*?</details>',cream_details,s,flags=re.S)
+# Add the cart drawer once.
+if 'id="gbCartDrawer"' not in s:
+    drawer='''\n<div class="gb-cart-overlay" id="gbCartOverlay" aria-hidden="true"></div>
+<aside class="gb-cart-drawer" id="gbCartDrawer" aria-hidden="true" aria-label="Shopping cart">
+ <div class="gb-cart-head"><div><div class="gb-cart-kicker">Gangster Bougie</div><h2>Your Cart</h2></div><button type="button" class="gb-cart-close" id="gbCartClose" aria-label="Close cart">×</button></div>
+ <div class="gb-cart-lines" id="gbCartLines"></div>
+ <div class="gb-cart-empty" id="gbCartEmpty">Your cart is empty.</div>
+ <div class="gb-cart-footer" id="gbCartFooter">
+  <div class="gb-cart-subtotal"><span>Subtotal</span><strong id="gbCartSubtotal">US$0.00</strong></div>
+  <p>Shipping and taxes are calculated at checkout.</p>
+  <button type="button" class="gb-cart-checkout" id="gbCartCheckout">Checkout</button>
+ </div>
+</aside>\n'''
+    s=s.replace('</body>',drawer+'</body>')
 
-# Ensure real Oxblood and Cream product pairs are present if earlier versions were partially applied.
-if 'id="byfTopRealProductPair"' not in s:
-    anchor='<div class="byf-fit-price">US$39.99</div>'
-    pair='<div class="byf-real-product-pair" id="byfTopRealProductPair"><img src="IMG_0547.jpeg" alt="Oxblood Sports Bra front" loading="lazy" decoding="async"><img src="IMG_0548.jpeg" alt="Oxblood Sports Bra back" loading="lazy" decoding="async"></div>'
-    s=s.replace(anchor,anchor+pair,1)
-if 'id="byfBottomRealProductPair"' not in s:
-    anchor='<div class="byf-fit-price" id="byfShopBottomPrice"></div>'
-    pair='<div class="byf-real-product-pair" id="byfBottomRealProductPair"><img src="IMG_0553.jpeg" alt="Cream High-Waisted Leggings product view 1" loading="lazy" decoding="async"><img src="IMG_0554.jpeg" alt="Cream High-Waisted Leggings product view 2" loading="lazy" decoding="async"></div>'
-    s=s.replace(anchor,anchor+pair,1)
-
-# Add safe inline details styling only if absent. No model/viewer selectors are changed.
-if 'Build Your Fit product details v37' not in s:
-    css='''\n<style>/* Build Your Fit product details v37 */
-#build-your-fit .byf-product-details{margin-top:14px;border-top:1px solid rgba(216,169,40,.28);padding-top:10px;text-align:left}
-#build-your-fit .byf-product-details summary{cursor:pointer;color:#f4cf63;font-weight:900;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;list-style:none}
-#build-your-fit .byf-product-details summary::-webkit-details-marker{display:none}
-#build-your-fit .byf-product-details summary:after{content:' +';float:right}
-#build-your-fit .byf-product-details[open] summary:after{content:' −'}
-#build-your-fit .byf-details-body{padding-top:10px;color:#d2d2d2;font-size:.84rem;line-height:1.5}
-#build-your-fit .byf-details-body p{margin:0 0 9px}
-#build-your-fit .byf-details-body ul{margin:0 0 10px 18px;padding:0}
-#build-your-fit .byf-real-product-pair{display:flex;gap:8px;margin-top:10px;max-width:190px}
-#build-your-fit .byf-real-product-pair img{width:calc(50% - 4px);aspect-ratio:1;object-fit:cover;background:#eee;border-radius:6px}
+if 'Gangster Bougie cart v38' not in s:
+    css='''\n<style>/* Gangster Bougie cart v38 */
+.gb-cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:190;opacity:0;pointer-events:none;transition:opacity .2s}.gb-cart-overlay.open{opacity:1;pointer-events:auto}.gb-cart-drawer{position:fixed;right:0;top:0;width:min(440px,94vw);height:100dvh;background:#090909;border-left:1px solid rgba(216,169,40,.5);z-index:200;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-12px 0 35px rgba(0,0,0,.55)}.gb-cart-drawer.open{transform:translateX(0)}.gb-cart-head{display:flex;align-items:center;justify-content:space-between;padding:22px;border-bottom:1px solid #282828}.gb-cart-head h2{font-family:'Bodoni Moda',serif;color:#f4cf63;text-transform:uppercase;font-size:1.65rem}.gb-cart-kicker{text-transform:uppercase;letter-spacing:.14em;font-size:.65rem;color:#aaa;font-weight:800}.gb-cart-close{width:42px;height:42px;border:1px solid #d8a928;border-radius:50%;background:#111;color:#f4cf63;font-size:1.65rem;cursor:pointer}.gb-cart-lines{overflow:auto;padding:10px 20px;flex:1}.gb-cart-line{padding:16px 0;border-bottom:1px solid #242424}.gb-cart-line-top{display:flex;justify-content:space-between;gap:16px}.gb-cart-line-name{font-weight:900}.gb-cart-line-size{font-size:.82rem;color:#aaa;margin-top:3px}.gb-cart-line-price{color:#f4cf63;font-weight:900;white-space:nowrap}.gb-cart-line-actions{display:flex;align-items:center;justify-content:space-between;margin-top:12px}.gb-cart-qty{display:flex;align-items:center;border:1px solid #444;border-radius:6px;overflow:hidden}.gb-cart-qty button{width:36px;height:34px;border:0;background:#151515;color:#fff;cursor:pointer;font-size:1.15rem}.gb-cart-qty span{min-width:36px;text-align:center;font-weight:800}.gb-cart-remove{border:0;background:transparent;color:#bbb;text-decoration:underline;cursor:pointer;font-size:.78rem}.gb-cart-empty{display:none;padding:34px 22px;color:#bbb;text-align:center}.gb-cart-footer{padding:18px 22px 24px;border-top:1px solid #282828}.gb-cart-subtotal{display:flex;justify-content:space-between;font-size:1.05rem;margin-bottom:7px}.gb-cart-subtotal strong{color:#f4cf63}.gb-cart-footer p{font-size:.75rem;color:#888;margin-bottom:14px}.gb-cart-checkout{width:100%;padding:15px;border:0;border-radius:7px;background:linear-gradient(135deg,#f6d56c,#d8a928);color:#111;font-weight:900;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}.gb-cart-checkout:disabled{opacity:.45;cursor:not-allowed}
 </style>\n'''
     s=s.replace('</head>',css+'</head>')
+
+# Add one cart controller. It deliberately uses the existing gbCart localStorage data.
+s=re.sub(r'\n?<script>\s*/\* Gangster Bougie cart controller v38 \*/.*?</script>\s*','\n',s,flags=re.S)
+cartjs='''\n<script>/* Gangster Bougie cart controller v38 */
+(function(){
+ const KEY='gbCart';
+ const link=document.getElementById('gbCartLink')||document.querySelector('.cart-link');
+ const drawer=document.getElementById('gbCartDrawer'),overlay=document.getElementById('gbCartOverlay'),close=document.getElementById('gbCartClose');
+ const lines=document.getElementById('gbCartLines'),empty=document.getElementById('gbCartEmpty'),footer=document.getElementById('gbCartFooter'),subtotal=document.getElementById('gbCartSubtotal'),checkout=document.getElementById('gbCartCheckout');
+ function read(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+ function write(c){localStorage.setItem(KEY,JSON.stringify(c));render()}
+ function price(x){if(typeof x.price==='number')return x.price;var m=String(x.price||'').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):0}
+ function count(c){return c.reduce((n,x)=>n+(Number(x.qty)||1),0)}
+ function render(){
+  const c=read(),n=count(c); if(link)link.textContent='CART ('+n+')';
+  if(!lines)return; lines.innerHTML=''; let total=0;
+  c.forEach(function(x,i){const q=Number(x.qty)||1,p=price(x);total+=p*q;const row=document.createElement('div');row.className='gb-cart-line';row.innerHTML='<div class="gb-cart-line-top"><div><div class="gb-cart-line-name"></div><div class="gb-cart-line-size"></div></div><div class="gb-cart-line-price"></div></div><div class="gb-cart-line-actions"><div class="gb-cart-qty"><button type="button" data-cart-action="minus" data-i="'+i+'">−</button><span>'+q+'</span><button type="button" data-cart-action="plus" data-i="'+i+'">+</button></div><button type="button" class="gb-cart-remove" data-cart-action="remove" data-i="'+i+'">Remove</button></div>';row.querySelector('.gb-cart-line-name').textContent=x.name||'Gangster Bougie Item';row.querySelector('.gb-cart-line-size').textContent='Size: '+(x.size||'—');row.querySelector('.gb-cart-line-price').textContent='US$'+(p*q).toFixed(2);lines.appendChild(row)});
+  if(subtotal)subtotal.textContent='US$'+total.toFixed(2);if(empty)empty.style.display=c.length?'none':'block';if(footer)footer.style.display=c.length?'block':'none';if(checkout)checkout.disabled=!c.length;
+ }
+ function openCart(e){if(e)e.preventDefault();render();drawer&&drawer.classList.add('open');overlay&&overlay.classList.add('open');drawer&&drawer.setAttribute('aria-hidden','false');overlay&&overlay.setAttribute('aria-hidden','false')}
+ function closeCart(){drawer&&drawer.classList.remove('open');overlay&&overlay.classList.remove('open');drawer&&drawer.setAttribute('aria-hidden','true');overlay&&overlay.setAttribute('aria-hidden','true')}
+ if(link)link.addEventListener('click',openCart);if(close)close.addEventListener('click',closeCart);if(overlay)overlay.addEventListener('click',closeCart);
+ if(lines)lines.addEventListener('click',function(e){const b=e.target.closest('[data-cart-action]');if(!b)return;const i=Number(b.dataset.i),c=read(),a=b.dataset.cartAction;if(!c[i])return;if(a==='plus')c[i].qty=(Number(c[i].qty)||1)+1;if(a==='minus'){c[i].qty=(Number(c[i].qty)||1)-1;if(c[i].qty<=0)c.splice(i,1)}if(a==='remove')c.splice(i,1);write(c)});
+ // Checkout is intentionally not wired to fulfillment yet; don't fake an order submission.
+ if(checkout)checkout.addEventListener('click',function(){alert('Checkout setup is the next step. Your cart is saved.');});
+ window.gbCartRefresh=render;
+ window.addEventListener('storage',render);
+ document.addEventListener('click',function(e){if(e.target&&e.target.id==='byfAddFit')setTimeout(render,0)},true);
+ render();
+})();
+</script>\n'''
+s=s.replace('</body>',cartjs+'</body>')
 
 p.write_text(s)
