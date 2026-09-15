@@ -5,8 +5,7 @@ p=Path('index.html')
 s=p.read_text()
 if 'id="build-your-fit"' not in s: raise SystemExit('Build Your Fit not present')
 
-# v35 performance cleanup. Appearance and Build Your Fit geometry are untouched.
-# Keep only the user's selected Lookbook images in the live page.
+# v36 performance cleanup. Appearance and Build Your Fit geometry are untouched.
 women_keep=['09D6C9A9-6759-4A5E-8C29-87A00A34A157.png','55CF2A2E-AA03-4D2F-9D7B-2E523AEC0041.png','C30C5493-EC0F-4DC6-B74D-FC2CC515FEB4.png','ECA29DBD-304E-493E-8A51-76E7CB5E4BC8.png']
 men_keep=['IMG_2021.jpeg','IMG_2028.jpeg','IMG_2029.jpeg','IMG_2030.jpeg']
 lookbook=s.index('<section class="lookbook"')
@@ -24,26 +23,44 @@ if first_window!=-1:
         block=prefix+row(women_keep)+row(men_keep,'men-ticker')+suffix
         s=s[:lookbook]+block+s[shop:]
 
-# Native lazy loading for ordinary visible-page images.
+# Native lazy loading on all normal images first.
 def optimize_img(m):
     tag=m.group(0)
     if re.search(r'\bloading\s*=',tag,re.I): return tag
     return tag[:-1]+' loading="lazy" decoding="async">'
 s=re.sub(r'<img\b[^>]*>',optimize_img,s,flags=re.I)
 
-# Hidden product modals previously contained real src= URLs, allowing browsers to
-# discover/download large galleries during initial page load. Convert modal images
-# to data-src and activate them only when that modal is actually opened.
+# True below-fold deferral: remove src from ordinary images after the hero and before
+# the modal markup. The browser therefore cannot request them until IntersectionObserver
+# sees them approaching the viewport. Build Your Fit uses CSS background boards and is
+# deliberately excluded from this transformation.
+main_start=s.find('<section class="lookbook"')
+modal_start=s.find('<div class="modal"')
+if main_start!=-1 and modal_start!=-1:
+    region=s[main_start:modal_start]
+    # Keep Build Your Fit block exactly as-is.
+    byf_start=region.find('<section id="build-your-fit"')
+    byf_end=region.find('</section>',byf_start)+10 if byf_start!=-1 else -1
+    def defer_html(chunk):
+        return re.sub(r'<img\b([^>]*?)\bsrc="([^"]+)"([^>]*)>',lambda x:'<img'+x.group(1)+'data-src="'+x.group(2)+'"'+x.group(3)+'>',chunk,flags=re.I)
+    if byf_start!=-1 and byf_end>byf_start:
+        region=defer_html(region[:byf_start])+region[byf_start:byf_end]+defer_html(region[byf_end:])
+    else:
+        region=defer_html(region)
+    s=s[:main_start]+region+s[modal_start:]
+
+# Hidden product modal images are also true-deferred until the modal opens.
 def defer_modal(m):
     block=m.group(0)
     block=re.sub(r'<img\b([^>]*?)\bsrc="([^"]+)"([^>]*)>',lambda x:'<img'+x.group(1)+'data-src="'+x.group(2)+'"'+x.group(3)+'>',block,flags=re.I)
     return block
 s=re.sub(r'<div class="modal"\b.*?(?=<div class="modal"\b|<script\b)',defer_modal,s,flags=re.S|re.I)
 
-# One small loader watches for any modal becoming open and restores only that modal's images.
-loader='''\n<script>/* Deferred modal images v35 */\n(function(){\n function loadModal(modal){if(!modal)return;modal.querySelectorAll('img[data-src]').forEach(function(img){if(!img.getAttribute('src'))img.setAttribute('src',img.dataset.src);});}\n document.addEventListener('click',function(){requestAnimationFrame(function(){document.querySelectorAll('.modal.open').forEach(loadModal);});},true);\n new MutationObserver(function(ms){ms.forEach(function(m){var el=m.target;if(el.classList&&el.classList.contains('modal')&&el.classList.contains('open'))loadModal(el);});}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});\n})();\n</script>\n'''
-if 'Deferred modal images v35' not in s:
-    s=s.replace('</body>',loader+'</body>')
-
+# Remove previous performance loaders so the patch stays idempotent.
+s=re.sub(r'\n?<script>\s*/\* Deferred modal images v35 \*/.*?</script>\s*','\n',s,flags=re.S)
+s=re.sub(r'\n?<script>\s*/\* Near-viewport image loader v36 \*/.*?</script>\s*','\n',s,flags=re.S)
 s=re.sub(r'\n?<script>\s*/\* Safe native lazy loading v31 \*/.*?</script>\s*','\n',s,flags=re.S)
+
+loader='''\n<script>/* Near-viewport image loader v36 */\n(function(){\n function load(img){if(img&&img.dataset.src&&!img.getAttribute('src'))img.setAttribute('src',img.dataset.src);}\n var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){load(e.target);io.unobserve(e.target);}});},{rootMargin:'700px 0px'}):null;\n document.querySelectorAll('main img[data-src]').forEach(function(img){if(io)io.observe(img);else load(img);});\n function loadModal(modal){if(!modal)return;modal.querySelectorAll('img[data-src]').forEach(load);}\n document.addEventListener('click',function(){requestAnimationFrame(function(){document.querySelectorAll('.modal.open').forEach(loadModal);});},true);\n new MutationObserver(function(ms){ms.forEach(function(m){var el=m.target;if(el.classList&&el.classList.contains('modal')&&el.classList.contains('open'))loadModal(el);});}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});\n})();\n</script>\n'''
+s=s.replace('</body>',loader+'</body>')
 p.write_text(s)
