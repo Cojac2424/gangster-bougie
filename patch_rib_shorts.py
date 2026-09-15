@@ -4,33 +4,41 @@ p=Path('index.html')
 s=p.read_text()
 if 'id="build-your-fit"' not in s: raise SystemExit('Build Your Fit not present')
 
-# v43 — add Bougie Houndstooth to the approved sports-bra shopping data.
-# No compositor geometry, model sizing, split points, or arrow positions are changed.
-if 'Bougie Houndstooth product data v43' not in s:
+# v44 — wire all six approved leggings to Signature Fit.
+# Shopping data only: no compositor geometry, model sizing, split points, arrows, or viewer layout changed.
+if 'Leggings product data v44' not in s:
     js=r'''
-<script>/* Bougie Houndstooth product data v43 */
+<script>/* Leggings product data v44 */
 (function(){
- const product={
-  name:'Bougie Houndstooth Sports Bra',
-  front:'IMG_0532.jpeg',back:'IMG_0533.jpeg',price:39.99,
-  details:`<p>Black, cream &amp; gold Bougie Houndstooth design with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>All-over printed design</li><li>Comfortable, athletic silhouette</li><li>Designed for training and everyday wear</li><li>Coordinates with Signature Houndstooth bottoms</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`
+ const products={
+  'Cream Leggings':{front:'IMG_0553.jpeg',back:'IMG_0554.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Soft Cream with understated gold Gangster Bougie detailing.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Cream High-Waisted Leggings':{front:'IMG_0553.jpeg',back:'IMG_0554.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Soft Cream with understated gold Gangster Bougie detailing.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Oxblood Leggings':{front:'IMG_0549.jpeg',back:'IMG_0550.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Rich Oxblood red finished with understated gold Gangster Bougie detailing.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Oxblood High-Waisted Leggings':{front:'IMG_0549.jpeg',back:'IMG_0550.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Rich Oxblood red finished with understated gold Gangster Bougie detailing.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Onyx Leggings':{front:'IMG_0541.jpeg',back:'IMG_0542.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Sleek solid Onyx black finished with understated gold Gangster Bougie detailing.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates with Signature Essentials and patterned Signature pieces</li><li>Made to order.</li></ul>`},
+  'Onyx High-Waisted Leggings':{front:'IMG_0541.jpeg',back:'IMG_0542.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Sleek solid Onyx black finished with understated gold Gangster Bougie detailing.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates with Signature Essentials and patterned Signature pieces</li><li>Made to order.</li></ul>`},
+  'Bougie Houndstooth Leggings':{front:'IMG_0534.jpeg',back:'IMG_0535.jpeg',price:69.99,details:`<p>Luxury meets movement. Black, cream and gold houndstooth with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>High-waisted silhouette</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Bougie Houndstooth High-Waisted Leggings':{front:'IMG_0534.jpeg',back:'IMG_0535.jpeg',price:69.99,details:`<p>Luxury meets movement. Black, cream and gold houndstooth with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>High-waisted silhouette</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Vault Leggings':{front:'IMG_0525.jpeg',back:'IMG_0526.jpeg',price:69.99,details:`<p>Luxury meets movement. Espresso, brown and gold Art Deco-inspired Vault design in a sleek, body-contouring silhouette.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>High-rise 4.5-inch waistband</li><li>Four-way stretch</li><li>83% polyester / 17% spandex</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Vault High-Waisted Leggings':{front:'IMG_0525.jpeg',back:'IMG_0526.jpeg',price:69.99,details:`<p>Luxury meets movement. Espresso, brown and gold Art Deco-inspired Vault design in a sleek, body-contouring silhouette.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>High-rise 4.5-inch waistband</li><li>Four-way stretch</li><li>83% polyester / 17% spandex</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Heritage Plaid Leggings':{front:'IMG_0520.jpeg',back:'IMG_0521.jpeg',price:69.99,details:`<p>Luxury meets movement. Signature burgundy, black and gold plaid with repeating GB monogram and crown detailing.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>83% polyester / 17% spandex</li><li>Four-way stretch for freedom of movement</li><li>Smooth 4.5-inch high-rise waistband</li><li>Full all-over print</li><li>Available in sizes XS–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Heritage Plaid High-Waisted Leggings':{front:'IMG_0520.jpeg',back:'IMG_0521.jpeg',price:69.99,details:`<p>Luxury meets movement. Signature burgundy, black and gold plaid with repeating GB monogram and crown detailing.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>83% polyester / 17% spandex</li><li>Four-way stretch for freedom of movement</li><li>Smooth 4.5-inch high-rise waistband</li><li>Full all-over print</li><li>Available in sizes XS–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`}
  };
+ const tech=`<p><strong>Note: Runs small, consider sizing up!</strong></p><p>83% Polyester, 17% Spandex<br>Skinny fit<br>Outside seam thread is color-matched to design<br>Interior white seam thread<br>Double layer waistband<br>Please note: Slightly see-through when stretched. Some of the undyed white underneath material may become visible at the seams or where sewn.<br>Assembled in the USA from globally sourced parts</p>`;
+ function current(){const e=document.getElementById('byfShopBottomName');return e?products[(e.textContent||'').trim()]:null}
  function sync(){
-  const nameEl=document.getElementById('byfShopTopName'),pair=document.getElementById('byfTopRealProductPair');
-  if(!nameEl||!pair||(nameEl.textContent||'').trim()!==product.name)return;
-  let imgs=pair.querySelectorAll('img');
-  if(imgs.length<2){pair.innerHTML='<img alt="" loading="lazy" decoding="async"><img alt="" loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
-  if(imgs[0].getAttribute('src')!==product.front)imgs[0].src=product.front;
-  if(imgs[1].getAttribute('src')!==product.back)imgs[1].src=product.back;
-  imgs[0].alt=product.name+' front';imgs[1].alt=product.name+' back';pair.style.display='flex';
-  const topItem=nameEl.closest('.byf-fit-item');
-  if(topItem){const det=topItem.querySelector('details');if(det){const body=det.querySelector('.byf-details-body')||det.querySelector('div');if(body)body.innerHTML=product.details}}
+  const nameEl=document.getElementById('byfShopBottomName'),pair=document.getElementById('byfBottomRealProductPair');if(!nameEl||!pair)return;
+  const name=(nameEl.textContent||'').trim(),p=products[name];
+  if(!p){pair.style.display='none';return}
+  let imgs=pair.querySelectorAll('img');if(imgs.length<2){pair.innerHTML='<img alt="" loading="lazy" decoding="async"><img alt="" loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==p.front)imgs[0].src=p.front;if(imgs[1].getAttribute('src')!==p.back)imgs[1].src=p.back;
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';pair.style.display='flex';
+  const price=document.getElementById('byfShopBottomPrice');if(price)price.textContent='US$69.99';
+  const item=nameEl.closest('.byf-fit-item');if(item){const det=item.querySelector('details');if(det){const body=det.querySelector('.byf-details-body')||det.querySelector('div');if(body)body.innerHTML=p.details+tech}}
  }
- const nameEl=document.getElementById('byfShopTopName');
- if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
- const root=document.getElementById('build-your-fit');if(root){root.addEventListener('click',()=>setTimeout(sync,0));root.addEventListener('pointerup',()=>setTimeout(sync,0))}
- sync();
- function cart(){document.querySelectorAll('.gb-cart-line').forEach(row=>{const n=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(),slot=row.querySelector('.gb-cart-thumb-slot');if(n!==product.name||!slot)return;let im=slot.querySelector('img');if(!im){im=document.createElement('img');im.className='gb-cart-thumb';im.loading='lazy';im.decoding='async';slot.appendChild(im)}if(im.getAttribute('src')!==product.front)im.src=product.front;im.alt=product.name})}
+ const nameEl=document.getElementById('byfShopBottomName');if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');if(root){root.addEventListener('click',()=>setTimeout(sync,0));root.addEventListener('pointerup',()=>setTimeout(sync,0))}sync();
+ function cart(){document.querySelectorAll('.gb-cart-line').forEach(row=>{const n=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(),p=products[n],slot=row.querySelector('.gb-cart-thumb-slot');if(!p||!slot)return;let im=slot.querySelector('img');if(!im){im=document.createElement('img');im.className='gb-cart-thumb';im.loading='lazy';im.decoding='async';slot.appendChild(im)}if(im.getAttribute('src')!==p.front)im.src=p.front;im.alt=n})}
  const lines=document.getElementById('gbCartLines');if(lines&&window.MutationObserver)new MutationObserver(cart).observe(lines,{childList:true,subtree:true});cart();
 })();
 </script>
