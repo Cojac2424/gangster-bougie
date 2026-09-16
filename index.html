@@ -1432,4 +1432,34 @@
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
+
+<script>/* Classic real product previews v51 */
+(function(){
+ const boards={
+  'Cream':'BB251A6A-A1C5-4955-AD45-12977154FDD1.jpeg','Grey':'48A8992E-44EE-4EA0-9216-6151AA482183.jpeg',
+  'Black':'6A0433B5-2CB5-487C-BF0C-BA13AEBF3614.jpeg','Blue':'1319CBE4-7111-42FE-AFB6-72211748DA6B.jpeg',
+  'Green':'7475A5C3-1000-4C72-9498-153934E2DE66.jpeg','Red':'71EA0B6E-ADAC-48A9-972B-6F8B9B4CF6AA.jpeg',
+  'Espresso':'5EA988CF-42B7-475B-BD47-B4E8F6D26456.jpeg'
+ };
+ function colour(name){for(const c in boards)if(name.endsWith('– '+c)||name.endsWith('- '+c))return c;return null}
+ function pairFor(nameId){const n=document.getElementById(nameId);return n&&n.closest('.byf-fit-item')?.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair')}
+ function paint(nameId){
+  const n=document.getElementById(nameId);if(!n)return;
+  const name=(n.textContent||'').trim(),c=colour(name);if(!c)return;
+  const pair=pairFor(nameId);if(!pair)return;
+  pair.style.display='flex';pair.classList.add('show');
+  let a=pair.querySelectorAll('img');
+  if(a.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';a=pair.querySelectorAll('img')}
+  a[0].src=boards[c];a[0].alt=name+' front';a[0].style.objectPosition='0% center';
+  a[1].src=boards[c];a[1].alt=name+' back';a[1].style.objectPosition='33.333333% center';
+ }
+ function sync(){paint('byfShopTopName');paint('byfShopBottomName')}
+ function install(){
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){requestAnimationFrame(sync)}).observe(el,{childList:true,characterData:true,subtree:true})});
+  const v=document.getElementById('byfViewFit');if(v)v.addEventListener('click',function(){requestAnimationFrame(sync)});
+  sync();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
 </body></html>
