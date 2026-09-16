@@ -1,38 +1,45 @@
 from pathlib import Path
+import re
 
 p=Path('index.html')
 s=p.read_text()
 
-# v75 — root-cause fix for Shop Women View Item second image.
-# Native Women Shop rows contain SIX fields:
-# [0] name, [1] category, [2] price, [3] sizes, [4] FRONT, [5] BACK.
-# v74 incorrectly used current[5]/current[6]. current[6] does not exist,
-# causing Safari's blue ? broken-image placeholder.
+# v76 — correct semantic orientation for every Shop Women View Item.
+# The v75 screenshot proves the files stored in each native row are ordered:
+# [4] = BACK and [5] = FRONT.
+# Display contract required by storefront:
+# catalogue card = FRONT ([5])
+# View Item LEFT = FRONT ([5])
+# View Item RIGHT = BACK ([4])
+# This changes only image selection; no layout, Build Your Fit geometry,
+# filters, cart, observer, modal cloning, or event architecture is touched.
 
 needle="<script>/* Women Shop preview catalog v63 */\n(function(){"
 if needle in s and '__gbWomenCatalogInit' not in s:
     s=s.replace(needle,needle+"\n if(window.__gbWomenCatalogInit)return;window.__gbWomenCatalogInit=true;",1)
-needle2="<script>/* Homepage hierarchy v64 */\n(function(){"
-if needle2 in s and '__gbWomenHierarchyInit' not in s:
-    s=s.replace(needle2,needle2+"\n if(window.__gbWomenHierarchyInit)return;window.__gbWomenHierarchyInit=true;",1)
 
-# One correct renderer contract. No observer, clone, or extra controller.
-for old in [
+# Normalize every known renderer variant to the verified orientation.
+variants=[
+ "document.getElementById('gbWqFront').src=current[4];document.getElementById('gbWqBack').src=current[5];",
  "document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[6];",
  "document.getElementById('gbWqFront').src=current[6];document.getElementById('gbWqBack').src=current[5];"
-]:
-    s=s.replace(old,"document.getElementById('gbWqFront').src=current[4];document.getElementById('gbWqBack').src=current[5];")
+]
+correct="document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[4];"
+for old in variants:s=s.replace(old,correct)
 
-# Catalogue card must use the same front source.
-s=s.replace("<img src=\"${p[5]}\" alt=\"${p[0]}\" loading=\"lazy\" decoding=\"async\">",
-            "<img src=\"${p[4]}\" alt=\"${p[0]}\" loading=\"lazy\" decoding=\"async\">")
+# Catalogue cards use the same verified FRONT file as the left View Item image.
+s=s.replace("<img src=\"${p[4]}\" alt=\"${p[0]}\" loading=\"lazy\" decoding=\"async\">",
+            "<img src=\"${p[5]}\" alt=\"${p[0]}\" loading=\"lazy\" decoding=\"async\">")
 
-# Remove old experimental Safari image rule if present.
-s=s.replace('#gbWomenQuick .gb-wq-pics img{content-visibility:auto}\n','')
+# Also normalize equivalent concatenated renderer syntax if present.
+s=s.replace("src=\"'+p[4]+'\" alt=\"'+p[0]+'\"", "src=\"'+p[5]+'\" alt=\"'+p[0]+'\"")
 
-# Preserve close cleanup and freeze protection.
-oldclose="function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}"
-newclose="function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');var f=document.getElementById('gbWqFront'),b=document.getElementById('gbWqBack');if(f)f.removeAttribute('src');if(b)b.removeAttribute('src')}"
-if oldclose in s:s=s.replace(oldclose,newclose,1)
+# Remove obsolete broken index-6 references anywhere in the native Women Shop block.
+m=re.search(r'(<script>/\* Women Shop preview catalog v63 \*/.*?</script>)',s,re.S)
+if m:
+    block=m.group(1)
+    block=block.replace("current[6]","current[4]")
+    block=block.replace("document.getElementById('gbWqFront').src=current[4];document.getElementById('gbWqBack').src=current[5];",correct)
+    s=s[:m.start()]+block+s[m.end():]
 
 p.write_text(s)
