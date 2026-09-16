@@ -1,16 +1,13 @@
 from pathlib import Path
-import re
 
 p=Path('index.html')
 s=p.read_text()
 
-# v74 — verified image-orientation repair. Publication trigger after generated index update.
-# The live screenshots proved the stored Women Shop pairs were semantically reversed:
-# first file was the BACK view and second file was the FRONT view.
-# Normalize the native product array itself so there is one source of truth:
-# p[5] = FRONT (catalogue card + View Item left)
-# p[6] = BACK  (View Item right)
-# This does not add another controller, observer, or modal layer.
+# v75 — root-cause fix for Shop Women View Item second image.
+# Native Women Shop rows contain SIX fields:
+# [0] name, [1] category, [2] price, [3] sizes, [4] FRONT, [5] BACK.
+# v74 incorrectly used current[5]/current[6]. current[6] does not exist,
+# causing Safari's blue ? broken-image placeholder.
 
 needle="<script>/* Women Shop preview catalog v63 */\n(function(){"
 if needle in s and '__gbWomenCatalogInit' not in s:
@@ -19,32 +16,23 @@ needle2="<script>/* Homepage hierarchy v64 */\n(function(){"
 if needle2 in s and '__gbWomenHierarchyInit' not in s:
     s=s.replace(needle2,needle2+"\n if(window.__gbWomenHierarchyInit)return;window.__gbWomenHierarchyInit=true;",1)
 
-pairs=[
- ('IMG_0589.jpeg','IMG_0590.jpeg'),('IMG_0586.jpeg','IMG_0588.jpeg'),
- ('IMG_0597.jpeg','IMG_0598.jpeg'),('IMG_0591.jpeg','IMG_0592.jpeg'),
- ('IMG_0595.jpeg','IMG_0596.jpeg'),('IMG_0593.jpeg','IMG_0594.jpeg'),
- ('IMG_0611.jpeg','IMG_0612.jpeg'),('IMG_0584.jpeg','IMG_0585.jpeg'),
- ('IMG_0607.jpeg','IMG_0608.jpeg'),('IMG_0605.jpeg','IMG_0606.jpeg'),
- ('IMG_0603.jpeg','IMG_0604.jpeg'),('IMG_0601.jpeg','IMG_0602.jpeg'),
- ('IMG_0599.jpeg','IMG_0600.jpeg'),('IMG_0609.jpeg','IMG_0610.jpeg'),
- ('IMG_0553.jpeg','IMG_0554.jpeg'),('IMG_0549.jpeg','IMG_0550.jpeg'),
- ('IMG_0541.jpeg','IMG_0542.jpeg'),('IMG_0534.jpeg','IMG_0535.jpeg'),
- ('IMG_0525.jpeg','IMG_0526.jpeg'),('IMG_0520.jpeg','IMG_0521.jpeg'),
- ('IMG_0557.jpeg','IMG_0558.jpeg'),('IMG_0555.jpeg','IMG_0556.jpeg'),
- ('IMG_0543.jpeg','IMG_0544.jpeg'),('IMG_0536.jpeg','IMG_0537.jpeg'),
- ('IMG_0529.jpeg','IMG_0530.jpeg'),('IMG_0515.jpeg','IMG_0516.jpeg')
-]
-m=re.search(r'(const P=\[)(.*?)(\n \];)',s,re.S)
-if m:
-    body=m.group(2)
-    for back,front in pairs:
-        old="'"+back+"','"+front+"'";new="'"+front+"','"+back+"'"
-        if old in body:body=body.replace(old,new,1)
-    s=s[:m.start(2)]+body+s[m.end(2):]
+# One correct renderer contract. No observer, clone, or extra controller.
+for old in [
+ "document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[6];",
+ "document.getElementById('gbWqFront').src=current[6];document.getElementById('gbWqBack').src=current[5];"
+]:
+    s=s.replace(old,"document.getElementById('gbWqFront').src=current[4];document.getElementById('gbWqBack').src=current[5];")
 
-s=s.replace("document.getElementById('gbWqFront').src=current[6];document.getElementById('gbWqBack').src=current[5];","document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[6];")
+# Catalogue card must use the same front source.
+s=s.replace("<img src=\"${p[5]}\" alt=\"${p[0]}\" loading=\"lazy\" decoding=\"async\">",
+            "<img src=\"${p[4]}\" alt=\"${p[0]}\" loading=\"lazy\" decoding=\"async\">")
+
+# Remove old experimental Safari image rule if present.
 s=s.replace('#gbWomenQuick .gb-wq-pics img{content-visibility:auto}\n','')
+
+# Preserve close cleanup and freeze protection.
 oldclose="function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}"
 newclose="function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');var f=document.getElementById('gbWqFront'),b=document.getElementById('gbWqBack');if(f)f.removeAttribute('src');if(b)b.removeAttribute('src')}"
 if oldclose in s:s=s.replace(oldclose,newclose,1)
+
 p.write_text(s)
