@@ -472,7 +472,10 @@
 </style>
 
 
-</head><body>
+\n<style>/* Women Shop stability v72 */
+#gbWomenCatalog .gb-women-card.gb-women-collapsed{display:none!important}
+#gbWomenQuick .gb-wq-pics img{content-visibility:auto}
+</style>\n</head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#" id="gbCartLink">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div></div></section>
 <section class="lookbook" id="lookbook"><div class="container"><div class="section-heading"><div><div class="eyebrow">Campaign</div><h2>The Lookbook</h2></div><p>Gangster Bougie styled as a full lifestyle — active sets, streetwear, hats and wrap accessories.</p></div><div class="lookbook-window"><div class="lookbook-grid"><div class="lookbook-item"><img data-src="09D6C9A9-6759-4A5E-8C29-87A00A34A157.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="55CF2A2E-AA03-4D2F-9D7B-2E523AEC0041.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="C30C5493-EC0F-4DC6-B74D-FC2CC515FEB4.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="ECA29DBD-304E-493E-8A51-76E7CB5E4BC8.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="09D6C9A9-6759-4A5E-8C29-87A00A34A157.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="55CF2A2E-AA03-4D2F-9D7B-2E523AEC0041.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="C30C5493-EC0F-4DC6-B74D-FC2CC515FEB4.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="ECA29DBD-304E-493E-8A51-76E7CB5E4BC8.png" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div></div></div><div class="lookbook-window"><div class="lookbook-grid men-ticker"><div class="lookbook-item"><img data-src="IMG_2021.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2028.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2029.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2030.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2021.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2028.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2029.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div><div class="lookbook-item"><img data-src="IMG_2030.jpeg" alt="Gangster Bougie lookbook" loading="lazy" decoding="async"></div></div></div><div class="lookbook-hint"><a class="shop-look" href="#shop">Shop the Look ↓</a></div></div></section>
@@ -1910,6 +1913,7 @@
 
 <script>/* Women Shop preview catalog v63 */
 (function(){
+ if(window.__gbWomenCatalogInit)return;window.__gbWomenCatalogInit=true;
  const P=[
   ['GB Classic Sports Bra – Cream','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0589.jpeg','IMG_0590.jpeg'],
   ['GB Classic Sports Bra – Grey','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0586.jpeg','IMG_0588.jpeg'],
@@ -1943,7 +1947,7 @@
  function money(v){return 'US$'+v.toFixed(2)}
  function render(filter){grid.innerHTML='';P.forEach(function(p,i){if(filter!=='all'&&!p[1].split(' ').includes(filter))return;const c=document.createElement('article');c.className='gb-women-card';c.innerHTML='<div class="gb-women-img"><img loading="lazy" decoding="async" src="'+p[5]+'" alt="'+p[0]+'"></div><div class="gb-women-info"><div class="gb-women-tag">'+p[1].split(' ')[0]+' Collection</div><div class="gb-women-name">'+p[0]+'</div><div class="gb-women-price">'+money(p[2])+'</div><button class="gb-women-view" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
  function openItem(i){current=P[i];size='';document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[6];document.getElementById('gbWqName').textContent=current[0];document.getElementById('gbWqTag').textContent=current[1].split(' ')[0]+' Collection';document.getElementById('gbWqPrice').textContent=money(current[2]);const s=document.getElementById('gbWqSizes');s.innerHTML='';current[3].forEach(function(x){const b=document.createElement('button');b.className='gb-wq-size';b.textContent=x;b.onclick=function(){size=x;s.querySelectorAll('button').forEach(q=>q.classList.remove('active'));b.classList.add('active')};s.appendChild(b)});modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
- function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
+ function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');var f=document.getElementById('gbWqFront'),b=document.getElementById('gbWqBack');if(f)f.removeAttribute('src');if(b)b.removeAttribute('src')}
  grid.addEventListener('click',function(e){const b=e.target.closest('.gb-women-view');if(b)openItem(Number(b.dataset.i))});
  document.querySelectorAll('.gb-women-filter').forEach(function(b){b.onclick=function(){document.querySelectorAll('.gb-women-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.filter)}});
  modal.querySelector('.gb-wq-close').onclick=close;modal.addEventListener('click',function(e){if(e.target===modal)close()});
@@ -1955,6 +1959,7 @@
 
 <script>/* Homepage hierarchy v64 */
 (function(){
+ if(window.__gbWomenHierarchyInit)return;window.__gbWomenHierarchyInit=true;
  function install(){
   const nav=document.querySelector('.nav-links');
   if(nav&&!nav.querySelector('.byf-nav-link')){
@@ -2043,18 +2048,5 @@
 </script>
 
 
-
-<script>/* Women Shop stable modal v71 */
-(function(){
- function clean(){
-  var ids=['gbWqDetails','gbWqDetailsV69','gbWqDetailsV70'];
-  for(var i=0;i<ids.length;i++){var n=document.getElementById(ids[i]);if(n)n.remove()}
- }
- document.addEventListener('click',function(e){
-  if(e.target.closest('#gbWomenGrid .gb-women-view'))clean();
-  if(e.target.closest('#gbWomenQuick .gb-wq-close'))clean();
- },true);
-})();
-</script>
 
 </body></html>
