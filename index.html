@@ -427,6 +427,18 @@
 @media(max-width:650px){#gbWomenCatalog{padding:42px 0}#gbWomenCatalog .gb-women-head{display:block}#gbWomenCatalog .gb-women-head p{margin-top:8px}#gbWomenCatalog .gb-women-grid{grid-template-columns:repeat(2,1fr);gap:10px}#gbWomenCatalog .gb-women-info{padding:11px}#gbWomenCatalog .gb-women-name{font-size:.8rem}#gbWomenQuick{padding:10px}#gbWomenQuick .gb-wq-box{grid-template-columns:1fr;padding:14px;gap:12px}#gbWomenQuick .gb-wq-copy{padding-bottom:8px}}
 </style>
 
+
+<style>/* Homepage hierarchy v64 */
+.nav-links .byf-nav-link{position:relative;overflow:hidden;border:1px solid var(--gold);border-radius:999px;padding:9px 13px;color:var(--gold-light);white-space:nowrap;box-shadow:0 0 0 rgba(244,207,99,0)}
+.nav-links .byf-nav-link::after{content:'';position:absolute;inset:-45% auto -45% -45%;width:32%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,245,185,.8),transparent);animation:gbByfShine 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes gbByfShine{0%,72%{left:-45%;opacity:0}76%{opacity:1}91%{left:125%;opacity:1}100%{left:125%;opacity:0}}
+#gbWomenCatalog .gb-women-more-wrap{text-align:center;margin-top:24px}
+#gbWomenCatalog .gb-women-more{padding:12px 22px;border:1px solid var(--gold);background:transparent;color:var(--gold-light);font-weight:900;text-transform:uppercase;letter-spacing:.09em;cursor:pointer}
+#gbWomenCatalog .gb-women-card.gb-women-collapsed{display:none!important}
+@media(max-width:760px){.nav-links .byf-nav-link{padding:8px 10px;font-size:.68rem}.nav{gap:8px}.nav-links{gap:9px}}
+@media(prefers-reduced-motion:reduce){.nav-links .byf-nav-link::after{animation:none}}
+</style>
+
 </head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#" id="gbCartLink">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div></div></section>
@@ -1904,6 +1916,39 @@
  modal.querySelector('.gb-wq-close').onclick=close;modal.addEventListener('click',function(e){if(e.target===modal)close()});
  document.getElementById('gbWqAdd').onclick=function(){if(!current)return;if(!size){alert('Please choose a size first.');return}try{let cart=JSON.parse(localStorage.getItem('gbCart')||'[]');const hit=cart.find(x=>x.name===current[0]&&x.size===size);if(hit)hit.qty=(hit.qty||1)+1;else cart.push({name:current[0],size:size,price:current[2],qty:1,image:current[5]});localStorage.setItem('gbCart',JSON.stringify(cart));if(window.gbCartRefresh)window.gbCartRefresh();close();const link=document.getElementById('gbCartLink');if(link)link.click()}catch(e){}};
  render('all');
+})();
+</script>
+
+
+<script>/* Homepage hierarchy v64 */
+(function(){
+ function install(){
+  const nav=document.querySelector('.nav-links');
+  if(nav&&!nav.querySelector('.byf-nav-link')){
+   const cart=nav.querySelector('#gbCartLink');
+   const a=document.createElement('a');a.className='byf-nav-link';a.href='#build-your-fit';a.textContent='Build Your Fit';
+   nav.insertBefore(a,cart||null);
+  }
+  const byf=document.getElementById('build-your-fit'),catalog=document.getElementById('gbWomenCatalog');
+  if(byf&&catalog&&byf.parentNode===catalog.parentNode){byf.insertAdjacentElement('afterend',catalog)}
+  if(!catalog)return;
+  const container=catalog.querySelector('.container'),grid=document.getElementById('gbWomenGrid');
+  if(!container||!grid)return;
+  let more=container.querySelector('.gb-women-more');
+  if(!more){const wrap=document.createElement('div');wrap.className='gb-women-more-wrap';more=document.createElement('button');more.className='gb-women-more';more.type='button';more.textContent='View More';wrap.appendChild(more);grid.insertAdjacentElement('afterend',wrap)}
+  let expanded=false;
+  function applyLimit(){
+   const cards=[...grid.querySelectorAll('.gb-women-card')];
+   cards.forEach((card,i)=>card.classList.toggle('gb-women-collapsed',!expanded&&i>=8));
+   more.style.display=cards.length>8?'inline-block':'none';
+   more.textContent=expanded?'Show Less':'View More';
+  }
+  more.onclick=function(){expanded=!expanded;applyLimit();if(!expanded)catalog.scrollIntoView({behavior:'smooth',block:'start'})};
+  const observer=new MutationObserver(applyLimit);observer.observe(grid,{childList:true});
+  catalog.querySelectorAll('.gb-women-filter').forEach(function(b){b.addEventListener('click',function(){expanded=false;setTimeout(applyLimit,0)})});
+  applyLimit();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
 
