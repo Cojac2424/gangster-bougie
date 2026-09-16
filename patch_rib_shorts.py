@@ -3,60 +3,70 @@ from pathlib import Path
 p=Path('index.html')
 s=p.read_text()
 
-# v66 — persistent jeweled cart + responsive cart pill containment.
-# Keeps all Build Your Fit geometry and commerce behavior untouched.
-if 'Persistent jeweled cart v66' not in s:
-    css=r'''
-<style>/* Persistent jeweled cart v66 */
-#gbCartLink{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:nowrap!important;width:auto!important;min-width:max-content!important;padding-left:12px!important;padding-right:14px!important;overflow:visible!important}
-#gbCartLink .gb-jeweled-cart{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:22px!important;height:19px!important;margin:0!important;flex:0 0 22px!important;position:static!important;transform:none!important}
-#gbCartLink .gb-jeweled-cart svg{display:block!important;width:22px!important;height:19px!important;overflow:visible!important}
-#gbCartLink .gb-jeweled-cart .cart-stroke{fill:none;stroke:#e5b83d;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 2px rgba(229,184,61,.4))}
-#gbCartLink .gb-jeweled-cart .gem{fill:#ffe68b;stroke:#c9961d;stroke-width:.65}
-#gbCartLink .gb-jeweled-cart .spark{fill:#fff0ad}
-@media(max-width:760px){
- .nav-links{grid-template-columns:minmax(0,.9fr) minmax(0,.9fr) minmax(108px,1.4fr) minmax(0,.95fr) minmax(94px,1.25fr)!important;gap:4px!important}
- .nav-links #gbCartLink{min-width:94px!important;max-width:none!important;padding:7px 7px!important;gap:4px!important;font-size:clamp(.53rem,2.25vw,.68rem)!important;justify-self:stretch!important}
- .nav-links #gbCartLink .gb-jeweled-cart{width:19px!important;height:17px!important;flex-basis:19px!important}
- .nav-links #gbCartLink .gb-jeweled-cart svg{width:19px!important;height:17px!important}
-}
-@media(min-width:761px) and (max-width:1180px){#gbCartLink{padding-left:11px!important;padding-right:13px!important;gap:5px!important;min-width:112px!important}}
-</style>
-'''
+# v67 — Women Shop product image correction.
+# Uses the already-confirmed Printify front/back mapping, without touching Build Your Fit geometry.
+if 'Women Shop front-back correction v67' not in s:
     js=r'''
-<script>/* Persistent jeweled cart v66 */
+<script>/* Women Shop front-back correction v67 */
 (function(){
- const ICON='<span class="gb-jeweled-cart" aria-hidden="true"><svg viewBox="0 0 24 20" xmlns="http://www.w3.org/2000/svg"><path class="cart-stroke" d="M1.5 2h2.4l2.1 10.2h11.8l2.3-7.4H5.1M7.2 15.6h.1M17.1 15.6h.1"/><circle class="cart-stroke" cx="7.3" cy="16.2" r="1.35"/><circle class="cart-stroke" cx="17.2" cy="16.2" r="1.35"/><path class="gem" d="M8 6.2l1.6-1.5 1.7 1.5-1.7 2.1z"/><path class="gem" d="M12.2 6.2l1.6-1.5 1.7 1.5-1.7 2.1z"/><path class="spark" d="M18.7 1.2l.45 1.05 1.05.45-1.05.45-.45 1.05-.45-1.05-1.05-.45 1.05-.45z"/></svg></span>';
- let repairing=false;
- function ensureIcon(){
-  const cart=document.getElementById('gbCartLink');if(!cart||repairing)return;
-  if(!cart.querySelector('.gb-jeweled-cart')){
-   repairing=true;
-   cart.insertAdjacentHTML('afterbegin',ICON);
-   repairing=false;
-  }
+ const products={
+  'GB Classic Sports Bra – Cream':['IMG_0589.jpeg','IMG_0590.jpeg'],
+  'GB Classic Sports Bra – Grey':['IMG_0586.jpeg','IMG_0588.jpeg'],
+  'GB Classic Sports Bra – Black':['IMG_0597.jpeg','IMG_0598.jpeg'],
+  'GB Classic Sports Bra – Blue':['IMG_0591.jpeg','IMG_0592.jpeg'],
+  'GB Classic Sports Bra – Green':['IMG_0595.jpeg','IMG_0596.jpeg'],
+  'GB Classic Sports Bra – Red':['IMG_0593.jpeg','IMG_0594.jpeg'],
+  'GB Classic Sports Bra – Espresso':['IMG_0611.jpeg','IMG_0612.jpeg'],
+  'GB Classic High-Waisted Leggings – Cream':['IMG_0584.jpeg','IMG_0585.jpeg'],
+  'GB Classic High-Waisted Leggings – Grey':['IMG_0607.jpeg','IMG_0608.jpeg'],
+  'GB Classic High-Waisted Leggings – Black':['IMG_0605.jpeg','IMG_0606.jpeg'],
+  'GB Classic High-Waisted Leggings – Blue':['IMG_0603.jpeg','IMG_0604.jpeg'],
+  'GB Classic High-Waisted Leggings – Green':['IMG_0601.jpeg','IMG_0602.jpeg'],
+  'GB Classic High-Waisted Leggings – Red':['IMG_0599.jpeg','IMG_0600.jpeg'],
+  'GB Classic High-Waisted Leggings – Espresso':['IMG_0609.jpeg','IMG_0610.jpeg'],
+  'Cream Leggings':['IMG_0553.jpeg','IMG_0554.jpeg'],
+  'Oxblood Leggings':['IMG_0549.jpeg','IMG_0550.jpeg'],
+  'Onyx Leggings':['IMG_0541.jpeg','IMG_0542.jpeg'],
+  'Bougie Houndstooth Leggings':['IMG_0534.jpeg','IMG_0535.jpeg'],
+  'Vault Leggings':['IMG_0525.jpeg','IMG_0526.jpeg'],
+  'Heritage Plaid Leggings':['IMG_0520.jpeg','IMG_0521.jpeg'],
+  'Cream Workout Shorts':['IMG_0557.jpeg','IMG_0558.jpeg'],
+  'Oxblood Workout Shorts':['IMG_0555.jpeg','IMG_0556.jpeg'],
+  'Onyx Workout Shorts':['IMG_0543.jpeg','IMG_0544.jpeg'],
+  'Bougie Houndstooth Workout Shorts':['IMG_0536.jpeg','IMG_0537.jpeg'],
+  'Vault Workout Shorts':['IMG_0529.jpeg','IMG_0530.jpeg'],
+  'Heritage Plaid Workout Shorts':['IMG_0515.jpeg','IMG_0516.jpeg']
+ };
+ function norm(v){return (v||'').replace(/\s+/g,' ').trim()}
+ function pairFor(name){
+  name=norm(name);if(products[name])return products[name];
+  const key=Object.keys(products).find(k=>norm(k)===name);return key?products[key]:null
  }
+ function fixCards(){
+  document.querySelectorAll('#gbWomenGrid .gb-women-card').forEach(function(card){
+   const nameEl=card.querySelector('.gb-women-name');const img=card.querySelector('.gb-women-img img');if(!nameEl||!img)return;
+   const pair=pairFor(nameEl.textContent);if(pair&&img.getAttribute('src')!==pair[0])img.src=pair[0];
+  })
+ }
+ function fixQuick(){
+  const modal=document.getElementById('gbWomenQuick');if(!modal||!modal.classList.contains('open'))return;
+  const name=document.getElementById('gbWqName');const front=document.getElementById('gbWqFront'),back=document.getElementById('gbWqBack');if(!name||!front||!back)return;
+  const pair=pairFor(name.textContent);if(!pair)return;
+  if(front.getAttribute('src')!==pair[0])front.src=pair[0];
+  if(back.getAttribute('src')!==pair[1])back.src=pair[1];
+  front.alt=norm(name.textContent)+' front view';back.alt=norm(name.textContent)+' back view';
+ }
+ function repair(){fixCards();fixQuick()}
  function install(){
-  ensureIcon();
-  const nav=document.querySelector('.nav-links');
-  if(nav){new MutationObserver(function(){ensureIcon()}).observe(nav,{subtree:true,childList:true,characterData:true})}
-  // Existing cart refreshes can rewrite the link text; re-apply icon immediately afterward.
-  let tries=0;
-  const hook=setInterval(function(){
-   ensureIcon();tries++;
-   if(window.gbCartRefresh&&!window.gbCartRefresh.__gbIconHooked){
-    const original=window.gbCartRefresh;
-    const wrapped=function(){const r=original.apply(this,arguments);ensureIcon();requestAnimationFrame(ensureIcon);return r};
-    wrapped.__gbIconHooked=true;window.gbCartRefresh=wrapped;clearInterval(hook)
-   }else if(tries>80)clearInterval(hook)
-  },100);
-  document.addEventListener('click',function(e){if(e.target.closest('#gbCartLink')||e.target.closest('.gb-cart-close'))setTimeout(ensureIcon,0)},true);
+  repair();
+  const grid=document.getElementById('gbWomenGrid');if(grid)new MutationObserver(function(){fixCards()}).observe(grid,{childList:true,subtree:true});
+  const modal=document.getElementById('gbWomenQuick');if(modal)new MutationObserver(function(){fixQuick()}).observe(modal,{attributes:true,attributeFilter:['class'],childList:true,subtree:true,characterData:true});
+  document.addEventListener('click',function(e){if(e.target.closest('#gbWomenGrid .gb-women-view')){setTimeout(fixQuick,0);requestAnimationFrame(fixQuick)}},true);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
 '''
-    s=s.replace('</head>',css+'\n</head>')
     s=s.replace('</body>',js+'\n</body>')
 
 p.write_text(s)
