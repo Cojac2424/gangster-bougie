@@ -588,7 +588,7 @@
 <script>/* Shop Men stable v83 */
 window.gbMenOpen=function(name,price,image){
  var cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
- var size=prompt(name+' — '+price+'\\nEnter size to add to cart, or Cancel to keep browsing:');
+ var size=prompt(name+' — '+price+'\nEnter size to add to cart, or Cancel to keep browsing:');
  if(!size)return;
  cart.push({name:name,size:size,price:Number(price.replace(/[^0-9.]/g,'')),qty:1,image:image});
  localStorage.setItem('gbCart',JSON.stringify(cart));
