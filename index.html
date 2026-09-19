@@ -2329,8 +2329,14 @@
    var b=e.target.closest('.gb-look-item button');if(!b)return;
    closeLook();showReturn();
    if(b.dataset.women){
+    var wanted=b.dataset.women;
     var all=[...document.querySelectorAll('#gbWomenCatalog .gb-women-filter')].find(function(x){return x.dataset.filter==='all'});if(all)all.click();
-    setTimeout(function(){var card=[...document.querySelectorAll('#gbWomenGrid .gb-women-card')].find(function(c){var n=c.querySelector('.gb-women-name');return n&&n.textContent.trim()===b.dataset.women});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},80);
+    var more=document.querySelector('#gbWomenCatalog .gb-women-more');
+    if(more&&more.textContent.trim()==='View More')more.click();
+    setTimeout(function(){
+     var card=[...document.querySelectorAll('#gbWomenGrid .gb-women-card')].find(function(c){var n=c.querySelector('.gb-women-name');return n&&n.textContent.trim()===wanted});
+     if(card){card.classList.remove('gb-women-collapsed');card.style.display='flex';card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}
+    },120);
    }else if(b.dataset.access){
     var opener=document.getElementById(b.dataset.access),card=[...document.querySelectorAll('#gbAccessoriesCatalog .gb-access-card')].find(function(c){var x=c.querySelector('.gb-access-view');return x&&x.dataset.open===b.dataset.access});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}else if(opener)opener.scrollIntoView({behavior:'smooth',block:'center'});
    }
