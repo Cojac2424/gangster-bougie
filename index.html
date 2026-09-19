@@ -734,7 +734,11 @@
           <li>One size: 13&quot; × 13&quot; (33 cm × 33 cm)</li>
         </ul>
         <hr class="sports-divider">
-        <div class="sports-colour-line">Colour: <strong>Black</strong></div>
+        <div class="sports-colour-line">Colour: <strong id="gymTowelColourName">White</strong></div>
+        <div class="sports-colors" aria-label="Choose colour">
+          <button class="sports-color gym-towel-color active" type="button" data-index="0" aria-label="White" title="White" style="background:#f4f2ea"></button>
+          <button class="sports-color gym-towel-color" type="button" data-index="1" aria-label="Black" title="Black" style="background:#17191b"></button>
+        </div>
         <div class="sports-buy-row">
           <div class="sports-size-block"><span class="option-label">Size</span><div class="sizes"><button class="size active" type="button">13&quot; × 13&quot;</button></div></div>
           <button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>ADD TO CART</button>
@@ -742,8 +746,8 @@
         <div class="sports-preview-note">Cart connection coming soon.</div>
       </div>
       <div class="sports-gallery">
-        <button class="sports-thumb active gym-towel-thumb" type="button" data-index="0"><img src="IMG_0098.jpeg" alt="Gangster Bougie Gym Face Towel View 1" loading="lazy" decoding="async"><span class="sports-thumb-label">View 1</span></button>
-        <button class="sports-thumb gym-towel-thumb" type="button" data-index="1"><img src="IMG_0099.jpeg" alt="Gangster Bougie Gym Face Towel View 2" loading="lazy" decoding="async"><span class="sports-thumb-label">View 2</span></button>
+        <button class="sports-thumb active gym-towel-thumb" type="button" data-index="0"><img src="IMG_0098.jpeg" alt="White Gangster Bougie Gym Face Towel" loading="lazy" decoding="async"><span class="sports-thumb-label">White</span></button>
+        <button class="sports-thumb gym-towel-thumb" type="button" data-index="1"><img src="IMG_0099.jpeg" alt="Black Gangster Bougie Gym Face Towel" loading="lazy" decoding="async"><span class="sports-thumb-label">Black</span></button>
       </div>
     </div>
   </div>
@@ -1069,14 +1073,18 @@
  const modal=document.getElementById('gymTowelModal');
  const main=document.getElementById('gymTowelMain');
  const files=['IMG_0098.jpeg','IMG_0099.jpeg'];
+ const labels=['White','Black'];
  const thumbs=[...document.querySelectorAll('.gym-towel-thumb')];
+ const colors=[...document.querySelectorAll('.gym-towel-color')];
+ const colourName=document.getElementById('gymTowelColourName');
  let idx=0;
- function show(i){idx=(i+files.length)%files.length;main.src=files[idx];main.alt='Gangster Bougie Gym Face Towel View '+(idx+1);thumbs.forEach((b,n)=>b.classList.toggle('active',n===idx));}
+ function show(i){idx=(i+files.length)%files.length;main.src=files[idx];main.alt=labels[idx]+' Gangster Bougie Gym Face Towel';if(colourName)colourName.textContent=labels[idx];thumbs.forEach((b,n)=>b.classList.toggle('active',n===idx));colors.forEach((b,n)=>b.classList.toggle('active',n===idx));}
  document.getElementById('openGymTowel').onclick=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');show(0);document.body.style.overflow='hidden';};
  document.getElementById('closeGymTowel').onclick=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
  document.getElementById('gymTowelPrev').onclick=()=>show(idx-1);
  document.getElementById('gymTowelNext').onclick=()=>show(idx+1);
  thumbs.forEach((b,n)=>b.onclick=()=>show(n));
+ colors.forEach((b,n)=>b.onclick=()=>show(n));
  modal.addEventListener('click',e=>{if(e.target===modal)document.getElementById('closeGymTowel').click();});
 })();
 
@@ -2247,7 +2255,7 @@
  }
  function activeText(m,sel,fallback){var x=m.querySelector(sel);return x?(x.textContent||x.getAttribute('aria-label')||fallback).trim():fallback}
  wire('gymBottleModal',function(m){var s=activeText(m,'.gym-bottle-size.active','12 oz'),is18=s.indexOf('18')===0;return{name:'Gangster Bougie Stainless Steel Gym Bottle',size:s,price:is18?54.99:49.99,image:is18?'IMG_0413.jpeg':'IMG_0412.jpeg'}});
- wire('gymTowelModal',function(){return{name:'Gangster Bougie Gym Face Towel',size:'13&quot; × 13&quot;',price:24.99,image:'IMG_0098.jpeg'}});
+ wire('gymTowelModal',function(){var colour=(document.getElementById('gymTowelColourName')||{}).textContent||'White';return{name:'Gangster Bougie Gym Face Towel',size:colour+' • 13&quot; × 13&quot;',price:24.99,image:colour==='Black'?'IMG_0099.jpeg':'IMG_0098.jpeg'}});
  wire('gymBagModal',function(m){var colour=(document.getElementById('gymBagColourName')||{}).textContent||'Black';var files={Black:'IMG_0093.jpeg',Gold:'IMG_0096.jpeg',Hunter:'IMG_0097.jpeg',Maroon:'IMG_0095.jpeg','Tropical Pink':'IMG_0092.jpeg',Royal:'IMG_0094.jpeg'};return{name:'Gangster Bougie Gym Bag',size:colour+' • One Size',price:54.99,image:files[colour]||'IMG_0093.jpeg'}});
  wire('yogaMatModal',function(m){var colour=(document.getElementById('yogaMatColourName')||{}).textContent||'Black';var files={Black:'IMG_0204.jpeg','Dark Grey':'IMG_0203.jpeg','Dark Red':'IMG_0201.jpeg','Dark Blue':'IMG_0200.jpeg',Turquoise:'IMG_0199.jpeg','Dark Green':'IMG_0198.jpeg'};return{name:'Gangster Bougie Foam Yoga Mat',size:colour+' • 24&quot; × 72&quot;',price:109.99,image:files[colour]||'IMG_0204.jpeg'}});
  wire('gbTravelBagModal',function(){return{name:'Gangster Bougie GB Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:109.99,image:'IMG_0416.jpeg'}});
