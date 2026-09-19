@@ -2225,4 +2225,35 @@
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<script>/* Accessories cart connection v90 */
+(function(){
+ function add(name,size,price,image){
+  try{
+   var cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
+   var hit=cart.find(function(x){return x.name===name&&x.size===size});
+   if(hit)hit.qty=(Number(hit.qty)||1)+1;else cart.push({name:name,size:size,price:price,qty:1,image:image});
+   localStorage.setItem('gbCart',JSON.stringify(cart));
+   if(window.gbCartRefresh)window.gbCartRefresh();
+   document.body.style.overflow='';
+   document.querySelectorAll('.modal.open').forEach(function(m){m.classList.remove('open');m.setAttribute('aria-hidden','true')});
+   var link=document.getElementById('gbCartLink');if(link)link.click();
+  }catch(e){}
+ }
+ function wire(id,getItem){
+  var m=document.getElementById(id);if(!m)return;
+  var b=m.querySelector('.sports-add');if(!b)return;
+  b.removeAttribute('aria-label');b.onclick=function(){var x=getItem(m);add(x.name,x.size,x.price,x.image)};
+  var note=m.querySelector('.sports-preview-note');if(note)note.style.display='none';
+ }
+ function activeText(m,sel,fallback){var x=m.querySelector(sel);return x?(x.textContent||x.getAttribute('aria-label')||fallback).trim():fallback}
+ wire('gymBottleModal',function(m){var s=activeText(m,'.gym-bottle-size.active','12 oz'),is18=s.indexOf('18')===0;return{name:'Gangster Bougie Stainless Steel Gym Bottle',size:s,price:is18?54.99:49.99,image:is18?'IMG_0413.jpeg':'IMG_0412.jpeg'}});
+ wire('gymTowelModal',function(){return{name:'Gangster Bougie Gym Face Towel',size:'13&quot; × 13&quot;',price:24.99,image:'IMG_0098.jpeg'}});
+ wire('gymBagModal',function(m){var colour=(document.getElementById('gymBagColourName')||{}).textContent||'Black';var files={Black:'IMG_0093.jpeg',Gold:'IMG_0096.jpeg',Hunter:'IMG_0097.jpeg',Maroon:'IMG_0095.jpeg','Tropical Pink':'IMG_0092.jpeg',Royal:'IMG_0094.jpeg'};return{name:'Gangster Bougie Gym Bag',size:colour+' • One Size',price:54.99,image:files[colour]||'IMG_0093.jpeg'}});
+ wire('yogaMatModal',function(m){var colour=(document.getElementById('yogaMatColourName')||{}).textContent||'Black';var files={Black:'IMG_0204.jpeg','Dark Grey':'IMG_0203.jpeg','Dark Red':'IMG_0201.jpeg','Dark Blue':'IMG_0200.jpeg',Turquoise:'IMG_0199.jpeg','Dark Green':'IMG_0198.jpeg'};return{name:'Gangster Bougie Foam Yoga Mat',size:colour+' • 24&quot; × 72&quot;',price:109.99,image:files[colour]||'IMG_0204.jpeg'}});
+ wire('gbTravelBagModal',function(){return{name:'Gangster Bougie GB Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:109.99,image:'IMG_0416.jpeg'}});
+ wire('travelBagModal',function(){return{name:'Gangster Bougie “Baddie” Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:109.99,image:'IMG_0414.jpeg'}});
+ wire('bandanaModal',function(){return{name:'Gangster Bougie Mini Wrap Bandana',size:'27&quot; × 13&quot;',price:27.99,image:'IMG_0321.jpeg'}});
+ wire('capModal',function(){return{name:'Gangster Bougie Embroidered Structured Cap',size:'One Size',price:39.99,image:'IMG_0319.jpeg'}});
+})();
+</script>
 </body></html>
