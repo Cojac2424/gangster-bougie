@@ -351,6 +351,17 @@
 .gb-outfit-slide{position:absolute;left:50%;top:50%;width:min(70vw,720px);height:auto;max-height:none;transform-style:preserve-3d;transform-origin:center;transition:transform .85s cubic-bezier(.2,.72,.2,1),opacity .85s ease,filter .85s ease;overflow:visible;background:#0d0d0d;border:1px solid rgba(216,169,40,.38);box-shadow:0 18px 55px rgba(0,0,0,.55);will-change:transform,opacity;cursor:pointer}
 .gb-outfit-slide img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .gb-outfit-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}.gb-outfit-dots span{width:7px;height:7px;border-radius:50%;background:#4b4b4b;transition:background .3s,transform .3s}.gb-outfit-dots span.active{background:var(--gold-light);transform:scale(1.35)}
+.gb-outfit-slide .gb-look-shop-btn{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;border:1px solid var(--gold);background:rgba(5,5,5,.92);color:var(--gold-light);padding:11px 18px;font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s}
+.gb-outfit-slide.gb-look-active .gb-look-shop-btn{opacity:1;pointer-events:auto}
+#gbLookModal{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.9);display:none;padding:20px;overflow:auto}#gbLookModal.open{display:grid;place-items:center}
+#gbLookModal .gb-look-box{width:min(940px,100%);background:#0b0b0b;border:1px solid var(--border);padding:24px;position:relative}
+#gbLookModal .gb-look-close{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:#080808;color:var(--gold-light);font-size:1.25rem;cursor:pointer}
+#gbLookModal h3{font-family:'Bodoni Moda',serif;font-size:clamp(1.6rem,4vw,2.6rem);text-transform:uppercase;margin-bottom:4px}#gbLookModal .gb-look-sub{color:var(--muted);margin-bottom:18px}
+#gbLookModal .gb-look-items{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.gb-look-item{background:#111;border:1px solid #292929;padding:10px;display:flex;flex-direction:column}.gb-look-item img{width:100%;aspect-ratio:1;object-fit:contain;background:#f4f3ef}.gb-look-item-name{font-family:'Bodoni Moda',serif;font-weight:900;text-transform:uppercase;font-size:.78rem;line-height:1.2;margin-top:10px}.gb-look-item-price{font-weight:900;margin-top:6px}.gb-look-item button{margin-top:auto;padding:9px;border:1px solid var(--gold);background:transparent;color:var(--gold-light);font-weight:900;text-transform:uppercase;font-size:.67rem;letter-spacing:.07em;cursor:pointer}
+.gb-look-back{margin-top:18px;padding:10px 15px;border:1px solid #555;background:#111;color:#fff;font-weight:800;cursor:pointer}
+.gb-look-highlight{animation:gbLookGlow 2.8s ease;border-color:var(--gold-light)!important;box-shadow:0 0 0 2px rgba(244,207,99,.75),0 0 28px rgba(216,169,40,.8)!important}@keyframes gbLookGlow{0%,100%{box-shadow:0 0 0 1px rgba(216,169,40,.3)}35%,70%{box-shadow:0 0 0 3px rgba(244,207,99,.95),0 0 38px rgba(216,169,40,.95)}}
+.gb-look-return{position:fixed;right:16px;bottom:18px;z-index:155;padding:11px 15px;border:1px solid var(--gold);background:#090909;color:var(--gold-light);font-weight:900;text-transform:uppercase;letter-spacing:.07em;font-size:.7rem;cursor:pointer;display:none}.gb-look-return.show{display:block}
+@media(max-width:800px){#gbLookModal .gb-look-items{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.gb-outfit-carousel{height:112vw;min-height:700px}.gb-outfit-slide{width:72vw}}
 @media(max-width:680px){.gb-outfit-shop{padding:48px 0}.gb-outfit-carousel{height:150vw;min-height:540px;max-height:790px;perspective:1050px}.gb-outfit-slide{width:82vw;overflow:visible}.gb-outfit-slide img{width:100%;height:auto;max-height:none}}
 </style>
@@ -511,7 +522,13 @@
 </head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#" id="gbCartLink">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div></div></section>
-<section id="shop" class="gb-outfit-shop"><div class="container"><div class="section-heading"><div><div class="eyebrow">Shop The Look</div><h2>Gangster Bougie Looks</h2></div><p>Explore the complete looks. Individual pieces will connect directly to Shop Women, Shop Men and Accessories.</p></div><div class="gb-outfit-carousel" id="gbOutfitCarousel"><article class="gb-outfit-slide"><img src="0487E238-7F25-47CC-9B2F-913F718A3915.png" alt="Gangster Bougie outfit look 1" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="15CD0524-CA40-4621-81A1-3ABDDF6C4FDD.png" alt="Gangster Bougie outfit look 2" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="1C478554-85CA-4F81-8358-47C4F86C0C0F.png" alt="Gangster Bougie outfit look 3" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="9BC2D535-588B-4711-8EFE-5D529A685A22.png" alt="Gangster Bougie outfit look 4" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="BAC0AEC8-24B2-4FD3-AECF-5E789E61CB2A.png" alt="Gangster Bougie outfit look 5" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="BE21A058-6B01-4269-8167-A376094E2D70.png" alt="Gangster Bougie outfit look 6" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="CAC264CF-EC46-4E8E-AD42-5A4FD048418B.png" alt="Gangster Bougie outfit look 7" loading="eager" decoding="sync" fetchpriority="high"></article></div><div class="gb-outfit-dots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></section>
+<section id="shop" class="gb-outfit-shop"><div class="container"><div class="section-heading"><div><div class="eyebrow">Shop The Look</div><h2>Gangster Bougie Looks</h2></div><p>Explore the complete looks. Individual pieces will connect directly to Shop Women, Shop Men and Accessories.</p></div><div class="gb-outfit-carousel" id="gbOutfitCarousel"><article class="gb-outfit-slide"><img src="0487E238-7F25-47CC-9B2F-913F718A3915.png" alt="Gangster Bougie outfit look 1" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="15CD0524-CA40-4621-81A1-3ABDDF6C4FDD.png" alt="Gangster Bougie outfit look 2" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="1C478554-85CA-4F81-8358-47C4F86C0C0F.png" alt="Gangster Bougie outfit look 3" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="9BC2D535-588B-4711-8EFE-5D529A685A22.png" alt="Gangster Bougie outfit look 4" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="BAC0AEC8-24B2-4FD3-AECF-5E789E61CB2A.png" alt="Gangster Bougie outfit look 5" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="BE21A058-6B01-4269-8167-A376094E2D70.png" alt="Gangster Bougie outfit look 6" loading="eager" decoding="sync" fetchpriority="high"></article><article class="gb-outfit-slide"><img src="CAC264CF-EC46-4E8E-AD42-5A4FD048418B.png" alt="Gangster Bougie outfit look 7" loading="eager" decoding="sync" fetchpriority="high"></article></div><div class="gb-outfit-dots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></section><div id="gbLookModal" aria-hidden="true"><div class="gb-look-box"><button class="gb-look-close" type="button" aria-label="Close">×</button><div class="eyebrow">Carousel Look 1</div><h3>Shop This Look</h3><p class="gb-look-sub">Choose an individual piece from this look.</p><div class="gb-look-items">
+<div class="gb-look-item"><img src="IMG_1916.jpeg" alt="Baby Bougie Tee Caviar"><div class="gb-look-item-name">Baby Bougie Tee – Caviar</div><div class="gb-look-item-price">US$49.99</div><button type="button" data-women="Baby Bougie Tee – Caviar">Shop Item</button></div>
+<div class="gb-look-item"><img src="IMG_1905.jpeg" alt="Baby Bougie Tee Cloud Dancer"><div class="gb-look-item-name">Baby Bougie Tee – Cloud Dancer</div><div class="gb-look-item-price">US$49.99</div><button type="button" data-women="Baby Bougie Tee – Cloud Dancer">Shop Item</button></div>
+<div class="gb-look-item"><img src="IMG_0312.jpeg" alt="Shorts Black"><div class="gb-look-item-name">Shorts – Black</div><div class="gb-look-item-price">US$59.99</div><button type="button" data-women="Shorts – Black">Shop Item</button></div>
+<div class="gb-look-item"><img src="IMG_0300.jpeg" alt="Shorts White"><div class="gb-look-item-name">Shorts – White</div><div class="gb-look-item-price">US$59.99</div><button type="button" data-women="Shorts – White">Shop Item</button></div>
+<div class="gb-look-item"><img src="IMG_0414.jpeg" alt="Baddie Faux Leather Travel Bag"><div class="gb-look-item-name">“Baddie” Faux Leather Travel Bag</div><div class="gb-look-item-price">US$109.99</div><button type="button" data-access="openTravelBag">Shop Item</button></div>
+</div><button class="gb-look-back" type="button">Back to This Look</button></div></div><button id="gbLookReturn" class="gb-look-return" type="button">← Back to This Look</button>
 <section id="gbWomenCatalog">
  <div class="container">
   <div class="gb-women-head"><div><div class="eyebrow">Gangster Bougie Women</div><h2>Shop Women</h2></div><p>Shop the pieces behind the fits. Start with the collection, then choose your exact size before adding it to your bag.</p></div>
@@ -2293,11 +2310,13 @@
 })();
 </script>
 
-<script>/* Seven-panel 3D continuous coverflow v86 */
+<script>/* Seven-panel 3D continuous coverflow v86 + Look 1 shopping */
 (function(){
  function init(){
   var car=document.getElementById('gbOutfitCarousel');if(!car)return;
   var slides=[...car.children],dots=[...document.querySelectorAll('.gb-outfit-dots span')],n=slides.length,active=0,timer,startX=null;
+  var modal=document.getElementById('gbLookModal'),returnBtn=document.getElementById('gbLookReturn');
+  var shopBtn=document.createElement('button');shopBtn.type='button';shopBtn.className='gb-look-shop-btn';shopBtn.textContent='SHOP ITEMS';slides[0].appendChild(shopBtn);
   function signed(i){var d=(i-active+n)%n;if(d>n/2)d-=n;return d}
   function draw(){
    var mobile=innerWidth<=680,step=mobile?42:48,depth=mobile?105:135,angle=mobile?23:28;
@@ -2305,15 +2324,33 @@
     var d=signed(i),ad=Math.abs(d),x=d*step,z=-ad*depth,ry=d===0?0:(d<0?angle:-angle),scale=d===0?1:Math.max(.62,1-ad*.10);
     s.style.zIndex=String(20-ad);s.style.opacity=ad>3?'0':String(Math.max(.18,1-ad*.20));s.style.filter=d===0?'brightness(1)':'brightness('+(Math.max(.48,.9-ad*.10))+')';
     s.style.pointerEvents=ad>2?'none':'auto';s.style.transform='translate(-50%,-50%) translateX('+x+'%) translateZ('+z+'px) rotateY('+ry+'deg) scale('+scale+')';
+    s.classList.toggle('gb-look-active',i===active);
    });
    dots.forEach(function(d,i){d.classList.toggle('active',i===active)});
   }
   function go(dir){active=(active+dir+n)%n;draw()}
   function restart(){clearInterval(timer);timer=setInterval(function(){go(1)},3600)}
-  slides.forEach(function(s,i){s.addEventListener('click',function(){var d=signed(i);if(d){active=i;draw();restart()}})});
+  slides.forEach(function(s,i){s.addEventListener('click',function(e){if(e.target.closest('.gb-look-shop-btn'))return;var d=signed(i);if(d){active=i;draw();restart()}})});
   car.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;clearInterval(timer)},{passive:true});
   car.addEventListener('touchend',function(e){if(startX!==null){var dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>35)go(dx<0?1:-1);startX=null}restart()},{passive:true});
   car.addEventListener('mouseenter',function(){clearInterval(timer)});car.addEventListener('mouseleave',restart);
+  function openLook(){clearInterval(timer);modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+  function closeLook(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';restart()}
+  shopBtn.addEventListener('click',function(e){e.stopPropagation();openLook()});
+  modal.querySelector('.gb-look-close').onclick=closeLook;modal.querySelector('.gb-look-back').onclick=closeLook;modal.addEventListener('click',function(e){if(e.target===modal)closeLook()});
+  function showReturn(){returnBtn.classList.add('show')}
+  function highlight(el){if(!el)return;el.classList.remove('gb-look-highlight');void el.offsetWidth;el.classList.add('gb-look-highlight');setTimeout(function(){el.classList.remove('gb-look-highlight')},3000)}
+  modal.addEventListener('click',function(e){
+   var b=e.target.closest('.gb-look-item button');if(!b)return;
+   closeLook();showReturn();
+   if(b.dataset.women){
+    var all=[...document.querySelectorAll('#gbWomenCatalog .gb-women-filter')].find(function(x){return x.dataset.filter==='all'});if(all)all.click();
+    setTimeout(function(){var card=[...document.querySelectorAll('#gbWomenGrid .gb-women-card')].find(function(c){var n=c.querySelector('.gb-women-name');return n&&n.textContent.trim()===b.dataset.women});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},80);
+   }else if(b.dataset.access){
+    var opener=document.getElementById(b.dataset.access),card=[...document.querySelectorAll('#gbAccessoriesCatalog .gb-access-card')].find(function(c){var x=c.querySelector('.gb-access-view');return x&&x.dataset.open===b.dataset.access});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}else if(opener)opener.scrollIntoView({behavior:'smooth',block:'center'});
+   }
+  });
+  returnBtn.onclick=function(){returnBtn.classList.remove('show');active=0;draw();car.scrollIntoView({behavior:'smooth',block:'center'});restart()};
   addEventListener('resize',draw,{passive:true});draw();restart();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
