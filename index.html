@@ -2071,8 +2071,39 @@
   'Cream Leggings','Oxblood Leggings',
   'Cream Workout Shorts','Oxblood Workout Shorts'
  ];
- function orderedProducts(){
-  const order=innerWidth<=680?signatureMobile:signatureDesktop;
+ const classicDesktop=[
+  'GB Classic Sports Bra – Cream','GB Classic Sports Bra – Grey','GB Classic Sports Bra – Black',
+  'GB Classic High-Waisted Leggings – Cream','GB Classic High-Waisted Leggings – Grey','GB Classic High-Waisted Leggings – Black',
+  'GB Classic Sports Bra – Red','GB Classic Sports Bra – Blue','GB Classic Sports Bra – Green',
+  'GB Classic High-Waisted Leggings – Red','GB Classic High-Waisted Leggings – Blue','GB Classic High-Waisted Leggings – Green',
+  'GB Classic Sports Bra – Espresso','GB Classic High-Waisted Leggings – Espresso'
+ ];
+ const classicMobile=[
+  'GB Classic Sports Bra – Cream','GB Classic Sports Bra – Grey',
+  'GB Classic High-Waisted Leggings – Cream','GB Classic High-Waisted Leggings – Grey',
+  'GB Classic Sports Bra – Black','GB Classic Sports Bra – Red',
+  'GB Classic High-Waisted Leggings – Black','GB Classic High-Waisted Leggings – Red',
+  'GB Classic Sports Bra – Blue','GB Classic Sports Bra – Green',
+  'GB Classic High-Waisted Leggings – Blue','GB Classic High-Waisted Leggings – Green',
+  'GB Classic Sports Bra – Espresso','GB Classic High-Waisted Leggings – Espresso'
+ ];
+ const shortsDesktop=[
+  'Onyx Workout Shorts','Heritage Plaid Workout Shorts','Oxblood Workout Shorts',
+  'Cream Workout Shorts','Vault Workout Shorts','Bougie Houndstooth Workout Shorts'
+ ];
+ const shortsMobile=[
+  'Onyx Workout Shorts','Heritage Plaid Workout Shorts',
+  'Cream Workout Shorts','Vault Workout Shorts',
+  'Oxblood Workout Shorts','Bougie Houndstooth Workout Shorts'
+ ];
+ function orderedProducts(filter){
+  const mobile=innerWidth<=680;
+  let order=null;
+  if(filter==='all')order=(mobile?signatureMobile:signatureDesktop).concat(mobile?classicMobile:classicDesktop);
+  else if(filter==='signature')order=mobile?signatureMobile:signatureDesktop;
+  else if(filter==='classic')order=mobile?classicMobile:classicDesktop;
+  else if(filter==='shorts')order=mobile?shortsMobile:shortsDesktop;
+  if(!order)return P.map(function(p,i){return {p:p,i:i}});
   const rank=new Map(order.map(function(name,i){return [name,i]}));
   return P.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){
    const ar=rank.has(a.p[0])?rank.get(a.p[0]):order.length+a.i;
@@ -2080,7 +2111,7 @@
    return ar-br;
   });
  }
- function render(filter){grid.innerHTML='';orderedProducts().forEach(function(item){const p=item.p,i=item.i;if(filter!=='all'&&!p[1].split(' ').includes(filter))return;const c=document.createElement('article');c.className='gb-women-card';c.innerHTML='<div class="gb-women-img"><img loading="lazy" decoding="async" src="'+p[5]+'" alt="'+p[0]+'"></div><div class="gb-women-info"><div class="gb-women-tag">'+p[1].split(' ')[0]+' Collection</div><div class="gb-women-name">'+p[0]+'</div><div class="gb-women-price">'+money(p[2])+'</div><button class="gb-women-view" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
+ function render(filter){grid.innerHTML='';orderedProducts(filter).forEach(function(item){const p=item.p,i=item.i;if(filter!=='all'&&!p[1].split(' ').includes(filter))return;const c=document.createElement('article');c.className='gb-women-card';c.innerHTML='<div class="gb-women-img"><img loading="lazy" decoding="async" src="'+p[5]+'" alt="'+p[0]+'"></div><div class="gb-women-info"><div class="gb-women-tag">'+p[1].split(' ')[0]+' Collection</div><div class="gb-women-name">'+p[0]+'</div><div class="gb-women-price">'+money(p[2])+'</div><button class="gb-women-view" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
  function openItem(i){current=P[i];size='';document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[4];document.getElementById('gbWqName').textContent=current[0];document.getElementById('gbWqTag').textContent=current[1].split(' ')[0]+' Collection';document.getElementById('gbWqPrice').textContent=money(current[2]);const s=document.getElementById('gbWqSizes');s.innerHTML='';current[3].forEach(function(x){const b=document.createElement('button');b.className='gb-wq-size';b.textContent=x;b.onclick=function(){size=x;s.querySelectorAll('button').forEach(q=>q.classList.remove('active'));b.classList.add('active')};s.appendChild(b)});modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
  function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');var f=document.getElementById('gbWqFront'),b=document.getElementById('gbWqBack');if(f)f.removeAttribute('src');if(b)b.removeAttribute('src')}
  grid.addEventListener('click',function(e){const b=e.target.closest('.gb-women-view');if(b)openItem(Number(b.dataset.i))});
