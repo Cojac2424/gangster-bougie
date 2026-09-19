@@ -345,9 +345,13 @@
 @media(max-width:560px){#build-your-fit .byf-bottom-real-product-pair img{width:72px;height:72px}#build-your-fit .byf-product-details-body{font-size:.8rem}}
 
 
-/* Seven-panel Shop The Look carousel v85 */
-.gb-outfit-shop{background:#070707;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.gb-outfit-carousel{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 2px 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.gb-outfit-carousel::-webkit-scrollbar{display:none}.gb-outfit-slide{flex:0 0 min(88%,860px);scroll-snap-align:center;background:#0d0d0d;border:1px solid rgba(216,169,40,.38);overflow:hidden}.gb-outfit-slide img{display:block;width:100%;height:auto;object-fit:contain}.gb-outfit-dots{display:flex;justify-content:center;gap:8px;margin-top:4px}.gb-outfit-dots span{width:7px;height:7px;border-radius:50%;background:#4b4b4b}.gb-outfit-dots span.active{background:var(--gold-light)}@media(max-width:680px){.gb-outfit-shop{padding:48px 0}.gb-outfit-slide{flex-basis:94%}.gb-outfit-carousel{gap:10px}}
+/* Seven-panel 3D continuous coverflow v86 */
+.gb-outfit-shop{background:#070707;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden}
+.gb-outfit-carousel{position:relative;height:clamp(360px,54vw,650px);width:100%;perspective:1500px;transform-style:preserve-3d;overflow:visible;touch-action:pan-y}
+.gb-outfit-slide{position:absolute;left:50%;top:50%;width:min(70vw,720px);max-height:94%;transform-style:preserve-3d;transform-origin:center;transition:transform .85s cubic-bezier(.2,.72,.2,1),opacity .85s ease,filter .85s ease;overflow:hidden;background:#0d0d0d;border:1px solid rgba(216,169,40,.38);box-shadow:0 18px 55px rgba(0,0,0,.55);will-change:transform,opacity;cursor:pointer}
+.gb-outfit-slide img{display:block;width:100%;height:auto;max-height:610px;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.gb-outfit-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}.gb-outfit-dots span{width:7px;height:7px;border-radius:50%;background:#4b4b4b;transition:background .3s,transform .3s}.gb-outfit-dots span.active{background:var(--gold-light);transform:scale(1.35)}
+@media(max-width:680px){.gb-outfit-shop{padding:48px 0}.gb-outfit-carousel{height:clamp(310px,105vw,520px);perspective:1050px}.gb-outfit-slide{width:82vw}.gb-outfit-slide img{max-height:490px}}
 </style>
 <style>/* Build Your Fit product details v37 */
 #build-your-fit .byf-product-details{margin-top:14px;border-top:1px solid rgba(216,169,40,.28);padding-top:10px;text-align:left}
@@ -2172,7 +2176,30 @@
 })();
 </script>
 
-<script>/* Seven-panel Shop The Look carousel v85 */
-(function(){function init(){var car=document.getElementById('gbOutfitCarousel');if(!car)return;var slides=[...car.children],dots=[...document.querySelectorAll('.gb-outfit-dots span')];function sync(){var cx=car.scrollLeft+car.clientWidth/2,best=0,dist=Infinity;slides.forEach(function(s,i){var d=Math.abs((s.offsetLeft+s.offsetWidth/2)-cx);if(d<dist){dist=d;best=i}});dots.forEach(function(d,i){d.classList.toggle('active',i===best)})}car.addEventListener('scroll',function(){requestAnimationFrame(sync)},{passive:true});sync()}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
+<script>/* Seven-panel 3D continuous coverflow v86 */
+(function(){
+ function init(){
+  var car=document.getElementById('gbOutfitCarousel');if(!car)return;
+  var slides=[...car.children],dots=[...document.querySelectorAll('.gb-outfit-dots span')],n=slides.length,active=0,timer,startX=null;
+  function signed(i){var d=(i-active+n)%n;if(d>n/2)d-=n;return d}
+  function draw(){
+   var mobile=innerWidth<=680,step=mobile?42:48,depth=mobile?105:135,angle=mobile?23:28;
+   slides.forEach(function(s,i){
+    var d=signed(i),ad=Math.abs(d),x=d*step,z=-ad*depth,ry=d===0?0:(d<0?angle:-angle),scale=d===0?1:Math.max(.62,1-ad*.10);
+    s.style.zIndex=String(20-ad);s.style.opacity=ad>3?'0':String(Math.max(.18,1-ad*.20));s.style.filter=d===0?'brightness(1)':'brightness('+(Math.max(.48,.9-ad*.10))+')';
+    s.style.pointerEvents=ad>2?'none':'auto';s.style.transform='translate(-50%,-50%) translateX('+x+'%) translateZ('+z+'px) rotateY('+ry+'deg) scale('+scale+')';
+   });
+   dots.forEach(function(d,i){d.classList.toggle('active',i===active)});
+  }
+  function go(dir){active=(active+dir+n)%n;draw()}
+  function restart(){clearInterval(timer);timer=setInterval(function(){go(1)},3600)}
+  slides.forEach(function(s,i){s.addEventListener('click',function(){var d=signed(i);if(d){active=i;draw();restart()}})});
+  car.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;clearInterval(timer)},{passive:true});
+  car.addEventListener('touchend',function(e){if(startX!==null){var dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>35)go(dx<0?1:-1);startX=null}restart()},{passive:true});
+  car.addEventListener('mouseenter',function(){clearInterval(timer)});car.addEventListener('mouseleave',restart);
+  addEventListener('resize',draw,{passive:true});draw();restart();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
 </script>
 </body></html>
