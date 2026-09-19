@@ -2047,7 +2047,9 @@
   ['Onyx Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0544.jpeg','IMG_0543.jpeg'],
   ['Bougie Houndstooth Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0537.jpeg','IMG_0536.jpeg'],
   ['Vault Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0530.jpeg','IMG_0529.jpeg'],
-  ['Heritage Plaid Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0516.jpeg','IMG_0515.jpeg']
+  ['Heritage Plaid Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0516.jpeg','IMG_0515.jpeg'],
+  ['Baby Bougie Tee – Caviar','babytee',49.99,['S','M','L','XL','2XL'],'IMG_1916.jpeg','IMG_1917.jpeg'],
+  ['Baby Bougie Tee – Cloud Dancer','babytee',49.99,['S','M','L','XL','2XL'],'IMG_1905.jpeg','IMG_1913.jpeg']
  ];
  const grid=document.getElementById('gbWomenGrid'),modal=document.getElementById('gbWomenQuick');if(!grid||!modal)return;
  let current=null,size='';
@@ -2099,7 +2101,18 @@
  function orderedProducts(filter){
   const mobile=innerWidth<=680;
   let order=null;
-  if(filter==='all')order=(mobile?signatureMobile:signatureDesktop).concat(mobile?classicMobile:classicDesktop);
+  if(filter==='all'){
+   const signature=mobile?signatureMobile:signatureDesktop;
+   const classic=mobile?classicMobile:classicDesktop;
+   order=signature.concat(classic.slice(0,-2),[
+    'GB Classic Sports Bra – Espresso','Baby Bougie Tee – Caviar',
+    'GB Classic High-Waisted Leggings – Espresso','Baby Bougie Tee – Cloud Dancer'
+   ]);
+   if(!mobile)order=signature.concat(classic.slice(0,-2),[
+    'GB Classic Sports Bra – Espresso','Baby Bougie Tee – Caviar','Baby Bougie Tee – Cloud Dancer',
+    'GB Classic High-Waisted Leggings – Espresso'
+   ]);
+  }
   else if(filter==='signature')order=mobile?signatureMobile:signatureDesktop;
   else if(filter==='classic')order=mobile?classicMobile:classicDesktop;
   else if(filter==='shorts')order=mobile?shortsMobile:shortsDesktop;
