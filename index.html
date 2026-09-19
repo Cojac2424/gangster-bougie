@@ -2074,8 +2074,8 @@
    const a=document.createElement('a');a.className='byf-nav-link';a.href='#build-your-fit';a.textContent='Build Your Fit';
    nav.insertBefore(a,cart||null);
   }
-  const byf=document.getElementById('build-your-fit'),catalog=document.getElementById('gbWomenCatalog');
-  if(byf&&catalog&&byf.parentNode===catalog.parentNode){byf.insertAdjacentElement('afterend',catalog)}
+  const catalog=document.getElementById('gbWomenCatalog');
+  // Homepage section order is defined in the HTML; do not reposition Shop Women at runtime.
   if(!catalog)return;
   const container=catalog.querySelector('.container'),grid=document.getElementById('gbWomenGrid');
   if(!container||!grid)return;
