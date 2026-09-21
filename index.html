@@ -2463,4 +2463,42 @@
  wire('capModal',function(){return{name:'Gangster Bougie Embroidered Structured Cap',size:'One Size',price:39.99,image:'IMG_0319.jpeg'}});
 })();
 </script>
+
+<style>/* Checkout success experience v92 */
+.gb-order-success{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:22px}
+.gb-order-success.open{display:flex}
+.gb-order-success-card{width:min(620px,100%);background:#0b0b0b;border:1px solid var(--gold);padding:42px 28px;text-align:center;box-shadow:0 18px 70px rgba(0,0,0,.65)}
+.gb-order-success-check{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;display:grid;place-items:center;background:linear-gradient(135deg,#a87912,var(--gold-light));color:#111;font-size:2.2rem;font-weight:900}
+.gb-order-success h2{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-size:clamp(2rem,6vw,3.2rem);margin-bottom:12px}
+.gb-order-success p{color:#c7c7c7;margin:0 auto 22px;max-width:480px}
+.gb-order-success .btn{min-width:210px}
+</style>
+<div id="gbOrderSuccess" class="gb-order-success" aria-hidden="true">
+ <div class="gb-order-success-card" role="dialog" aria-modal="true" aria-labelledby="gbOrderSuccessTitle">
+  <div class="gb-order-success-check" aria-hidden="true">✓</div>
+  <h2 id="gbOrderSuccessTitle">Thank You for Your Order</h2>
+  <p>Your payment was successful. We've received your order and a confirmation will be sent to the email used at checkout.</p>
+  <button id="gbContinueShopping" class="btn btn-gold" type="button">Continue Shopping</button>
+ </div>
+</div>
+<script>/* Checkout success experience v92 */
+(function(){
+ function init(){
+  var q=new URLSearchParams(location.search);
+  if(q.get('checkout')!=='success')return;
+  try{localStorage.removeItem('gbCart')}catch(e){}
+  if(window.gbCartRefresh)try{window.gbCartRefresh()}catch(e){}
+  var modal=document.getElementById('gbOrderSuccess'),btn=document.getElementById('gbContinueShopping');
+  if(!modal||!btn)return;
+  modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  try{history.replaceState({},document.title,location.pathname+location.hash)}catch(e){}
+  btn.addEventListener('click',function(){
+   modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';
+   window.scrollTo({top:0,behavior:'smooth'});
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body></html>
