@@ -294,6 +294,46 @@
 @media(max-width:760px){#build-your-fit{padding-top:20px!important;padding-bottom:20px!important}#build-your-fit .byf-shell{grid-template-columns:1fr!important;gap:12px!important}#build-your-fit .byf-model-pair{width:max-content!important;max-width:calc(100% - 100px)!important;padding:0 12px!important}#build-your-fit .byf-model-pair .byf-model,#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{width:min(154px,34vw,14svh)!important}#build-your-fit .byf-outer-arrow{width:40px!important;height:40px!important;font-size:1.55rem!important}#build-your-fit .byf-outer-arrow.left{left:-46px!important}#build-your-fit .byf-outer-arrow.right{right:-46px!important}}
 
 
+/* Build Your Fit — mobile whole Signature Fit viewport v93 */
+@media(max-width:760px){
+ #build-your-fit .byf-fit-panel.open{
+   padding:10px!important;
+   border-radius:12px!important;
+   font-size:.78rem!important;
+ }
+ #build-your-fit .byf-fit-title{font-size:1rem!important;line-height:1.05!important;margin-bottom:2px!important}
+ #build-your-fit .byf-fit-tag{font-size:.72rem!important;line-height:1.15!important;margin-bottom:7px!important}
+ #build-your-fit .byf-fit-item{
+   padding-top:7px!important;
+   padding-bottom:7px!important;
+   padding-right:132px!important;
+   min-height:112px!important;
+ }
+ #build-your-fit .byf-fit-name{font-size:.78rem!important;line-height:1.18!important;max-width:190px}
+ #build-your-fit .byf-fit-price{font-size:.78rem!important;margin:2px 0 4px!important}
+ #build-your-fit .byf-size-label{font-size:.65rem!important;margin-bottom:4px!important}
+ #build-your-fit .byf-sizes{gap:4px!important}
+ #build-your-fit .byf-size{min-width:34px!important;padding:5px 6px!important;border-radius:6px!important;font-size:.68rem!important}
+ #build-your-fit .byf-real-product-pair,
+ #build-your-fit .byf-bottom-real-product-pair{width:124px!important;max-width:124px!important;gap:4px!important}
+ #build-your-fit .byf-real-product-pair img,
+ #build-your-fit .byf-bottom-real-product-pair img{width:60px!important;height:60px!important;padding:2px!important;border-radius:7px!important}
+ #build-your-fit .byf-product-details{margin-top:5px!important;padding-top:5px!important}
+ #build-your-fit .byf-product-details summary{font-size:.68rem!important}
+ #build-your-fit .byf-fit-actions{margin-top:7px!important;gap:5px!important}
+ #build-your-fit .byf-fit-actions button{padding:8px!important;font-size:.72rem!important}
+ #build-your-fit .byf-fit-note{font-size:.65rem!important;margin-top:5px!important}
+}
+@media(max-width:390px){
+ #build-your-fit .byf-fit-panel.open{padding:8px!important}
+ #build-your-fit .byf-fit-item{padding-right:116px!important;min-height:104px!important}
+ #build-your-fit .byf-fit-name{font-size:.72rem!important;max-width:165px}
+ #build-your-fit .byf-real-product-pair,
+ #build-your-fit .byf-bottom-real-product-pair{width:108px!important;max-width:108px!important}
+ #build-your-fit .byf-real-product-pair img,
+ #build-your-fit .byf-bottom-real-product-pair img{width:52px!important;height:52px!important}
+}
+
 /* Build Your Fit — View This Fit shopping layer v27 */
 #build-your-fit .byf-fit-shop{width:min(620px,100%);margin:18px auto 0;text-align:center}
 #build-your-fit .byf-view-fit{border:1px solid #d9a11e;background:#111;color:#f4d06f;border-radius:999px;padding:13px 28px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
@@ -1313,7 +1353,7 @@
  let fitTopSize='',fitBottomSize='';
  function makeSizes(el,sizes,kind){if(!el)return;el.innerHTML='';sizes.forEach(sz=>{const b=document.createElement('button');b.type='button';b.className='byf-size';b.textContent=sz;b.onclick=()=>{el.querySelectorAll('.byf-size').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(kind==='top')fitTopSize=sz;else fitBottomSize=sz;if(fitNote)fitNote.textContent='Your top and bottom can be different sizes.'};el.appendChild(b)})}
  makeSizes(topSizes,['S','M','L','XL','2XL'],'top');makeSizes(bottomSizes,['XS','S','M','L','XL','2XL'],'bottom');
- if(viewFit)viewFit.onclick=()=>{fitPanel.classList.toggle('open');fitPanel.setAttribute('aria-hidden',fitPanel.classList.contains('open')?'false':'true');render()};
+ if(viewFit)viewFit.onclick=()=>{const opening=!fitPanel.classList.contains('open');fitPanel.classList.toggle('open');fitPanel.setAttribute('aria-hidden',fitPanel.classList.contains('open')?'false':'true');render();if(opening){requestAnimationFrame(()=>{requestAnimationFrame(()=>{const header=document.querySelector('header');const headerH=header?header.getBoundingClientRect().height:0;const r=fitPanel.getBoundingClientRect();const vh=window.innerHeight||document.documentElement.clientHeight;let top=window.scrollY+r.top-Math.max(8,(vh-r.height)/2);if(r.height>=vh-headerH-12)top=window.scrollY+r.top-headerH-6;window.scrollTo({top:Math.max(0,top),behavior:'smooth'})})})}};
  const addFit=document.getElementById('byfAddFit');if(addFit)addFit.onclick=()=>{if(!fitTopSize||!fitBottomSize){if(fitNote)fitNote.textContent='Please choose a top size and a bottom size first.';return}const bottomName=bottoms[bi][0],items=[{name:tops[ti][0],size:fitTopSize,price:39.99},{name:bottomName,size:fitBottomSize,price:bottomName.includes('Workout Shorts')?54.99:69.99}];const cart=JSON.parse(localStorage.getItem('gbCart')||'[]');cart.push(...items);localStorage.setItem('gbCart',JSON.stringify(cart));if(fitNote)fitNote.textContent=`Added ${tops[ti][0]} (${fitTopSize}) + ${bottomName} (${fitBottomSize}) to your cart.`};
  if(pair){let sx=null,sy=null,which=null;pair.style.touchAction='pan-y';pair.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const r=pair.getBoundingClientRect();sx=e.clientX;sy=e.clientY;which=((e.clientY-r.top)/r.height)<0.5?'top':'bottom'});pair.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx,dy=e.clientY-sy,w=which;sx=sy=which=null;if(Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy))move(w,dx<0?1:-1)});pair.addEventListener('pointercancel',()=>{sx=sy=which=null})}
  render();
