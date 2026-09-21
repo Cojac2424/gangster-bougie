@@ -1405,8 +1405,20 @@
  function closeCart(){drawer&&drawer.classList.remove('open');overlay&&overlay.classList.remove('open');drawer&&drawer.setAttribute('aria-hidden','true');overlay&&overlay.setAttribute('aria-hidden','true')}
  if(link)link.addEventListener('click',openCart);if(close)close.addEventListener('click',closeCart);if(overlay)overlay.addEventListener('click',closeCart);
  if(lines)lines.addEventListener('click',function(e){const b=e.target.closest('[data-cart-action]');if(!b)return;const i=Number(b.dataset.i),c=read(),a=b.dataset.cartAction;if(!c[i])return;if(a==='plus')c[i].qty=(Number(c[i].qty)||1)+1;if(a==='minus'){c[i].qty=(Number(c[i].qty)||1)-1;if(c[i].qty<=0)c.splice(i,1)}if(a==='remove')c.splice(i,1);write(c)});
- // Checkout is intentionally not wired to fulfillment yet; don't fake an order submission.
- if(checkout)checkout.addEventListener('click',function(){alert('Checkout setup is the next step. Your cart is saved.');});
+ // Secure Stripe Checkout is created by a Netlify Function; browser cart prices are not trusted.
+ if(checkout)checkout.addEventListener('click',async function(){
+  const cart=read();if(!cart.length)return;
+  const original=checkout.textContent;checkout.disabled=true;checkout.textContent='Opening secure checkout…';
+  try{
+   const res=await fetch('/.netlify/functions/create-checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:cart.map(function(x){return{name:x.name,size:x.size,qty:Number(x.qty)||1}})})});
+   const data=await res.json();
+   if(!res.ok||!data.url)throw new Error(data.error||'Unable to start checkout.');
+   window.location.assign(data.url);
+  }catch(err){
+   alert(err&&err.message?err.message:'Unable to start checkout. Please try again.');
+   checkout.disabled=false;checkout.textContent=original;
+  }
+ });
  window.gbCartRefresh=render;
  window.addEventListener('storage',render);
  document.addEventListener('click',function(e){if(e.target&&e.target.id==='byfAddFit')setTimeout(render,0)},true);
