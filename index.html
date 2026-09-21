@@ -294,42 +294,6 @@
 @media(max-width:760px){#build-your-fit{padding-top:20px!important;padding-bottom:20px!important}#build-your-fit .byf-shell{grid-template-columns:1fr!important;gap:12px!important}#build-your-fit .byf-model-pair{width:max-content!important;max-width:calc(100% - 100px)!important;padding:0 12px!important}#build-your-fit .byf-model-pair .byf-model,#build-your-fit .byf-model-pair .byf-view:first-child .byf-model,#build-your-fit .byf-model-pair .byf-view:last-child .byf-model{width:min(154px,34vw,14svh)!important}#build-your-fit .byf-outer-arrow{width:40px!important;height:40px!important;font-size:1.55rem!important}#build-your-fit .byf-outer-arrow.left{left:-46px!important}#build-your-fit .byf-outer-arrow.right{right:-46px!important}}
 
 
-/* Build Your Fit — continuous premium gold shimmer v92 */
-#build-your-fit .byf-view-fit{
- position:relative!important;
- overflow:hidden!important;
- isolation:isolate;
- border:2px solid #ffe78b!important;
- background:linear-gradient(135deg,#17130a 0%,#090909 48%,#1d1608 100%)!important;
- color:#fff0a6!important;
- box-shadow:0 0 0 1px rgba(244,207,99,.45),0 0 20px rgba(216,169,40,.55),0 0 42px rgba(216,169,40,.24)!important;
- text-shadow:0 0 10px rgba(255,225,113,.45);
- animation:gbByfGoldPulse 2.4s ease-in-out infinite!important;
-}
-#build-your-fit .byf-view-fit::before{
- content:"";
- position:absolute;
- z-index:-1;
- top:-70%;
- bottom:-70%;
- left:-55%;
- width:34%;
- pointer-events:none;
- transform:skewX(-20deg);
- background:linear-gradient(90deg,transparent,rgba(255,241,171,.18),rgba(255,255,235,.96),rgba(255,218,83,.52),transparent);
- animation:gbByfGoldSweep 1.9s linear infinite!important;
-}
-@keyframes gbByfGoldSweep{
- 0%{left:-55%;opacity:.2}
- 12%{opacity:1}
- 88%{opacity:1}
- 100%{left:125%;opacity:.2}
-}
-@keyframes gbByfGoldPulse{
- 0%,100%{box-shadow:0 0 0 1px rgba(244,207,99,.45),0 0 16px rgba(216,169,40,.5),0 0 34px rgba(216,169,40,.2)}
- 50%{box-shadow:0 0 0 2px rgba(255,235,145,.9),0 0 28px rgba(244,190,44,.85),0 0 56px rgba(216,169,40,.4)}
-}
-
 /* Build Your Fit — View This Fit shopping layer v27 */
 #build-your-fit .byf-fit-shop{width:min(620px,100%);margin:18px auto 0;text-align:center}
 #build-your-fit .byf-view-fit{border:1px solid #d9a11e;background:#111;color:#f4d06f;border-radius:999px;padding:13px 28px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
@@ -493,14 +457,15 @@
 
 
 <style>/* Homepage hierarchy v64 */
-.nav-links .byf-nav-link{position:relative;overflow:hidden;border:1px solid var(--gold);border-radius:999px;padding:9px 13px;color:var(--gold-light);white-space:nowrap;box-shadow:0 0 0 rgba(244,207,99,0)}
-.nav-links .byf-nav-link::after{content:'';position:absolute;inset:-45% auto -45% -45%;width:32%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,245,185,.8),transparent);animation:gbByfShine 5.5s ease-in-out infinite;pointer-events:none}
-@keyframes gbByfShine{0%,72%{left:-45%;opacity:0}76%{opacity:1}91%{left:125%;opacity:1}100%{left:125%;opacity:0}}
+.nav-links .byf-nav-link{position:relative;overflow:hidden;border:2px solid #ffe78b;border-radius:999px;padding:9px 13px;color:#fff0a6;white-space:nowrap;background:linear-gradient(135deg,rgba(216,169,40,.16),rgba(5,5,5,.92),rgba(216,169,40,.12));box-shadow:0 0 0 1px rgba(244,207,99,.42),0 0 16px rgba(216,169,40,.5),0 0 30px rgba(216,169,40,.22);text-shadow:0 0 9px rgba(255,225,113,.5);animation:gbByfNavPulse 2.4s ease-in-out infinite}
+.nav-links .byf-nav-link::after{content:'';position:absolute;inset:-55% auto -55% -45%;width:34%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,241,171,.22),rgba(255,255,235,.96),rgba(255,218,83,.5),transparent);animation:gbByfShine 1.8s linear infinite;pointer-events:none}
+@keyframes gbByfShine{0%{left:-45%;opacity:.35}12%{opacity:1}88%{opacity:1}100%{left:125%;opacity:.35}}
+@keyframes gbByfNavPulse{0%,100%{box-shadow:0 0 0 1px rgba(244,207,99,.42),0 0 14px rgba(216,169,40,.45),0 0 28px rgba(216,169,40,.18)}50%{box-shadow:0 0 0 2px rgba(255,235,145,.88),0 0 24px rgba(244,190,44,.78),0 0 44px rgba(216,169,40,.34)}}
 #gbWomenCatalog .gb-women-more-wrap{text-align:center;margin-top:24px}
 #gbWomenCatalog .gb-women-more{padding:12px 22px;border:1px solid var(--gold);background:transparent;color:var(--gold-light);font-weight:900;text-transform:uppercase;letter-spacing:.09em;cursor:pointer}
 #gbWomenCatalog .gb-women-card.gb-women-collapsed{display:none!important}
 @media(max-width:760px){.nav-links .byf-nav-link{padding:8px 10px;font-size:.68rem}.nav{gap:8px}.nav-links{gap:9px}}
-@media(prefers-reduced-motion:reduce){.nav-links .byf-nav-link::after{animation:none}}
+
 </style>
 
 
