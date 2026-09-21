@@ -2360,7 +2360,7 @@
    else if(b.dataset.men){setTimeout(function(){var card=[...document.querySelectorAll('#gbMenGrid .gb-men-card')].find(function(c){var x=c.querySelector('.gb-men-name');return x&&x.textContent.trim()===wanted});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},80)}
    else if(b.dataset.access){var card=[...document.querySelectorAll('#gbAccessoriesCatalog .gb-access-card')].find(function(c){var x=c.querySelector('.gb-access-view');return x&&x.dataset.open===wanted});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}}
   });
-  returnBtn.onclick=function(){clearInterval(timer);returnBtn.classList.remove('show');document.querySelectorAll('.modal.open').forEach(function(m){m.classList.remove('open');m.setAttribute('aria-hidden','true')});document.body.style.overflow='';active=lookOrigin;draw();car.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(restart,900)};
+  returnBtn.onclick=function(){clearInterval(timer);returnBtn.classList.remove('show');document.querySelectorAll('.modal.open,#gbWomenQuick.open,#gbMenQuick.open').forEach(function(m){m.classList.remove('open');m.setAttribute('aria-hidden','true')});document.body.style.overflow='';active=lookOrigin;draw();car.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(restart,900)};
   addEventListener('resize',draw,{passive:true});draw();restart();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
