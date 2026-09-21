@@ -2353,14 +2353,14 @@
   function openLook(i){clearInterval(timer);renderLook(i);modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
   function closeLook(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';restart()}
   modal.querySelector('.gb-look-close').onclick=closeLook;modal.querySelector('.gb-look-back').onclick=closeLook;modal.addEventListener('click',function(e){if(e.target===modal)closeLook()});
-  function showReturn(){returnBtn.classList.add('show')} function highlight(el){if(!el)return;el.classList.remove('gb-look-highlight');void el.offsetWidth;el.classList.add('gb-look-highlight');setTimeout(function(){el.classList.remove('gb-look-highlight')},3000)}
+  function showReturn(){clearInterval(timer);returnBtn.classList.add('show')} function highlight(el){if(!el)return;el.classList.remove('gb-look-highlight');void el.offsetWidth;el.classList.add('gb-look-highlight');setTimeout(function(){el.classList.remove('gb-look-highlight')},3000)}
   modal.addEventListener('click',function(e){
    var b=e.target.closest('.gb-look-item button');if(!b)return;var wanted=b.dataset.women||b.dataset.men||b.dataset.access;closeLook();showReturn();
    if(b.dataset.women){var all=[...document.querySelectorAll('#gbWomenCatalog .gb-women-filter')].find(function(x){return x.dataset.filter==='all'});if(all)all.click();var more=document.querySelector('#gbWomenCatalog .gb-women-more');if(more&&more.textContent.trim()==='View More')more.click();setTimeout(function(){var card=[...document.querySelectorAll('#gbWomenGrid .gb-women-card')].find(function(c){var x=c.querySelector('.gb-women-name');return x&&x.textContent.trim()===wanted});if(card){card.classList.remove('gb-women-collapsed');card.style.display='flex';card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},120)}
    else if(b.dataset.men){setTimeout(function(){var card=[...document.querySelectorAll('#gbMenGrid .gb-men-card')].find(function(c){var x=c.querySelector('.gb-men-name');return x&&x.textContent.trim()===wanted});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},80)}
    else if(b.dataset.access){var card=[...document.querySelectorAll('#gbAccessoriesCatalog .gb-access-card')].find(function(c){var x=c.querySelector('.gb-access-view');return x&&x.dataset.open===wanted});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}}
   });
-  returnBtn.onclick=function(){returnBtn.classList.remove('show');active=lookOrigin;draw();car.scrollIntoView({behavior:'smooth',block:'center'});restart()};
+  returnBtn.onclick=function(){clearInterval(timer);returnBtn.classList.remove('show');active=lookOrigin;draw();car.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(restart,900)};
   addEventListener('resize',draw,{passive:true});draw();restart();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
