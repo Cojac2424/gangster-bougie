@@ -44,3 +44,4 @@ export default async(req)=>{
   return Response.json({ok:true,mode:'activewear_identity_candidates',shop_id:SHOP_ID,website_product_count:rows.length,candidate_ready_count:rows.filter(x=>x.status==='candidate_ready').length,review_needed_count:rows.filter(x=>x.status==='review_needed').length,rows});
  }catch(e){console.error(e);return Response.json({ok:false,error:'Unable to audit activewear identities.'},{status:502});}
 };
+// Branch-deploy trigger: activewear mapping audit ready.
