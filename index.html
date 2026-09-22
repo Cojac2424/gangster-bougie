@@ -2503,4 +2503,48 @@
 })();
 </script>
 
+
+<style id="gb-account-preview-v1">
+.gb-account-link{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;color:var(--gold-light);cursor:pointer}
+.gb-account-icon{width:23px;height:23px;display:block;flex:0 0 auto}
+.gb-account-icon svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gb-account-text{font:inherit}
+.gb-account-preview{position:fixed;inset:0;z-index:320;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px}
+.gb-account-preview.open{display:flex}
+.gb-account-card{position:relative;width:min(480px,100%);background:#0b0b0b;border:1px solid var(--gold);padding:34px 24px;text-align:center;box-shadow:0 18px 70px rgba(0,0,0,.7)}
+.gb-account-card h2{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-size:2rem;margin-bottom:8px}
+.gb-account-card p{color:#bbb;margin:0 auto 18px;max-width:380px}
+.gb-account-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--gold-light);font-size:1.7rem;cursor:pointer}
+@media(max-width:680px){
+ .nav-links{grid-template-columns:1.16fr .64fr .78fr .92fr .52fr .88fr!important}
+ .gb-account-link{padding:7px 0!important}
+ .gb-account-icon{width:21px;height:21px}
+ .gb-account-text{display:none}
+}
+</style>
+<div id="gbAccountPreview" class="gb-account-preview" aria-hidden="true">
+ <div class="gb-account-card" role="dialog" aria-modal="true" aria-labelledby="gbAccountTitle">
+  <button class="gb-account-close" type="button" aria-label="Close account">×</button>
+  <div class="gb-account-icon" style="width:38px;height:38px;margin:0 auto 12px" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></div>
+  <h2 id="gbAccountTitle">My Account</h2>
+  <p>This is the account location for sign in and My Orders. Secure customer account access and order history are being connected next.</p>
+ </div>
+</div>
+<script id="gb-account-preview-script-v1">
+(function(){
+ function install(){
+  var nav=document.querySelector('.nav-links'),cart=document.getElementById('gbCartLink');if(!nav||!cart||document.getElementById('gbAccountLink'))return;
+  var a=document.createElement('a');a.href='#';a.id='gbAccountLink';a.className='gb-account-link';a.setAttribute('aria-label','My Account');
+  a.innerHTML='<span class="gb-account-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></span><span class="gb-account-text">Account</span>';
+  nav.insertBefore(a,cart);
+  var m=document.getElementById('gbAccountPreview');
+  function close(){m.classList.remove('open');m.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+  a.addEventListener('click',function(e){e.preventDefault();m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'});
+  m.querySelector('.gb-account-close').addEventListener('click',close);
+  m.addEventListener('click',function(e){if(e.target===m)close()});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
 </body></html>
