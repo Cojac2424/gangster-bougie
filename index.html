@@ -605,7 +605,7 @@
   {name:'Onyx/Gold Gangster Bougie Basketball Rib Shorts',price:57.99,sizes:['S','M','L','XL','2XL','3XL'],imgs:['IMG_0629.jpeg'],desc:'Onyx/Gold Gangster Bougie basketball rib shorts featuring signature GB detailing with a bold athletic streetwear silhouette.'},
   {name:'Cream/Gold Gangster Bougie Basketball Rib Shorts',price:57.99,sizes:['S','M','L','XL','2XL','3XL'],imgs:['IMG_0630.jpeg'],desc:'Cream/Gold Gangster Bougie basketball rib shorts featuring signature GB detailing with a bold athletic streetwear silhouette.'},
   {name:'Crowned Luxury Signature Cap',price:49.99,sizes:['One Size'],imgs:['IMG_0638.jpeg','IMG_0637.jpeg'],desc:'A signature Crowned Luxury cap featuring bold GB branding and a polished streetwear finish.'},
-  {name:'Crowned Luxury Crew Socks',price:19.99,sizes:['S/M','L/XL'],imgs:['IMG_0635.jpeg'],desc:'Crowned Luxury crew socks featuring signature GB branding, designed to finish the Gangster Bougie look from head to toe.'}
+  {name:'Crowned Luxury Crew Socks',price:19.99,sizes:['One Size'],imgs:['IMG_0635.jpeg'],desc:'Crowned Luxury crew socks featuring signature GB branding, designed to finish the Gangster Bougie look from head to toe.'}
  ],grid=document.getElementById('gbMenGrid'),modal=document.getElementById('gbMenQuick'),current=null,size='';
  function money(v){return 'US'+String.fromCharCode(36)+v.toFixed(2)}
  function render(){grid.innerHTML='';P.forEach(function(p,i){var c=document.createElement('article');c.className='gb-men-card';c.innerHTML='<div class="gb-men-img"><img loading="lazy" decoding="async" src="'+p.imgs[0]+'" alt="'+p.name+'"></div><div class="gb-men-info"><div class="gb-men-tag">Crowned Luxury</div><div class="gb-men-name">'+p.name+'</div><div class="gb-men-price">'+money(p.price)+'</div><button class="gb-men-view" type="button" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
@@ -2206,13 +2206,15 @@
    return ar-br;
   });
  }
- function render(filter){grid.innerHTML='';orderedProducts(filter).forEach(function(item){const p=item.p,i=item.i;if(filter!=='all'&&!p[1].split(' ').includes(filter))return;const c=document.createElement('article');c.className='gb-women-card';c.innerHTML='<div class="gb-women-img"><img loading="lazy" decoding="async" src="'+p[5]+'" alt="'+p[0]+'"></div><div class="gb-women-info"><div class="gb-women-tag">'+p[1].split(' ')[0]+' Collection</div><div class="gb-women-name">'+p[0]+'</div><div class="gb-women-price">'+money(p[2])+'</div><button class="gb-women-view" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
- function openItem(i){current=P[i];size='';document.getElementById('gbWqFront').src=current[5];document.getElementById('gbWqBack').src=current[4];document.getElementById('gbWqName').textContent=current[0];document.getElementById('gbWqTag').textContent=current[1].split(' ')[0]+' Collection';document.getElementById('gbWqPrice').textContent=money(current[2]);const s=document.getElementById('gbWqSizes');s.innerHTML='';current[3].forEach(function(x){const b=document.createElement('button');b.className='gb-wq-size';b.textContent=x;b.onclick=function(){size=x;s.querySelectorAll('button').forEach(q=>q.classList.remove('active'));b.classList.add('active')};s.appendChild(b)});modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
+ function womenCardImage(p){return p[1]==='signature bra'?p[4]:p[5]}
+ function womenSecondImage(p){return p[1]==='signature bra'?p[5]:p[4]}
+ function render(filter){grid.innerHTML='';orderedProducts(filter).forEach(function(item){const p=item.p,i=item.i;if(filter!=='all'&&!p[1].split(' ').includes(filter))return;const c=document.createElement('article');c.className='gb-women-card';c.innerHTML='<div class="gb-women-img"><img loading="lazy" decoding="async" src="'+womenCardImage(p)+'" alt="'+p[0]+'"></div><div class="gb-women-info"><div class="gb-women-tag">'+p[1].split(' ')[0]+' Collection</div><div class="gb-women-name">'+p[0]+'</div><div class="gb-women-price">'+money(p[2])+'</div><button class="gb-women-view" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
+ function openItem(i){current=P[i];size='';document.getElementById('gbWqFront').src=womenCardImage(current);document.getElementById('gbWqBack').src=womenSecondImage(current);document.getElementById('gbWqName').textContent=current[0];document.getElementById('gbWqTag').textContent=current[1].split(' ')[0]+' Collection';document.getElementById('gbWqPrice').textContent=money(current[2]);const s=document.getElementById('gbWqSizes');s.innerHTML='';current[3].forEach(function(x){const b=document.createElement('button');b.className='gb-wq-size';b.textContent=x;b.onclick=function(){size=x;s.querySelectorAll('button').forEach(q=>q.classList.remove('active'));b.classList.add('active')};s.appendChild(b)});modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
  function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');var f=document.getElementById('gbWqFront'),b=document.getElementById('gbWqBack');if(f)f.removeAttribute('src');if(b)b.removeAttribute('src')}
  grid.addEventListener('click',function(e){const b=e.target.closest('.gb-women-view');if(b)openItem(Number(b.dataset.i))});
  document.querySelectorAll('.gb-women-filter').forEach(function(b){b.onclick=function(){document.querySelectorAll('.gb-women-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.filter)}});
  modal.querySelector('.gb-wq-close').onclick=close;modal.addEventListener('click',function(e){if(e.target===modal)close()});
- document.getElementById('gbWqAdd').onclick=function(){if(!current)return;if(!size){alert('Please choose a size first.');return}try{let cart=JSON.parse(localStorage.getItem('gbCart')||'[]');const hit=cart.find(x=>x.name===current[0]&&x.size===size);if(hit)hit.qty=(hit.qty||1)+1;else cart.push({name:current[0],size:size,price:current[2],qty:1,image:current[5]});localStorage.setItem('gbCart',JSON.stringify(cart));if(window.gbCartRefresh)window.gbCartRefresh();close();const link=document.getElementById('gbCartLink');if(link)link.click()}catch(e){}};
+ document.getElementById('gbWqAdd').onclick=function(){if(!current)return;if(!size){alert('Please choose a size first.');return}try{let cart=JSON.parse(localStorage.getItem('gbCart')||'[]');const hit=cart.find(x=>x.name===current[0]&&x.size===size);if(hit)hit.qty=(hit.qty||1)+1;else cart.push({name:current[0],size:size,price:current[2],qty:1,image:womenCardImage(current)});localStorage.setItem('gbCart',JSON.stringify(cart));if(window.gbCartRefresh)window.gbCartRefresh();close();const link=document.getElementById('gbCartLink');if(link)link.click()}catch(e){}};
  render('all');
  let signatureLayoutMobile=innerWidth<=680;
  addEventListener('resize',function(){
@@ -2501,6 +2503,22 @@
 })();
 </script>
 
+
+<style id="gb-byf-contained-shimmer-v1">
+/* Keep the Build Your Fit shine strictly inside the pill. */
+.nav-links .byf-nav-link{overflow:hidden!important;isolation:isolate}
+.nav-links .byf-nav-link::after{
+  top:0!important;
+  bottom:0!important;
+  height:100%!important;
+  inset-block:0!important;
+  width:22%!important;
+  filter:none!important;
+  box-shadow:none!important;
+  background:linear-gradient(90deg,transparent,rgba(255,241,171,.16),rgba(255,255,235,.72),rgba(255,218,83,.28),transparent)!important;
+}
+@keyframes gbByfShine{0%{left:-28%;opacity:.25}15%{opacity:.75}85%{opacity:.75}100%{left:108%;opacity:.25}}
+</style>
 <style id="gb-account-preview-v1">
 .gb-account-link{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;color:var(--gold-light);cursor:pointer}
 .gb-account-icon{width:23px;height:23px;display:block;flex:0 0 auto}
