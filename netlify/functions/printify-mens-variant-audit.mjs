@@ -2,10 +2,10 @@ const SHOP_ID='28816619';
 const TARGETS=[
  {website_name:'Onyx/Gold Crowned Luxury Full-Zip Hoodie',titles:['Onyx/Gold-Gangster Bougie Crowned Luxury Full-Zip Hoodie'],sizes:['S','M','L','XL','2XL']},
  {website_name:'Cream/Gold Crowned Luxury Full-Zip Hoodie',titles:['Cream-Gangster Bougie Crowned Luxury Full-Zip Hoodie'],sizes:['S','M','L','XL','2XL']},
- {website_name:'Black Crowned Luxury Cotton Tee',titles:['Gangster Bougie Crowned Luxury Cotton Tee'],color:'Solid Black',sizes:['S','M','L','XL','2XL']},
- {website_name:'White Crowned Luxury Cotton Tee',titles:['Gangster Bougie Crowned Luxury Cotton Tee'],color:'Solid White',sizes:['S','M','L','XL','2XL']},
- {website_name:'Onyx/Gold Gangster Bougie Basketball Rib Shorts',keywords:['basketball','rib','shorts'],colorHints:['black','onyx'],sizes:['S','M','L','XL','2XL','XXL']},
- {website_name:'Cream/Gold Gangster Bougie Basketball Rib Shorts',keywords:['basketball','rib','shorts'],colorHints:['white','cream'],sizes:['S','M','L','XL','2XL','XXL']},
+ {website_name:'Black Crowned Luxury Cotton Tee',titles:['Gangster Bougie Crowned Luxury Cotton Tee'],color:'Solid Black',sizes:['S','M','L','XL','2XL','3XL']},
+ {website_name:'White Crowned Luxury Cotton Tee',titles:['Gangster Bougie Crowned Luxury Cotton Tee'],color:'Solid White',sizes:['S','M','L','XL','2XL','3XL']},
+ {website_name:'Onyx/Gold Gangster Bougie Basketball Rib Shorts',keywords:['basketball','rib','shorts'],colorHints:['black','onyx'],sizes:['S','M','L','XL','2XL','3XL']},
+ {website_name:'Cream/Gold Gangster Bougie Basketball Rib Shorts',keywords:['basketball','rib','shorts'],colorHints:['white','cream'],sizes:['S','M','L','XL','2XL','3XL']},
  {website_name:'Crowned Luxury Signature Cap',keywords:['crowned','luxury','cap'],one_size:true},
  {website_name:'Crowned Luxury Crew Socks',titles:['Gangster Bougie Crowned Luxury Crew Socks'],one_size:true}
 ];
