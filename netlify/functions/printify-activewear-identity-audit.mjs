@@ -25,6 +25,10 @@ function exactIdentityOverride(identity,p){
  const t=norm(p.title),w=norm(identity.website_name);
  if(identity.website_name==='GB Classic Sports Bra – Red') return t==='gb sports bra red';
  if(identity.website_name==='GB Classic Sports Bra – Espresso') return t==='gb sports bra espresso';
+ if(identity.website_name==='GB Classic Sports Bra – Cream') return t==='gb sports bra white';
+ if(identity.website_name==='GB Classic Sports Bra – Blue') return t==='gb sports bra midnight navy';
+ if(identity.website_name==='GB Classic Sports Bra – Green') return t==='gb sports bra deep forrest'||t==='gb sports bra deep forest';
+ if(identity.website_name==='GB Classic High-Waisted Leggings – Green') return t==='gb classic high waisted leggings deep forrest'||t==='gb classic high waisted leggings deep forest';
  if(identity.website_name==='Heritage Plaid Sports Bra') return t==='gangster bougie heritage plaid sports bra';
  if(identity.website_name==='Heritage Plaid Leggings') return t==='gangster bougie heritage plaid high waisted leggings';
  if(identity.website_name==='Shorts – Black') return p.id==='6a9c474cc8dc7ed3a507b76f';
