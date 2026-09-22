@@ -2516,9 +2516,10 @@
 .gb-account-card p{color:#bbb;margin:0 auto 18px;max-width:380px}
 .gb-account-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--gold-light);font-size:1.7rem;cursor:pointer}
 @media(max-width:680px){
- .nav-links{grid-template-columns:1.16fr .64fr .78fr .92fr .52fr .88fr!important}
- .gb-account-link{padding:7px 0!important}
- .gb-account-icon{width:21px;height:21px}
+ .nav{position:relative}
+ .nav-links{grid-template-columns:1.25fr .72fr .82fr 1fr .92fr!important}
+ .gb-account-link{position:absolute!important;right:7px;top:70px;width:42px;height:42px;padding:0!important;border:1px solid var(--gold);border-radius:50%;background:rgba(5,5,5,.78);z-index:25}
+ .gb-account-icon{width:23px;height:23px}
  .gb-account-text{display:none}
 }
 </style>
@@ -2536,7 +2537,7 @@
   var nav=document.querySelector('.nav-links'),cart=document.getElementById('gbCartLink');if(!nav||!cart||document.getElementById('gbAccountLink'))return;
   var a=document.createElement('a');a.href='#';a.id='gbAccountLink';a.className='gb-account-link';a.setAttribute('aria-label','My Account');
   a.innerHTML='<span class="gb-account-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></span><span class="gb-account-text">Account</span>';
-  nav.insertBefore(a,cart);
+  if(window.matchMedia('(max-width:680px)').matches){nav.parentElement.appendChild(a)}else{nav.insertBefore(a,cart);}
   var m=document.getElementById('gbAccountPreview');
   function close(){m.classList.remove('open');m.setAttribute('aria-hidden','true');document.body.style.overflow=''}
   a.addEventListener('click',function(e){e.preventDefault();m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'});
