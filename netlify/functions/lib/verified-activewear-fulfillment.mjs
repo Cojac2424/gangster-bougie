@@ -35,4 +35,7 @@ export const VERIFIED_ACTIVEWEAR_PRODUCTS={
  'GB Classic High-Waisted Leggings – Espresso':{product_id:'6aaa6cde76fcc4ec0005b3e8',sizes:{XS:67982,S:67983,M:67984,L:67985,XL:67986,'2XL':67987}},
  'Baby Bougie Tee – Caviar':{product_id:'6aa06ae32b7606c81303d5ee',sizes:{S:125767,M:125764,L:125760,XL:125771,'2XL':125744},availability:{S:false}},
  'Baby Bougie Tee – Cloud Dancer':{product_id:'6aa06ae32b7606c81303d5ee',sizes:{S:125769,M:125766,L:125762,XL:125773,'2XL':125746},availability:{S:false}}
+ 'GB Classic Sports Bra – Grey':{product_id:'6aa978893aae6055db046726',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
+ 'GB Classic Sports Bra – Black':{product_id:'6aa980b2fb7cdbeacc040b59',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
+ 'GB Classic High-Waisted Leggings – Grey':{product_id:'6aaa0f4cdca52244a60458c0',sizes:{XS:67982,S:67983,M:67984,L:67985,XL:67986,'2XL':67987}},
 };
