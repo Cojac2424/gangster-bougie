@@ -33,6 +33,6 @@ export const PRODUCT_IDENTITIES = [
  ['Heritage Plaid Workout Shorts','workout_shorts','signature','heritage_plaid'],
  ['Vault Workout Shorts','workout_shorts','signature','vault'],
  ['Bougie Houndstooth Workout Shorts','workout_shorts','signature','bougie_houndstooth'],
- ['Shorts – Black','workout_shorts','baby_bougie','black'],
- ['Shorts – White','workout_shorts','baby_bougie','white']
+ ['Shorts – Black','workout_shorts','standalone','black'],
+ ['Shorts – White','workout_shorts','standalone','white']
 ].map(([website_name,family,collection,design])=>({website_name,family,collection,design}));
