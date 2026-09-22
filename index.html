@@ -2504,6 +2504,21 @@
 </script>
 
 
+<style id="gb-byf-contained-shimmer-v1">
+/* Keep the Build Your Fit shine strictly inside the pill. */
+.nav-links .byf-nav-link{overflow:hidden!important;isolation:isolate}
+.nav-links .byf-nav-link::after{
+  top:0!important;
+  bottom:0!important;
+  height:100%!important;
+  inset-block:0!important;
+  width:22%!important;
+  filter:none!important;
+  box-shadow:none!important;
+  background:linear-gradient(90deg,transparent,rgba(255,241,171,.16),rgba(255,255,235,.72),rgba(255,218,83,.28),transparent)!important;
+}
+@keyframes gbByfShine{0%{left:-28%;opacity:.25}15%{opacity:.75}85%{opacity:.75}100%{left:108%;opacity:.25}}
+</style>
 <style id="gb-account-preview-v1">
 .gb-account-link{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;color:var(--gold-light);cursor:pointer}
 .gb-account-icon{width:23px;height:23px;display:block;flex:0 0 auto}
