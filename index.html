@@ -2527,41 +2527,54 @@
 }
 </style>
 <div id="gbAccountPreview" class="gb-account-preview" aria-hidden="true">
- <div class="gb-account-card" role="dialog" aria-modal="true" aria-labelledby="gbAccountTitle">
+ <div class="gb-account-card" role="dialog" aria-modal="true" aria-labelledby="gbAccountTitle" style="max-height:86vh;overflow:auto">
   <button class="gb-account-close" type="button" aria-label="Close account">×</button>
   <div class="gb-account-icon" style="width:38px;height:38px;margin:0 auto 12px" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></div>
   <h2 id="gbAccountTitle">My Account</h2>
-  <p>Sign in securely to view your Gangster Bougie order history.</p>
+  <p id="gbAccountIntro">Sign in securely to view your Gangster Bougie order history.</p>
   <form id="gbAccountEmailForm" style="margin-top:16px;display:grid;gap:10px">
    <input id="gbAccountEmail" type="email" autocomplete="email" placeholder="Email address" required style="width:100%;padding:12px;border:1px solid rgba(216,169,40,.5);border-radius:8px;background:#0b0b0b;color:#fff">
-   <button type="submit" style="padding:11px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:#111;font-weight:800">Continue</button>
+   <button type="submit" style="padding:11px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:#111;font-weight:800">Email My Code</button>
+  </form>
+  <form id="gbAccountCodeForm" hidden style="margin-top:12px;display:none;gap:10px">
+   <input id="gbAccountCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6-digit code" required style="width:100%;padding:12px;text-align:center;letter-spacing:6px;border:1px solid rgba(216,169,40,.5);border-radius:8px;background:#0b0b0b;color:#fff">
+   <button type="submit" style="padding:11px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:#111;font-weight:800">Verify & View My Orders</button>
   </form>
   <p id="gbAccountMessage" style="margin-top:12px;font-size:.85rem;color:var(--muted)"></p>
   <div id="gbOrdersList" style="margin-top:16px;text-align:left"></div>
  </div>
 </div>
-<script id="gb-account-preview-script-v1">
+<script id="gb-account-preview-script-v2">
 (function(){
+ function money(cents,currency){try{return new Intl.NumberFormat('en-CA',{style:'currency',currency:currency||'CAD'}).format((Number(cents)||0)/100)}catch(_){return ((Number(cents)||0)/100).toFixed(2)}}
+ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
+ function renderOrders(orders){
+  var box=document.getElementById('gbOrdersList');
+  if(!orders.length){box.innerHTML='<div style="padding:16px;border:1px solid rgba(216,169,40,.35);border-radius:10px">No orders found for this email yet.</div>';return}
+  box.innerHTML='<h3 style="color:var(--gold);margin:4px 0 12px">My Orders</h3>'+orders.map(function(o){
+   var items=(o.items||[]).map(function(x){return '<div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0"><span>'+esc(x.name)+(x.selection?' — '+esc(x.selection):'')+'</span><strong>× '+esc(x.quantity)+'</strong></div>'}).join('');
+   var date=o.created_at?new Date(o.created_at).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'';
+   return '<article style="border:1px solid rgba(216,169,40,.42);border-radius:12px;padding:14px;margin:0 0 12px;background:#090909"><div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><strong style="color:var(--gold)">'+esc(o.order_number)+'</strong><div style="font-size:.78rem;color:var(--muted)">'+esc(date)+'</div></div><span style="text-transform:capitalize;font-size:.8rem;border:1px solid rgba(216,169,40,.5);border-radius:999px;padding:4px 8px">'+esc(o.status||'confirmed')+'</span></div><div style="margin-top:10px">'+items+'</div><div style="border-top:1px solid #333;margin-top:8px;padding-top:10px;display:flex;justify-content:space-between"><strong>Total</strong><strong>'+esc(money(o.amount_total,o.currency))+'</strong></div></article>'
+  }).join('');
+ }
+ async function loadOrders(token,msg){
+  msg.textContent='Loading your orders…';
+  var r=await fetch('/.netlify/functions/customer-orders',{headers:{Authorization:'Bearer '+token}}),d=await r.json();
+  if(!r.ok)throw new Error(d.error||'Unable to load orders.');
+  renderOrders(d.orders||[]);msg.textContent='Signed in as '+d.email;
+  document.getElementById('gbAccountEmailForm').style.display='none';document.getElementById('gbAccountCodeForm').style.display='none';
+ }
  function install(){
   var nav=document.querySelector('.nav-links'),cart=document.getElementById('gbCartLink');if(!nav||!cart||document.getElementById('gbAccountLink'))return;
   var a=document.createElement('a');a.href='#';a.id='gbAccountLink';a.className='gb-account-link';a.setAttribute('aria-label','My Account');
   a.innerHTML='<span class="gb-account-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></span><span class="gb-account-text">Account</span>';
-  if(window.matchMedia('(max-width:680px)').matches){nav.parentElement.appendChild(a)}else{nav.insertBefore(a,cart);}
-  var m=document.getElementById('gbAccountPreview');
+  if(window.matchMedia('(max-width:680px)').matches){nav.parentElement.appendChild(a)}else{nav.insertBefore(a,cart)}
+  var m=document.getElementById('gbAccountPreview'),emailForm=document.getElementById('gbAccountEmailForm'),codeForm=document.getElementById('gbAccountCodeForm'),msg=document.getElementById('gbAccountMessage'),pendingEmail='';
   function close(){m.classList.remove('open');m.setAttribute('aria-hidden','true');document.body.style.overflow=''}
-  a.addEventListener('click',function(e){e.preventDefault();m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'});
-  m.querySelector('.gb-account-close').addEventListener('click',close);
-  m.addEventListener('click',function(e){if(e.target===m)close()});
-  var form=document.getElementById('gbAccountEmailForm'),msg=document.getElementById('gbAccountMessage');
-  if(form)form.addEventListener('submit',async function(e){
-   e.preventDefault();msg.textContent='Preparing secure sign-in…';
-   try{
-    var email=document.getElementById('gbAccountEmail').value.trim();
-    var r=await fetch('/.netlify/functions/customer-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'request_code',email:email})});
-    var d=await r.json();
-    msg.textContent=r.ok?'Secure email verification is prepared. Email delivery is the next connection.':(d.error||'Unable to start sign-in.');
-   }catch(_){msg.textContent='Unable to start sign-in right now.'}
-  });
+  a.addEventListener('click',async function(e){e.preventDefault();m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';var t=sessionStorage.getItem('gbCustomerToken');if(t){try{await loadOrders(t,msg)}catch(_){sessionStorage.removeItem('gbCustomerToken')}}});
+  m.querySelector('.gb-account-close').addEventListener('click',close);m.addEventListener('click',function(e){if(e.target===m)close()});
+  emailForm.addEventListener('submit',async function(e){e.preventDefault();msg.textContent='Sending your verification code…';pendingEmail=document.getElementById('gbAccountEmail').value.trim();try{var r=await fetch('/.netlify/functions/customer-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'request_code',email:pendingEmail})}),d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to send code.');codeForm.hidden=false;codeForm.style.display='grid';emailForm.style.display='none';msg.textContent='We emailed a 6-digit code to '+pendingEmail+'. It expires in 10 minutes.';document.getElementById('gbAccountCode').focus()}catch(err){msg.textContent=err.message}});
+  codeForm.addEventListener('submit',async function(e){e.preventDefault();msg.textContent='Verifying…';try{var r=await fetch('/.netlify/functions/customer-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify_code',email:pendingEmail,code:document.getElementById('gbAccountCode').value.trim()})}),d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to verify code.');sessionStorage.setItem('gbCustomerToken',d.token);await loadOrders(d.token,msg)}catch(err){msg.textContent=err.message}});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
