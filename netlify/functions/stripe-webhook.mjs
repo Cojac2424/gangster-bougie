@@ -3,7 +3,9 @@
 // SAFETY: does NOT create a Printify order yet.
 
 import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
-import { submitPrintifyOrder } from './lib/printify-submit.mjs';
+import { buildGbOrderRecord } from './lib/gb-order-record.mjs';
+import { saveGbOrder } from './lib/gb-order-store.mjs';
+import { sendOrderConfirmation } from './lib/gb-email.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -45,7 +47,7 @@ export default async(req)=>{
    const fullName=String(details.name||full.shipping_details?.name||'').trim(), parts=fullName.split(/\\s+/), first=parts.shift()||'', last=parts.join(' ')||'-';
    const items=(full.line_items?.data||[]).map(li=>{
      const prod=li.price?.product||{}, md=prod.metadata||{};
-     return {name:md.storefront_name||prod.name||li.description,size:md.storefront_selection||'',qty:li.quantity||1};
+     return {name:md.storefront_name||prod.name||li.description,size:md.storefront_selection||'',qty:li.quantity||1,printify_product_id:md.printify_product_id||null,printify_variant_id:md.printify_variant_id||null};
    });
    const built=buildPrintifyOrder({items,external_id:s.id,shipping:{
      first_name:first,last_name:last,email:details.email||full.customer_email||'',phone:details.phone||'Not provided',
@@ -55,20 +57,28 @@ export default async(req)=>{
      console.error('PAID CHECKOUT NEEDS REVIEW',JSON.stringify({event_id:event.id,session_id:s.id,reason:built.error,details:built}));
      return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:false,printify_order_created:false});
    }
-   // Submission is wired but remains OFF unless PRINTIFY_FULFILLMENT_ENABLED is explicitly set to "true".
-   // Printify recommends Manual order approval when controlling when orders enter production.
-   const enabled=String(process.env.PRINTIFY_FULFILLMENT_ENABLED||'').toLowerCase()==='true';
-   if(!enabled){
-     console.log('VERIFIED PAID CHECKOUT READY - PRINTIFY LOCKED',JSON.stringify({event_id:event.id,session_id:s.id,line_items:built.payload.line_items.length}));
-     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_submission_locked:true,printify_order_created:false});
+   const order=buildGbOrderRecord({stripeSession:full,eventId:event.id,items});
+   if(!order.ok){
+     console.error('GB ORDER RECORD BUILD FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:order.error}));
+     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:false,printify_order_created:false});
    }
-   const submitted=await submitPrintifyOrder(built.payload,{allow:true});
-   if(!submitted.ok){
-     console.error('PRINTIFY SUBMISSION FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:submitted.error,status:submitted.status||null}));
-     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_submission_attempted:true,printify_order_created:false,error:'printify_submission_failed'},{status:500});
+   let saved;
+   try{saved=await saveGbOrder(order.record)}
+   catch(e){
+     console.error('GB ORDER STORAGE FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:String(e?.message||e)}));
+     return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
    }
-   console.log('PRINTIFY ORDER RESOLVED',JSON.stringify({event_id:event.id,session_id:s.id,order_id:submitted.order_id,duplicate_prevented:!!submitted.duplicate_prevented}));
-   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_submission_attempted:true,printify_order_created:!submitted.duplicate_prevented,duplicate_prevented:!!submitted.duplicate_prevented,printify_order_id:submitted.order_id||null});
+   if(!saved.ok){
+     console.error('GB ORDER STORAGE REJECTED',JSON.stringify({event_id:event.id,session_id:s.id,error:saved.error}));
+     return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
+   }
+   let confirmation={ok:true,skipped:!saved.created};
+   if(saved.created){
+    try{confirmation=await sendOrderConfirmation(saved.record)}catch(e){confirmation={ok:false,error:String(e?.message||e)}}
+    if(!confirmation.ok)console.error('ORDER CONFIRMATION EMAIL FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:confirmation.error,status:confirmation.status||null}));
+   }
+   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:false}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:false});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
