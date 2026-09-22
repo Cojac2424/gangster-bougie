@@ -2,6 +2,7 @@
 // No public order lookup by email alone: access requires a short-lived email verification code.
 import { getStore } from '@netlify/blobs';
 import { listGbOrdersByEmail } from './lib/gb-order-store.mjs';
+import { sendVerificationCode } from './lib/gb-email.mjs';
 
 const STORE='gb-customer-auth-v1', enc=new TextEncoder();
 function email(v){return String(v||'').trim().toLowerCase()}
@@ -20,9 +21,13 @@ export default async(req)=>{
    if(!/^\S+@\S+\.\S+$/.test(e))return Response.json({error:'Enter a valid email.'},{status:400});
    const c=code(), expires=Date.now()+10*60*1000;
    await store.setJSON('code/'+await digest(e),{hash:await digest(e+'|'+c),expires,attempts:0});
-   // Email delivery is deliberately not faked. The next step connects this code to the branded email provider.
-   console.log('CUSTOMER ACCESS CODE CREATED',{email:e,expires_at:new Date(expires).toISOString()});
-   return Response.json({ok:true,verification_required:true,email_delivery_ready:false,message:'Verification code created; email delivery is being connected.'});
+   const sent=await sendVerificationCode({to:e,code:c});
+   if(!sent.ok){
+    console.error('CUSTOMER ACCESS EMAIL FAILED',{email:e,error:sent.error,status:sent.status||null});
+    return Response.json({error:'Unable to send verification email right now.'},{status:502});
+   }
+   console.log('CUSTOMER ACCESS CODE EMAILED',{email:e,expires_at:new Date(expires).toISOString(),email_id:sent.id});
+   return Response.json({ok:true,verification_required:true,email_delivery_ready:true,message:'Verification code sent.'});
   }
   if(action==='verify_code'){
    const c=String(b.code||'').trim();
