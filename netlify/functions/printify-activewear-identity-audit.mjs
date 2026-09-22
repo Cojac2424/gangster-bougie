@@ -27,6 +27,8 @@ function exactIdentityOverride(identity,p){
  if(identity.website_name==='GB Classic Sports Bra – Espresso') return t==='gb sports bra espresso';
  if(identity.website_name==='Heritage Plaid Sports Bra') return t==='gangster bougie heritage plaid sports bra';
  if(identity.website_name==='Heritage Plaid Leggings') return t==='gangster bougie heritage plaid high waisted leggings';
+ if(identity.website_name==='Shorts – Black') return p.id==='6a9c474cc8dc7ed3a507b76f';
+ if(identity.website_name==='Shorts – White') return p.id==='6aa2e0b480260294d0e53dd';
  return false;
 }
 function candidateScore(identity,p){
