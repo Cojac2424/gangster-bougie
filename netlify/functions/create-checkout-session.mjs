@@ -63,6 +63,7 @@ export default async (req) => {
   p.set('shipping_address_collection[allowed_countries][0]','CA');
   p.set('shipping_address_collection[allowed_countries][1]','US');
   p.set('metadata[fulfillment_mapping]','exact-v1');
+  p.set('metadata[printify_submission]','locked');
   items.forEach((x,i)=>{
     const f=fulfillment.items[i];
     p.set(`line_items[${i}][quantity]`,String(x.quantity));
@@ -73,6 +74,7 @@ export default async (req) => {
     p.set(`line_items[${i}][price_data][product_data][metadata][printify_product_id]`,f.product_id);
     p.set(`line_items[${i}][price_data][product_data][metadata][printify_variant_id]`,String(f.variant_id));
     p.set(`line_items[${i}][price_data][product_data][metadata][storefront_selection]`,String(f.selection||'').slice(0,120));
+    p.set(`line_items[${i}][price_data][product_data][metadata][storefront_name]`,x.name);
   });
   const stripe=await fetch('https://api.stripe.com/v1/checkout/sessions',{
     method:'POST',
