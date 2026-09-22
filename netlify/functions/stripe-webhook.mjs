@@ -4,6 +4,7 @@
 
 import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
 import { buildGbOrderRecord } from './lib/gb-order-record.mjs';
+import { saveGbOrder } from './lib/gb-order-store.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -60,8 +61,18 @@ export default async(req)=>{
      console.error('GB ORDER RECORD BUILD FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:order.error}));
      return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:false,printify_order_created:false});
    }
-   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:order.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,printify_order_created:false}));
-   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_number:order.record.order_number,printify_order_created:false});
+   let saved;
+   try{saved=await saveGbOrder(order.record)}
+   catch(e){
+     console.error('GB ORDER STORAGE FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:String(e?.message||e)}));
+     return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
+   }
+   if(!saved.ok){
+     console.error('GB ORDER STORAGE REJECTED',JSON.stringify({event_id:event.id,session_id:s.id,error:saved.error}));
+     return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
+   }
+   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,printify_order_created:false}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,printify_order_created:false});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
