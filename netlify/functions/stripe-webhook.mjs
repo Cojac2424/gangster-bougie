@@ -3,6 +3,7 @@
 // SAFETY: does NOT create a Printify order yet.
 
 import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
+import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -54,8 +55,20 @@ export default async(req)=>{
      console.error('PAID CHECKOUT NEEDS REVIEW',JSON.stringify({event_id:event.id,session_id:s.id,reason:built.error,details:built}));
      return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:false,printify_order_created:false});
    }
-   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,printify_order_created:false}));
-   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_order_created:false});
+   // Submission is wired but remains OFF unless PRINTIFY_FULFILLMENT_ENABLED is explicitly set to "true".
+   // Printify recommends Manual order approval when controlling when orders enter production.
+   const enabled=String(process.env.PRINTIFY_FULFILLMENT_ENABLED||'').toLowerCase()==='true';
+   if(!enabled){
+     console.log('VERIFIED PAID CHECKOUT READY - PRINTIFY LOCKED',JSON.stringify({event_id:event.id,session_id:s.id,line_items:built.payload.line_items.length}));
+     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_submission_locked:true,printify_order_created:false});
+   }
+   const submitted=await submitPrintifyOrder(built.payload,{allow:true});
+   if(!submitted.ok){
+     console.error('PRINTIFY SUBMISSION FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:submitted.error,status:submitted.status||null}));
+     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_submission_attempted:true,printify_order_created:false,error:'printify_submission_failed'},{status:500});
+   }
+   console.log('PRINTIFY ORDER RESOLVED',JSON.stringify({event_id:event.id,session_id:s.id,order_id:submitted.order_id,duplicate_prevented:!!submitted.duplicate_prevented}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_submission_attempted:true,printify_order_created:!submitted.duplicate_prevented,duplicate_prevented:!!submitted.duplicate_prevented,printify_order_id:submitted.order_id||null});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
