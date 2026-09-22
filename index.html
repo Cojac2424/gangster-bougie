@@ -2531,7 +2531,13 @@
   <button class="gb-account-close" type="button" aria-label="Close account">×</button>
   <div class="gb-account-icon" style="width:38px;height:38px;margin:0 auto 12px" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></div>
   <h2 id="gbAccountTitle">My Account</h2>
-  <p>This is the account location for sign in and My Orders. Secure customer account access and order history are being connected next.</p>
+  <p>Sign in securely to view your Gangster Bougie order history.</p>
+  <form id="gbAccountEmailForm" style="margin-top:16px;display:grid;gap:10px">
+   <input id="gbAccountEmail" type="email" autocomplete="email" placeholder="Email address" required style="width:100%;padding:12px;border:1px solid rgba(216,169,40,.5);border-radius:8px;background:#0b0b0b;color:#fff">
+   <button type="submit" style="padding:11px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:#111;font-weight:800">Continue</button>
+  </form>
+  <p id="gbAccountMessage" style="margin-top:12px;font-size:.85rem;color:var(--muted)"></p>
+  <div id="gbOrdersList" style="margin-top:16px;text-align:left"></div>
  </div>
 </div>
 <script id="gb-account-preview-script-v1">
@@ -2546,6 +2552,16 @@
   a.addEventListener('click',function(e){e.preventDefault();m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'});
   m.querySelector('.gb-account-close').addEventListener('click',close);
   m.addEventListener('click',function(e){if(e.target===m)close()});
+  var form=document.getElementById('gbAccountEmailForm'),msg=document.getElementById('gbAccountMessage');
+  if(form)form.addEventListener('submit',async function(e){
+   e.preventDefault();msg.textContent='Preparing secure sign-in…';
+   try{
+    var email=document.getElementById('gbAccountEmail').value.trim();
+    var r=await fetch('/.netlify/functions/customer-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'request_code',email:email})});
+    var d=await r.json();
+    msg.textContent=r.ok?'Secure email verification is prepared. Email delivery is the next connection.':(d.error||'Unable to start sign-in.');
+   }catch(_){msg.textContent='Unable to start sign-in right now.'}
+  });
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
