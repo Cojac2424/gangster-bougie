@@ -2517,8 +2517,11 @@
 .gb-account-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--gold-light);font-size:1.7rem;cursor:pointer}
 @media(max-width:680px){
  .nav{position:relative}
- .nav-links{grid-template-columns:1.25fr .72fr .82fr 1fr .92fr!important}
- .gb-account-link{position:absolute!important;right:7px;top:70px;width:42px;height:42px;padding:0!important;border:1px solid var(--gold);border-radius:50%;background:rgba(5,5,5,.78);z-index:25}
+ /* Preserve the proven five-item mobile nav proportions from before Account was added. */
+ .nav-links{display:grid!important;grid-template-columns:minmax(0,.9fr) minmax(0,.9fr) minmax(108px,1.4fr) minmax(0,.95fr) minmax(94px,1.25fr)!important;gap:4px!important;width:100%!important;overflow:visible!important}
+ .nav-links .byf-nav-link{grid-column:3!important;white-space:nowrap!important;overflow:visible!important;padding:8px 2px!important;font-size:clamp(.56rem,2.35vw,.69rem)!important}
+ /* Account is independent of the nav row and lives in the empty upper-right header area. */
+ .gb-account-link{position:absolute!important;right:10px;top:8px;width:42px;height:42px;padding:0!important;border:1px solid var(--gold);border-radius:50%;background:rgba(5,5,5,.78);z-index:25}
  .gb-account-icon{width:23px;height:23px}
  .gb-account-text{display:none}
 }
