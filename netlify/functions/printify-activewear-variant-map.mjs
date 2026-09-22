@@ -55,3 +55,5 @@ export default async(req)=>{
   return Response.json({ok:true,mode:'verified_activewear_variant_map',shop_id:SHOP_ID,total:mappings.length,ready:mappings.filter(x=>x.status==='ready').length,review_needed:mappings.filter(x=>x.status!=='ready').length,note:'Read-only. No orders are created.',mappings});
  }catch(e){console.error(e);return Response.json({ok:false,error:'Unable to build verified activewear variant map.'},{status:502});}
 };
+
+// Batched branch-deploy trigger.
