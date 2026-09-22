@@ -16,10 +16,29 @@ function aliases(identity){
  if(d==='bougie houndstooth')out.push('houndstooth');
  return out;
 }
+function familyTerms(family){
+ const map={sports_bra:['sports bra'],leggings:['legging','leggings','high waisted leggings'],workout_shorts:['workout shorts']};
+ return map[family]||[family.replaceAll('_',' ')];
+}
+function isSameFamily(identity,title){const t=norm(title);return familyTerms(identity.family).some(x=>t.includes(norm(x)));}
+function exactIdentityOverride(identity,p){
+ const t=norm(p.title),w=norm(identity.website_name);
+ if(identity.website_name==='GB Classic Sports Bra – Red') return t==='gb sports bra red';
+ if(identity.website_name==='GB Classic Sports Bra – Espresso') return t==='gb sports bra espresso';
+ if(identity.website_name==='Heritage Plaid Sports Bra') return t==='gangster bougie heritage plaid sports bra';
+ if(identity.website_name==='Heritage Plaid Leggings') return t==='gangster bougie heritage plaid high waisted leggings';
+ return false;
+}
 function candidateScore(identity,p){
  const title=norm(p.title);let score=0;
+ const sameFamily=isSameFamily(identity,p.title);
+ score+=sameFamily?40:-45;
  for(const a of aliases(identity)){if(title.includes(norm(a)))score+=a===identity.design.replaceAll('_',' ')?45:15;}
+ if(identity.collection==='classic'&&title.includes('classic'))score+=30;
+ if(identity.collection==='signature'&&title.includes('signature'))score+=20;
+ if(identity.collection==='baby_bougie'&&title.includes('baby'))score+=20;
  score+=Math.min(30,overlap(identity.website_name,p.title)*6);
+ if(exactIdentityOverride(identity,p))score+=100;
  return score;
 }
 export default async(req)=>{
