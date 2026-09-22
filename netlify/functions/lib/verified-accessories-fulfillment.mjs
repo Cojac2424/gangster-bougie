@@ -9,4 +9,7 @@ export const VERIFIED_ACCESSORIES_PRODUCTS={
  'Crowned Luxury Signature Cap':{product_id:'6aab724d99c3fd89f2072a19',variant_id:125371},
  'Crowned Luxury Crew Socks':{product_id:'6aad440c581aae87ec0b7e49',variant_id:63289}
 };
-export const UNRESOLVED_TRAVEL_BAGS=[{product_id:'6aa41602d808b658480ed47e',variant_id:164441},{product_id:'6aa13978a00cda924c08618b',variant_id:164441}];
+export const VERIFIED_TRAVEL_BAGS={
+ 'GB Faux Leather Travel Bag':{product_id:'6aa41602d808b658480ed47e',variant_id:164441},
+ '“Baddie” Faux Leather Travel Bag':{product_id:'6aa13978a00cda924c08618b',variant_id:164441}
+};
