@@ -3,6 +3,7 @@
 // SAFETY: does NOT create a Printify order yet.
 
 import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
+import { buildGbOrderRecord } from './lib/gb-order-record.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -44,7 +45,7 @@ export default async(req)=>{
    const fullName=String(details.name||full.shipping_details?.name||'').trim(), parts=fullName.split(/\\s+/), first=parts.shift()||'', last=parts.join(' ')||'-';
    const items=(full.line_items?.data||[]).map(li=>{
      const prod=li.price?.product||{}, md=prod.metadata||{};
-     return {name:md.storefront_name||prod.name||li.description,size:md.storefront_selection||'',qty:li.quantity||1};
+     return {name:md.storefront_name||prod.name||li.description,size:md.storefront_selection||'',qty:li.quantity||1,printify_product_id:md.printify_product_id||null,printify_variant_id:md.printify_variant_id||null};
    });
    const built=buildPrintifyOrder({items,external_id:s.id,shipping:{
      first_name:first,last_name:last,email:details.email||full.customer_email||'',phone:details.phone||'Not provided',
@@ -54,8 +55,13 @@ export default async(req)=>{
      console.error('PAID CHECKOUT NEEDS REVIEW',JSON.stringify({event_id:event.id,session_id:s.id,reason:built.error,details:built}));
      return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:false,printify_order_created:false});
    }
-   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,printify_order_created:false}));
-   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_order_created:false});
+   const order=buildGbOrderRecord({stripeSession:full,eventId:event.id,items});
+   if(!order.ok){
+     console.error('GB ORDER RECORD BUILD FAILED',JSON.stringify({event_id:event.id,session_id:s.id,error:order.error}));
+     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:false,printify_order_created:false});
+   }
+   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:order.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,printify_order_created:false}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_number:order.record.order_number,printify_order_created:false});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
