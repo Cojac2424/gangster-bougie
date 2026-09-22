@@ -13,7 +13,7 @@ const TARGETS=[
  {website_name:'Heritage Plaid Leggings',product_id:'6aa73d67d0d6187b3a0f1a23',sizes:['XS','S','M','L','XL','2XL']},
  {website_name:'GB Classic High-Waisted Leggings – Green',product_title:['GB Classic High-Waisted Leggings – Deep Forrest','GB Classic High-Waisted Leggings – Deep Forest'],sizes:['XS','S','M','L','XL','2XL']},
  {website_name:'Shorts – Black',product_id:'6a9c474cc8dc7ed3a507b76f',sizes:['XS','S','M','L','XL']},
- {website_name:'Shorts – White',product_id:'6aa2e0b480260294d0e53dd',sizes:['XS','S','M','L','XL']}
+ {website_name:'Shorts – White',product_title:['White-Gangster Bougie Women’s Workout Shorts'],sizes:['XS','S','M','L','XL']}
 ];
 
 function norm(v=''){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
