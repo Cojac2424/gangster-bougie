@@ -2,6 +2,8 @@
 // SECURITY: verifies Stripe's signature before accepting a payment event.
 // SAFETY: does NOT create a Printify order yet.
 
+import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
+
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
 function constantTime(a,b){
@@ -32,8 +34,28 @@ export default async(req)=>{
  if(event.type==='checkout.session.completed'){
    const s=event.data?.object||{};
    if(s.payment_status!=='paid')return Response.json({received:true,accepted:false,reason:'payment_not_paid'});
-   console.log('VERIFIED PAID CHECKOUT',JSON.stringify({event_id:event.id,session_id:s.id,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,customer_email:s.customer_details?.email||s.customer_email||null,printify_order_created:false}));
-   return Response.json({received:true,accepted:true,verified_paid:true,printify_order_created:false});
+   // Fetch the authoritative paid session + line items from Stripe; never trust browser cart data here.
+   const sk=process.env.STRIPE_SECRET_KEY;
+   if(!sk)return Response.json({error:'Stripe API key is not configured.'},{status:500});
+   const sr=await fetch('https://api.stripe.com/v1/checkout/sessions/'+encodeURIComponent(s.id)+'?expand[]=line_items.data.price.product',{headers:{Authorization:'Bearer '+sk}});
+   const full=await sr.json();
+   if(!sr.ok)return Response.json({error:'Unable to retrieve paid checkout.'},{status:502});
+   const details=full.customer_details||{}, addr=details.address||full.shipping_details?.address||{};
+   const fullName=String(details.name||full.shipping_details?.name||'').trim(), parts=fullName.split(/\\s+/), first=parts.shift()||'', last=parts.join(' ')||'-';
+   const items=(full.line_items?.data||[]).map(li=>{
+     const prod=li.price?.product||{}, md=prod.metadata||{};
+     return {name:md.storefront_name||prod.name||li.description,size:md.storefront_selection||'',qty:li.quantity||1};
+   });
+   const built=buildPrintifyOrder({items,external_id:s.id,shipping:{
+     first_name:first,last_name:last,email:details.email||full.customer_email||'',phone:details.phone||'Not provided',
+     country:addr.country||'',region:addr.state||'',address1:addr.line1||'',address2:addr.line2||'',city:addr.city||'',zip:addr.postal_code||''
+   }});
+   if(!built.ok){
+     console.error('PAID CHECKOUT NEEDS REVIEW',JSON.stringify({event_id:event.id,session_id:s.id,reason:built.error,details:built}));
+     return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:false,printify_order_created:false});
+   }
+   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,printify_order_created:false}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,printify_order_created:false});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
