@@ -11,6 +11,7 @@ export const VERIFIED_ACTIVEWEAR_PRODUCTS={
  'Heritage Plaid Leggings':{product_id:'6aa73d67d0d6187b3a0f1a23',sizes:{XS:67982,S:67983,M:67984,L:67985,XL:67986,'2XL':67987}},
  'GB Classic High-Waisted Leggings – Green':{product_id:'6aaa114d79930e28420e529e',sizes:{XS:67982,S:67983,M:67984,L:67985,XL:67986,'2XL':67987}},
  'Shorts – Black':{product_id:'6a9c474cc8dc7ed3a507b76f',sizes:{XS:96680,S:96681,M:96682,L:96683,XL:96684}},
+ 'Shorts – White':{product_id:'6aa2e0b4802690294d0e53dd',sizes:{XS:96680,S:96681,M:96682,L:96683,XL:96684}},
  'Onyx Sports Bra':{product_id:'6aa77a8cb9b58955fe0cbde4',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
  'Cream Sports Bra':{product_id:'6aa7824d78b4b44d1007fbd2',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
  'Oxblood Sports Bra':{product_id:'6aa7801ad093b223de020f3a',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
@@ -35,5 +36,3 @@ export const VERIFIED_ACTIVEWEAR_PRODUCTS={
  'Baby Bougie Tee – Caviar':{product_id:'6aa06ae32b7606c81303d5ee',sizes:{S:125767,M:125764,L:125760,XL:125771,'2XL':125744},availability:{S:false}},
  'Baby Bougie Tee – Cloud Dancer':{product_id:'6aa06ae32b7606c81303d5ee',sizes:{S:125769,M:125766,L:125762,XL:125773,'2XL':125746},availability:{S:false}}
 };
-// White Shorts verified READY in the live branch test (10/10); its exact product ID
-// will be captured in the next catalog-family batch before automatic fulfillment is enabled.
