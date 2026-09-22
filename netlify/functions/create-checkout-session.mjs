@@ -1,3 +1,4 @@
+import { resolveCart } from './lib/fulfillment-resolver.mjs';
 const PRICE_CENTS = Object.freeze({
   'Onyx Sports Bra':3999,'Cream Sports Bra':3999,'Oxblood Sports Bra':3999,'Heritage Plaid Sports Bra':3999,'Vault Sports Bra':3999,'Bougie Houndstooth Sports Bra':3999,
   'Cream Leggings':6999,'Oxblood Leggings':6999,'Onyx Leggings':6999,'Bougie Houndstooth Leggings':6999,'Vault Leggings':6999,'Heritage Plaid Leggings':6999,
@@ -47,6 +48,11 @@ export default async (req) => {
     if(!unit_amount) return Response.json({error:'An item in your cart is not available for checkout: '+name},{status:400});
     items.push({name,size,quantity,unit_amount});
   }
+  const fulfillment=resolveCart(body.items);
+  if(!fulfillment.ok){
+    console.error('Fulfillment mapping rejected checkout',fulfillment.unresolved);
+    return Response.json({error:'One or more cart options are not ready for fulfillment.',unresolved:fulfillment.unresolved.map(x=>({name:x.name,option:x.option,error:x.error}))},{status:400});
+  }
   const origin=safeOrigin(req);
   if(!origin) return Response.json({error:'Site URL is not configured.'},{status:500});
   const p=new URLSearchParams();
@@ -56,12 +62,19 @@ export default async (req) => {
   p.set('billing_address_collection','auto');
   p.set('shipping_address_collection[allowed_countries][0]','CA');
   p.set('shipping_address_collection[allowed_countries][1]','US');
+  p.set('metadata[fulfillment_mapping]','exact-v1');
+  p.set('metadata[printify_submission]','locked');
   items.forEach((x,i)=>{
+    const f=fulfillment.items[i];
     p.set(`line_items[${i}][quantity]`,String(x.quantity));
     p.set(`line_items[${i}][price_data][currency]`,'usd');
     p.set(`line_items[${i}][price_data][unit_amount]`,String(x.unit_amount));
     p.set(`line_items[${i}][price_data][product_data][name]`,x.name);
     if(x.size) p.set(`line_items[${i}][price_data][product_data][description]`,'Size / option: '+x.size);
+    p.set(`line_items[${i}][price_data][product_data][metadata][printify_product_id]`,f.product_id);
+    p.set(`line_items[${i}][price_data][product_data][metadata][printify_variant_id]`,String(f.variant_id));
+    p.set(`line_items[${i}][price_data][product_data][metadata][storefront_selection]`,String(f.selection||'').slice(0,120));
+    p.set(`line_items[${i}][price_data][product_data][metadata][storefront_name]`,x.name);
   });
   const stripe=await fetch('https://api.stripe.com/v1/checkout/sessions',{
     method:'POST',
