@@ -54,6 +54,8 @@ export default async (req) => {
   p.set('success_url',origin+'/?checkout=success&session_id={CHECKOUT_SESSION_ID}');
   p.set('cancel_url',origin+'/?checkout=cancelled');
   p.set('billing_address_collection','auto');
+  p.set('shipping_address_collection[allowed_countries][0]','CA');
+  p.set('shipping_address_collection[allowed_countries][1]','US');
   items.forEach((x,i)=>{
     p.set(`line_items[${i}][quantity]`,String(x.quantity));
     p.set(`line_items[${i}][price_data][currency]`,'usd');
