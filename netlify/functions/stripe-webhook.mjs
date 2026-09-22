@@ -37,3 +37,5 @@ export default async(req)=>{
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
+
+// Branch deploy refresh after webhook secret configuration.
