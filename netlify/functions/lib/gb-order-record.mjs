@@ -43,6 +43,9 @@ export function buildGbOrderRecord({stripeSession,eventId,items,printifyOrderId=
   payment_status:s.payment_status,
   currency:String(s.currency||'usd').toUpperCase(),
   amount_total:Number.isFinite(Number(s.amount_total))?Number(s.amount_total):null,
+  amount_subtotal:Number.isFinite(Number(s.amount_subtotal))?Number(s.amount_subtotal):null,
+  amount_shipping:Number.isFinite(Number(s.total_details?.amount_shipping))?Number(s.total_details.amount_shipping):0,
+  amount_tax:Number.isFinite(Number(s.total_details?.amount_tax))?Number(s.total_details.amount_tax):0,
   customer:{email:details.email||s.customer_email||'',name:details.name||shipping.name||'',phone:details.phone||''},
   shipping:{name:shipping.name||details.name||'',address1:addr.line1||'',address2:addr.line2||'',city:addr.city||'',region:addr.state||'',postal_code:addr.postal_code||'',country:addr.country||''},
   items:normalizedItems
