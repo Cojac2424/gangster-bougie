@@ -14,6 +14,8 @@ const PRICE_CENTS = Object.freeze({
   'Gangster Bougie “Baddie” Faux Leather Travel Bag':10999,'“Baddie” Faux Leather Travel Bag':10999,'Gangster Bougie Mini Wrap Bandana':2799,'Mini Wrap Bandana':2799,
   'Gangster Bougie Embroidered Structured Cap':3999,'Embroidered Structured Cap':3999
 });
+const SHOP_ID='28816619';
+const ALLOWED_COUNTRIES=new Set(['CA','US']);
 const VARIABLE_PRICES = Object.freeze({
   'Gangster Bougie Stainless Steel Gym Bottle': {'18 oz':5499},
   'Stainless Steel Gym Bottle': {'18 oz':5499}
@@ -53,6 +55,28 @@ export default async (req) => {
     console.error('Fulfillment mapping rejected checkout',fulfillment.unresolved);
     return Response.json({error:'One or more cart options are not ready for fulfillment.',unresolved:fulfillment.unresolved.map(x=>({name:x.name,option:x.option,error:x.error}))},{status:400});
   }
+  const a=body.address||{};
+  const country=String(a.country||'').trim().toUpperCase();
+  if(!ALLOWED_COUNTRIES.has(country)) return Response.json({error:'Shipping is currently available to Canada and the United States.'},{status:400});
+  const address_to={
+    first_name:String(a.first_name||'Customer').trim(),last_name:String(a.last_name||'-').trim(),
+    email:String(a.email||'checkout@example.invalid').trim(),phone:String(a.phone||'Not provided').trim(),
+    country,region:String(a.region||'').trim(),address1:String(a.address1||'').trim(),address2:String(a.address2||'').trim(),
+    city:String(a.city||'').trim(),zip:String(a.zip||'').trim()
+  };
+  const missing=['region','address1','city','zip'].filter(k=>!address_to[k]);
+  if(missing.length) return Response.json({error:'Please complete your shipping address before checkout.',missing},{status:400});
+  if(!process.env.PRINTIFY_API_TOKEN) return Response.json({error:'Shipping calculator is not configured.'},{status:500});
+  const shippingPayload={line_items:fulfillment.items.map(x=>({product_id:x.product_id,variant_id:x.variant_id,quantity:x.quantity})),address_to};
+  const qr=await fetch('https://api.printify.com/v1/shops/'+SHOP_ID+'/orders/shipping.json',{method:'POST',headers:{Authorization:'Bearer '+process.env.PRINTIFY_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(shippingPayload)});
+  const qd=await qr.json().catch(()=>({}));
+  if(!qr.ok) return Response.json({error:'Unable to calculate shipping for this address.'},{status:502});
+  const quoteEntries=Object.entries(qd||{}).filter(([,v])=>Number.isFinite(Number(v))&&Number(v)>=0);
+  if(!quoteEntries.length) return Response.json({error:'No shipping method is available for this order.'},{status:422});
+  const preferred=quoteEntries.find(([k])=>/standard/i.test(k))||quoteEntries[0];
+  const shippingName=String(preferred[0]||'Standard shipping').slice(0,100);
+  const shippingAmount=Math.round(Number(preferred[1]));
+
   const origin=safeOrigin(req);
   if(!origin) return Response.json({error:'Site URL is not configured.'},{status:500});
   const p=new URLSearchParams();
@@ -60,10 +84,17 @@ export default async (req) => {
   p.set('success_url',origin+'/?checkout=success&session_id={CHECKOUT_SESSION_ID}');
   p.set('cancel_url',origin+'/?checkout=cancelled');
   p.set('billing_address_collection','auto');
+  p.set('automatic_tax[enabled]','true');
   p.set('shipping_address_collection[allowed_countries][0]','CA');
   p.set('shipping_address_collection[allowed_countries][1]','US');
   p.set('metadata[fulfillment_mapping]','exact-v1');
   p.set('metadata[printify_submission]','locked');
+  p.set('metadata[quoted_shipping_cents]',String(shippingAmount));
+  p.set('metadata[quoted_shipping_method]',shippingName);
+  p.set('shipping_options[0][shipping_rate_data][type]','fixed_amount');
+  p.set('shipping_options[0][shipping_rate_data][fixed_amount][amount]',String(shippingAmount));
+  p.set('shipping_options[0][shipping_rate_data][fixed_amount][currency]','usd');
+  p.set('shipping_options[0][shipping_rate_data][display_name]',shippingName);
   items.forEach((x,i)=>{
     const f=fulfillment.items[i];
     p.set(`line_items[${i}][quantity]`,String(x.quantity));
