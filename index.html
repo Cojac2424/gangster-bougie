@@ -1408,7 +1408,7 @@
  // Secure Stripe Checkout is created by a Netlify Function; browser cart prices are not trusted.
  if(checkout)checkout.addEventListener('click',async function(){
   const cart=read();if(!cart.length)return;
-  const original=checkout.textContent;checkout.disabled=true;checkout.textContent='Opening secure checkout…';
+  const original=checkout.textContent;checkout.disabled=true;
   try{
    const res=await fetch('/.netlify/functions/create-checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:cart.map(function(x){return{name:x.name,size:x.size,qty:Number(x.qty)||1}})})});
    const data=await res.json();
@@ -1416,7 +1416,7 @@
    window.location.assign(data.url);
   }catch(err){
    alert(err&&err.message?err.message:'Unable to start checkout. Please try again.');
-   checkout.disabled=false;checkout.textContent=original;
+   checkout.disabled=false;
   }
  });
  window.gbCartRefresh=render;
