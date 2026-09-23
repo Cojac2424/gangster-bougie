@@ -1374,8 +1374,8 @@
 })();
 </script>
 
-<div class="gb-checkout-overlay" id="gbCheckoutOverlay" aria-hidden="true"><section class="gb-checkout-panel" role="dialog" aria-modal="true" aria-labelledby="gbCheckoutTitle"><button type="button" class="gb-checkout-x" id="gbCheckoutClose" aria-label="Close checkout">×</button><div class="gb-checkout-brand">Gangster Bougie</div><h2 id="gbCheckoutTitle">Checkout</h2><p class="gb-checkout-intro">Delivery & payment</p><form id="gbCheckoutForm"><label class="gb-email-label">Email<input id="gbCheckoutEmail" name="email" type="email" autocomplete="email" required></label><div class="gb-stripe-section"><div class="gb-stripe-heading">Delivery information</div><div id="gbShippingAddress"></div></div><div class="gb-checkout-review"><div><span>Merchandise subtotal</span><strong id="gbCheckoutSubtotal">US$0.00</strong></div><div><span>Shipping</span><strong id="gbCheckoutShipping">Enter delivery address</strong></div><div><span>Tax</span><strong id="gbCheckoutTax">Calculated automatically</strong></div><div class="gb-total-row"><span>Total</span><strong id="gbCheckoutTotal">—</strong></div></div><div class="gb-stripe-section"><div class="gb-stripe-heading">Payment</div><div id="gbPaymentElement"></div></div><p class="gb-checkout-note">Your delivery address is entered once. Shipping and applicable tax are included in the total before payment is authorized.</p><button class="gb-cart-checkout" type="submit" id="gbCheckoutContinue" disabled>Pay</button><div class="gb-checkout-error" id="gbCheckoutError" role="alert"></div></form></section></div>
-<style>.gb-checkout-overlay{position:fixed;inset:0;z-index:260;background:rgba(0,0,0,.88);display:none;overflow:auto;padding:24px}.gb-checkout-overlay.open{display:grid;place-items:start center}.gb-checkout-panel{position:relative;width:min(760px,100%);background:#090909;border:1px solid rgba(216,169,40,.55);box-shadow:0 22px 70px rgba(0,0,0,.7);padding:28px;margin:auto}.gb-checkout-x{position:absolute;right:16px;top:16px;width:40px;height:40px;border:1px solid #d8a928;border-radius:50%;background:#111;color:#f4cf63;font-size:1.5rem}.gb-checkout-brand{color:#f4cf63;text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:900}.gb-checkout-panel h2{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-size:2rem;margin:5px 48px 8px 0}.gb-checkout-intro,.gb-checkout-note{color:#aaa;font-size:.86rem}.gb-email-label{display:block;margin:22px 0;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#ccc}.gb-email-label input{display:block;width:100%;margin-top:6px;padding:12px;border:1px solid #444;border-radius:5px;background:#111;color:#fff;font:inherit}.gb-stripe-section{border:1px solid #2b2b2b;border-radius:7px;padding:16px;margin:16px 0;background:#0d0d0d}.gb-stripe-heading{color:#f4cf63;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;font-weight:900;margin-bottom:12px}.gb-checkout-review{border-top:1px solid #2b2b2b;border-bottom:1px solid #2b2b2b;padding:12px 0;margin:16px 0}.gb-checkout-review div{display:flex;justify-content:space-between;gap:18px;padding:5px 0}.gb-checkout-review strong{color:#f4cf63;text-align:right}.gb-checkout-review .gb-total-row{border-top:1px solid #333;margin-top:7px;padding-top:12px;font-size:1.08rem}.gb-checkout-note{margin:12px 0 15px}.gb-checkout-error{color:#ff9c9c;font-size:.84rem;margin-top:10px;min-height:1.2em}.gb-cart-checkout:disabled{opacity:.5;cursor:not-allowed}@media(max-width:600px){.gb-checkout-overlay{padding:10px}.gb-checkout-panel{padding:22px 16px}.gb-checkout-review div{font-size:.86rem}}</style>
+<div class="gb-checkout-overlay" id="gbCheckoutOverlay" aria-hidden="true"><section class="gb-checkout-panel" role="dialog" aria-modal="true" aria-labelledby="gbCheckoutTitle"><button type="button" class="gb-checkout-x" id="gbCheckoutClose" aria-label="Close checkout">×</button><div class="gb-checkout-brand">Gangster Bougie</div><h2 id="gbCheckoutTitle">Checkout</h2><p class="gb-checkout-intro">Delivery & payment</p><form id="gbCheckoutForm"><label class="gb-email-label">Email<input id="gbCheckoutEmail" name="email" type="email" autocomplete="email" required></label><div class="gb-stripe-section"><div class="gb-stripe-heading">Delivery information</div><div id="gbShippingAddress"></div></div><div class="gb-checkout-review"><div id="gbCheckoutItems" class="gb-checkout-items"></div><div><span>Subtotal</span><strong id="gbCheckoutSubtotal">US$0.00</strong></div><div><span>Shipping</span><strong id="gbCheckoutShipping">Enter delivery address</strong></div><div><span>Tax</span><strong id="gbCheckoutTax">Calculated automatically</strong></div><div class="gb-total-row"><span>Total</span><strong id="gbCheckoutTotal">—</strong></div></div><div class="gb-stripe-section"><div class="gb-stripe-heading">Payment</div><div id="gbPaymentElement"></div></div><p class="gb-checkout-note">Your delivery address is entered once. Shipping and applicable tax are included in the total before payment is authorized.</p><button class="gb-cart-checkout" type="submit" id="gbCheckoutContinue" disabled>Pay</button><div class="gb-checkout-error" id="gbCheckoutError" role="alert"></div></form></section></div>
+<style>.gb-checkout-overlay{position:fixed;inset:0;z-index:260;background:rgba(0,0,0,.88);display:none;overflow:auto;padding:24px}.gb-checkout-overlay.open{display:grid;place-items:start center}.gb-checkout-panel{position:relative;width:min(760px,100%);background:#090909;border:1px solid rgba(216,169,40,.55);box-shadow:0 22px 70px rgba(0,0,0,.7);padding:28px;margin:auto}.gb-checkout-x{position:absolute;right:16px;top:16px;width:40px;height:40px;border:1px solid #d8a928;border-radius:50%;background:#111;color:#f4cf63;font-size:1.5rem}.gb-checkout-brand{color:#f4cf63;text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:900}.gb-checkout-panel h2{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-size:2rem;margin:5px 48px 8px 0}.gb-checkout-intro,.gb-checkout-note{color:#aaa;font-size:.86rem}.gb-email-label{display:block;margin:22px 0;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#ccc}.gb-email-label input{display:block;width:100%;margin-top:6px;padding:12px;border:1px solid #444;border-radius:5px;background:#111;color:#fff;font:inherit}.gb-stripe-section{border:1px solid #2b2b2b;border-radius:7px;padding:16px;margin:16px 0;background:#0d0d0d}.gb-stripe-heading{color:#f4cf63;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;font-weight:900;margin-bottom:12px}.gb-checkout-review{border-top:1px solid #2b2b2b;border-bottom:1px solid #2b2b2b;padding:12px 0;margin:16px 0}.gb-checkout-review div{display:flex;justify-content:space-between;gap:18px;padding:5px 0}.gb-checkout-review strong{color:#f4cf63;text-align:right}.gb-checkout-items{display:block!important;padding:0 0 8px!important}.gb-checkout-items .gb-checkout-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;padding:8px 0;border-bottom:1px solid #222}.gb-checkout-item small{display:block;color:#999;font-size:.78rem;margin-top:2px}.gb-checkout-item>strong{white-space:nowrap}.gb-checkout-review .gb-total-row{border-top:1px solid #333;margin-top:7px;padding-top:12px;font-size:1.08rem}.gb-checkout-note{margin:12px 0 15px}.gb-checkout-error{color:#ff9c9c;font-size:.84rem;margin-top:10px;min-height:1.2em}.gb-cart-checkout:disabled{opacity:.5;cursor:not-allowed}@media(max-width:600px){.gb-checkout-overlay{padding:10px}.gb-checkout-panel{padding:22px 16px}.gb-checkout-review div{font-size:.86rem}}</style>
 <div class="gb-cart-overlay" id="gbCartOverlay" aria-hidden="true"></div>
 <aside class="gb-cart-drawer" id="gbCartDrawer" aria-hidden="true" aria-label="Shopping cart">
  <div class="gb-cart-head"><div><div class="gb-cart-kicker">Gangster Bougie</div><h2>Your Cart</h2></div><button type="button" class="gb-cart-close" id="gbCartClose" aria-label="Close cart">×</button></div>
@@ -1409,9 +1409,1198 @@
  if(link)link.addEventListener('click',openCart);if(close)close.addEventListener('click',closeCart);if(overlay)overlay.addEventListener('click',closeCart);
  if(lines)lines.addEventListener('click',function(e){const b=e.target.closest('[data-cart-action]');if(!b)return;const i=Number(b.dataset.i),c=read(),a=b.dataset.cartAction;if(!c[i])return;if(a==='plus')c[i].qty=(Number(c[i].qty)||1)+1;if(a==='minus'){c[i].qty=(Number(c[i].qty)||1)-1;if(c[i].qty<=0)c.splice(i,1)}if(a==='remove')c.splice(i,1);write(c)});
  // Gangster Bougie custom Stripe Checkout: one address entry, Printify shipping, Stripe Tax and embedded payment.
- const coOverlay=document.getElementById('gbCheckoutOverlay'),coClose=document.getElementById('gbCheckoutClose'),coForm=document.getElementById('gbCheckoutForm'),coSubtotal=document.getElementById('gbCheckoutSubtotal'),coShipping=document.getElementById('gbCheckoutShipping'),coTax=document.getElementById('gbCheckoutTax'),coTotal=document.getElementById('gbCheckoutTotal'),coEmail=document.getElementById('gbCheckoutEmail'),coError=document.getElementById('gbCheckoutError'),coContinue=document.getElementById('gbCheckoutContinue');
+ const coItems=document.getElementById('gbCheckoutItems'),coOverlay=document.getElementById('gbCheckoutOverlay'),coClose=document.getElementById('gbCheckoutClose'),coForm=document.getElementById('gbCheckoutForm'),coSubtotal=document.getElementById('gbCheckoutSubtotal'),coShipping=document.getElementById('gbCheckoutShipping'),coTax=document.getElementById('gbCheckoutTax'),coTotal=document.getElementById('gbCheckoutTotal'),coEmail=document.getElementById('gbCheckoutEmail'),coError=document.getElementById('gbCheckoutError'),coContinue=document.getElementById('gbCheckoutContinue');
  let gbCheckout=null,gbActions=null,gbSession=null,gbShippingEl=null,gbPaymentEl=null,gbCheckoutCart=[],gbQuoteTimer=null,gbLastQuote='';
- function cartSubtotal(){return read().reduce((n,x)=>n+price(x)*(Number(x.qty)||1),0)}
+ function cartSubtotal(){return read().reduce((n,x)=>n+price(x)*(Number(x.qty)||1),0)} function renderCheckoutItems(){if(!coItems)return;coItems.innerHTML=gbCheckoutCart.map(x=>{const q=Number(x.qty)||1,u=price(x);return '<div class="gb-checkout-item"><span><b>'+esc(x.name)+'</b><small>'+(x.size?'Size / option: '+esc(x.size)+' · ':'')+'Qty '+q+'</small></span><strong>US
+ function money(a){if(!a)return '—';return (a.amount?String(a.amount):('US$'+((Number(a.minorUnitsAmount)||0)/100).toFixed(2)))}
+ function closeCheckout(){if(coOverlay){coOverlay.classList.remove('open');coOverlay.setAttribute('aria-hidden','true')}}
+ function resetCheckoutMounts(){['gbShippingAddress','gbPaymentElement'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=''});gbCheckout=gbActions=gbSession=gbShippingEl=gbPaymentEl=null;gbLastQuote='';if(coContinue)coContinue.disabled=true}
+ function updateSummary(s){gbSession=s;if(!s)return;if(coShipping)coShipping.textContent=s.shipping?money(s.total.shippingRate):'Enter delivery address';if(coTax)coTax.textContent=s.tax?.status==='ready'?money(s.total.taxExclusive):'Calculated automatically';if(coTotal)coTotal.textContent=s.shipping?money(s.total.total):'—';if(coContinue)coContinue.disabled=!s.canConfirm||!s.shipping}
+ async function quoteShippingDetails(contact){const a=contact?.address||{};if(!a.country||!a.line1||!a.city||!a.postal_code||!a.state)return;const name=(contact.name||[contact.firstName,contact.lastName].filter(Boolean).join(' ')).trim()||'Customer';const sig=[a.country,a.state,a.city,a.postal_code,a.line1,a.line2||'',gbCheckoutCart.map(x=>x.name+'|'+x.size+'|'+x.qty).join(';')].join('|');if(sig===gbLastQuote)return;gbLastQuote=sig;if(coShipping)coShipping.textContent='Calculating…';const s=gbActions.getSession();const body={session_id:s.id,items:gbCheckoutCart,address:{name,email:s.email||coEmail?.value||'',country:a.country,region:a.state,address1:a.line1,address2:a.line2||'',city:a.city,zip:a.postal_code}};const result=await gbActions.runServerUpdate(async()=>{const r=await fetch('/.netlify/functions/calculate-shipping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to calculate shipping.');return d});if(result.type==='error'){gbLastQuote='';throw new Error(result.error?.message||'Unable to calculate shipping.')}const fresh=gbActions.getSession();if(fresh.shippingOptions?.length&&!fresh.shipping){const pick=fresh.shippingOptions.find(x=>/standard/i.test(x.displayName||''))||fresh.shippingOptions[0];const chosen=await gbActions.updateShippingOption(pick.id);if(chosen.type==='error')throw new Error(chosen.error?.message||'Unable to select shipping.')}updateSummary(gbActions.getSession())}
+ async function startCheckout(){gbCheckoutCart=read().map(x=>({name:x.name,size:x.size,qty:Number(x.qty)||1}));if(!gbCheckoutCart.length)return;resetCheckoutMounts();renderCheckoutItems();if(coSubtotal)coSubtotal.textContent='US$'+cartSubtotal().toFixed(2);if(coShipping)coShipping.textContent='Enter delivery address';if(coTax)coTax.textContent='Calculated automatically';if(coTotal)coTotal.textContent='—';if(coError)coError.textContent='';closeCart();coOverlay.classList.add('open');coOverlay.setAttribute('aria-hidden','false');try{const r=await fetch('/.netlify/functions/create-checkout-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:gbCheckoutCart})});const d=await r.json();if(!r.ok||!d.checkoutSessionClientSecret||!d.publishableKey)throw new Error(d.error||'Unable to start checkout.');const stripe=Stripe(d.publishableKey);gbCheckout=stripe.initCheckout({clientSecret:d.checkoutSessionClientSecret,elementsOptions:{appearance:{theme:'night',variables:{colorPrimary:'#d8a928',colorBackground:'#111111',colorText:'#ffffff',colorDanger:'#ff9c9c',borderRadius:'5px'}}}});const loaded=await gbCheckout.loadActions();if(loaded.type!=='success')throw new Error(loaded.error?.message||'Unable to load checkout.');gbActions=loaded.actions;gbShippingEl=gbCheckout.createShippingAddressElement({display:{name:'split'}});gbPaymentEl=gbCheckout.createPaymentElement({layout:'accordion'});gbShippingEl.mount('#gbShippingAddress');gbPaymentEl.mount('#gbPaymentElement');gbShippingEl.on('change',ev=>{clearTimeout(gbQuoteTimer);if(!ev.complete){gbLastQuote='';if(coShipping)coShipping.textContent='Enter delivery address';return}gbQuoteTimer=setTimeout(async()=>{try{const contact=ev.value||{};const fullName=(contact.name||[contact.firstName,contact.lastName].filter(Boolean).join(' ')).trim()||'Customer';const updated=await gbActions.updateShippingAddress({name:fullName,address:contact.address});if(updated.type==='error')throw new Error(updated.error?.message||'Unable to update delivery address.');updateSummary(gbActions.getSession());await quoteShippingDetails(contact)}catch(e){gbLastQuote='';if(coError)coError.textContent=e.message}},300)});updateSummary(gbActions.getSession())}catch(e){if(coError)coError.textContent=e.message||'Unable to start checkout.'}}
+ if(checkout)checkout.addEventListener('click',startCheckout);
+ if(coClose)coClose.addEventListener('click',closeCheckout);if(coOverlay)coOverlay.addEventListener('click',e=>{if(e.target===coOverlay)closeCheckout()});
+ if(coForm)coForm.addEventListener('submit',async e=>{e.preventDefault();if(!gbActions)return;coContinue.disabled=true;if(coError)coError.textContent='';try{const er=await gbActions.updateEmail(coEmail.value.trim());if(er.type==='error')throw new Error(er.error?.message||'Please enter a valid email.');const v=await gbActions.validateElements();if(v.type==='error')throw new Error(v.error?.message||'Please complete delivery and payment information.');const result=await gbActions.confirm({redirect:'if_required',returnUrl:location.origin+'/?checkout=success'});if(result.type==='error')throw new Error(result.error?.message||'Payment could not be completed.');updateSummary(result.session);if(result.session?.status?.type==='complete')location.assign('/?checkout=success&session_id='+encodeURIComponent(result.session.id))}catch(err){if(coError)coError.textContent=err.message||'Unable to complete payment.';coContinue.disabled=!gbSession?.canConfirm||!gbSession?.shipping}});
+ window.gbCartRefresh=render;
+ window.addEventListener('storage',render);
+ document.addEventListener('click',function(e){if(e.target&&e.target.id==='byfAddFit')setTimeout(render,0)},true);
+ render();
+})();
+</script>
+
+<!-- Redeploy preview after sandbox Stripe context update -->
+<script>/* Build Your Fit top real-image guard v40 */
+(function(){
+ function syncTopRealImages(){
+  var name=document.getElementById('byfShopTopName');
+  var pair=document.getElementById('byfTopRealProductPair');
+  if(!name||!pair)return;
+  var isOxblood=(name.textContent||'').trim()==='Oxblood Sports Bra';
+  pair.style.display=isOxblood?'flex':'none';
+ }
+ var root=document.getElementById('build-your-fit');
+ if(root){
+  root.addEventListener('click',function(){setTimeout(syncTopRealImages,0)});
+  root.addEventListener('pointerup',function(){setTimeout(syncTopRealImages,0)});
+ }
+ var name=document.getElementById('byfShopTopName');
+ if(name&&window.MutationObserver)new MutationObserver(syncTopRealImages).observe(name,{childList:true,characterData:true,subtree:true});
+ syncTopRealImages();
+})();
+</script>
+
+<script>/* Sports bra product data v42 */
+(function(){
+ const bras={
+  'Heritage Plaid Sports Bra':{
+   front:'IMG_0522.jpeg',back:'IMG_0523.jpeg',price:39.99,
+   details:`<p>Make a statement without saying a word. The Gangster Bougie Heritage Plaid Sports Bra combines deep burgundy, black and gold with our signature GB monogram and crown detailing for a luxury streetwear take on activewear.</p><p>Designed with a supportive U-shaped back and removable chest padding, it delivers comfort and attitude whether you’re training, styling it casually, or building a complete Signature fit.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>Soft, lightweight and breathable polyester</li><li>U-shaped back for added support</li><li>Removable chest padding</li><li>Available in sizes S–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`},
+  'Vault Sports Bra':{
+   front:'IMG_0527.jpeg',back:'IMG_0528.jpeg',price:39.99,
+   details:`<p>Make luxury part of the uniform. The Gangster Bougie Signature Vault Sports Bra features our espresso, brown and gold Art Deco-inspired Vault design, finished with signature GB detailing for a rich, elevated look.</p><p>Designed for movement while making a statement, this fitted sports bra combines comfort and attitude with an all-over pattern created to coordinate across the GB Signature collection.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>Comfortable, supportive fit</li><li>All-over printed design</li><li>Designed to coordinate with Vault Leggings and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`},
+  'Onyx Sports Bra':{
+   front:'IMG_0545.jpeg',back:'IMG_0546.jpeg',price:39.99,
+   details:`<p>Clean. Elevated, unmistakably Gangster Bougie. The Gangster Bougie Signature Essentials Onyx Sports Bra pairs a solid Onyx black foundation with understated gold GB detailing for a versatile luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or mix effortlessly with Heritage Plaid, Vault, Bougie Houndstooth and matching Signature Essentials bottoms.</p><ul><li>Solid Onyx black</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`},
+  'Oxblood Sports Bra':{
+   front:'IMG_0547.jpeg',back:'IMG_0548.jpeg',price:39.99,
+   details:`<p>Bold, elevated and unmistakably Gangster Bougie. The Gangster Bougie Signature Essentials Oxblood Sports Bra combines a rich Oxblood red foundation with understated gold GB detailing for a luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature gold crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or mix effortlessly with pieces throughout the GB Signature Collection.</p><ul><li>Rich Oxblood red</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`},
+  'Cream Sports Bra':{
+   front:'IMG_0551.jpeg',back:'IMG_0552.jpeg',price:39.99,
+   details:`<p>Clean, refined and effortlessly Gangster Bougie. The Gangster Bougie Signature Essentials Cream Sports Bra pairs a soft Cream foundation with understated gold GB detailing for an elevated luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature gold crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or coordinate effortlessly with pieces throughout the GB Signature Collection.</p><ul><li>Soft Cream colour</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`}
+ };
+ function syncBra(){
+  const nameEl=document.getElementById('byfShopTopName'),pair=document.getElementById('byfTopRealProductPair');
+  if(!nameEl||!pair)return;
+  const name=(nameEl.textContent||'').trim(),d=bras[name];
+  if(!d){pair.style.display='none';return}
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img alt="" loading="lazy" decoding="async"><img alt="" loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  // src is changed only for the selected bra: no category-wide image preload.
+  if(imgs[0].getAttribute('src')!==d.front)imgs[0].src=d.front;
+  if(imgs[1].getAttribute('src')!==d.back)imgs[1].src=d.back;
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';pair.style.display='flex';
+  const topItem=nameEl.closest('.byf-fit-item');
+  if(topItem){const det=topItem.querySelector('details');if(det){const body=det.querySelector('.byf-details-body')||det.querySelector('div');if(body)body.innerHTML=d.details}}
+ }
+ const nameEl=document.getElementById('byfShopTopName');
+ if(nameEl&&window.MutationObserver)new MutationObserver(syncBra).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');if(root){root.addEventListener('click',()=>setTimeout(syncBra,0));root.addEventListener('pointerup',()=>setTimeout(syncBra,0))}
+ syncBra();
+ // Keep cart thumbnails synchronized with the exact selected bra. One front image only.
+ function syncCartThumbs(){document.querySelectorAll('.gb-cart-line').forEach(row=>{const n=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(),d=bras[n],slot=row.querySelector('.gb-cart-thumb-slot');if(!slot||!d)return;let im=slot.querySelector('img');if(!im){im=document.createElement('img');im.className='gb-cart-thumb';im.loading='lazy';im.decoding='async';slot.appendChild(im)}if(im.getAttribute('src')!==d.front)im.src=d.front;im.alt=n})}
+ const cartLines=document.getElementById('gbCartLines');if(cartLines&&window.MutationObserver)new MutationObserver(syncCartThumbs).observe(cartLines,{childList:true,subtree:true});syncCartThumbs();
+})();
+</script>
+
+<script>/* Bougie Houndstooth product data v43 */
+(function(){
+ const product={
+  name:'Bougie Houndstooth Sports Bra',
+  front:'IMG_0532.jpeg',back:'IMG_0533.jpeg',price:39.99,
+  details:`<p>Black, cream &amp; gold Bougie Houndstooth design with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>All-over printed design</li><li>Comfortable, athletic silhouette</li><li>Designed for training and everyday wear</li><li>Coordinates with Signature Houndstooth bottoms</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>`
+ };
+ function sync(){
+  const nameEl=document.getElementById('byfShopTopName'),pair=document.getElementById('byfTopRealProductPair');
+  if(!nameEl||!pair||(nameEl.textContent||'').trim()!==product.name)return;
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img alt="" loading="lazy" decoding="async"><img alt="" loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==product.front)imgs[0].src=product.front;
+  if(imgs[1].getAttribute('src')!==product.back)imgs[1].src=product.back;
+  imgs[0].alt=product.name+' front';imgs[1].alt=product.name+' back';pair.style.display='flex';
+  const topItem=nameEl.closest('.byf-fit-item');
+  if(topItem){const det=topItem.querySelector('details');if(det){const body=det.querySelector('.byf-details-body')||det.querySelector('div');if(body)body.innerHTML=product.details}}
+ }
+ const nameEl=document.getElementById('byfShopTopName');
+ if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');if(root){root.addEventListener('click',()=>setTimeout(sync,0));root.addEventListener('pointerup',()=>setTimeout(sync,0))}
+ sync();
+ function cart(){document.querySelectorAll('.gb-cart-line').forEach(row=>{const n=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(),slot=row.querySelector('.gb-cart-thumb-slot');if(n!==product.name||!slot)return;let im=slot.querySelector('img');if(!im){im=document.createElement('img');im.className='gb-cart-thumb';im.loading='lazy';im.decoding='async';slot.appendChild(im)}if(im.getAttribute('src')!==product.front)im.src=product.front;im.alt=product.name})}
+ const lines=document.getElementById('gbCartLines');if(lines&&window.MutationObserver)new MutationObserver(cart).observe(lines,{childList:true,subtree:true});cart();
+})();
+</script>
+
+<script>/* Leggings product data v44 */
+(function(){
+ const products={
+  'Cream Leggings':{front:'IMG_0553.jpeg',back:'IMG_0554.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Soft Cream with understated gold Gangster Bougie detailing.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Cream High-Waisted Leggings':{front:'IMG_0553.jpeg',back:'IMG_0554.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Soft Cream with understated gold Gangster Bougie detailing.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Oxblood Leggings':{front:'IMG_0549.jpeg',back:'IMG_0550.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Rich Oxblood red finished with understated gold Gangster Bougie detailing.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Oxblood High-Waisted Leggings':{front:'IMG_0549.jpeg',back:'IMG_0550.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Rich Oxblood red finished with understated gold Gangster Bougie detailing.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Onyx Leggings':{front:'IMG_0541.jpeg',back:'IMG_0542.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Sleek solid Onyx black finished with understated gold Gangster Bougie detailing.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates with Signature Essentials and patterned Signature pieces</li><li>Made to order.</li></ul>`},
+  'Onyx High-Waisted Leggings':{front:'IMG_0541.jpeg',back:'IMG_0542.jpeg',price:69.99,details:`<p>Clean luxury built for movement. Sleek solid Onyx black finished with understated gold Gangster Bougie detailing.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates with Signature Essentials and patterned Signature pieces</li><li>Made to order.</li></ul>`},
+  'Bougie Houndstooth Leggings':{front:'IMG_0534.jpeg',back:'IMG_0535.jpeg',price:69.99,details:`<p>Luxury meets movement. Black, cream and gold houndstooth with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>High-waisted silhouette</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Bougie Houndstooth High-Waisted Leggings':{front:'IMG_0534.jpeg',back:'IMG_0535.jpeg',price:69.99,details:`<p>Luxury meets movement. Black, cream and gold houndstooth with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>High-waisted silhouette</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Vault Leggings':{front:'IMG_0525.jpeg',back:'IMG_0526.jpeg',price:69.99,details:`<p>Luxury meets movement. Espresso, brown and gold Art Deco-inspired Vault design in a sleek, body-contouring silhouette.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>High-rise 4.5-inch waistband</li><li>Four-way stretch</li><li>83% polyester / 17% spandex</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Vault High-Waisted Leggings':{front:'IMG_0525.jpeg',back:'IMG_0526.jpeg',price:69.99,details:`<p>Luxury meets movement. Espresso, brown and gold Art Deco-inspired Vault design in a sleek, body-contouring silhouette.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>High-rise 4.5-inch waistband</li><li>Four-way stretch</li><li>83% polyester / 17% spandex</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Heritage Plaid Leggings':{front:'IMG_0520.jpeg',back:'IMG_0521.jpeg',price:69.99,details:`<p>Luxury meets movement. Signature burgundy, black and gold plaid with repeating GB monogram and crown detailing.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>83% polyester / 17% spandex</li><li>Four-way stretch for freedom of movement</li><li>Smooth 4.5-inch high-rise waistband</li><li>Full all-over print</li><li>Available in sizes XS–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Heritage Plaid High-Waisted Leggings':{front:'IMG_0520.jpeg',back:'IMG_0521.jpeg',price:69.99,details:`<p>Luxury meets movement. Signature burgundy, black and gold plaid with repeating GB monogram and crown detailing.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>83% polyester / 17% spandex</li><li>Four-way stretch for freedom of movement</li><li>Smooth 4.5-inch high-rise waistband</li><li>Full all-over print</li><li>Available in sizes XS–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`}
+ };
+ const tech=`<p><strong>Note: Runs small, consider sizing up!</strong></p><p>83% Polyester, 17% Spandex<br>Skinny fit<br>Outside seam thread is color-matched to design<br>Interior white seam thread<br>Double layer waistband<br>Please note: Slightly see-through when stretched. Some of the undyed white underneath material may become visible at the seams or where sewn.<br>Assembled in the USA from globally sourced parts</p>`;
+ function current(){const e=document.getElementById('byfShopBottomName');return e?products[(e.textContent||'').trim()]:null}
+ function sync(){
+  const nameEl=document.getElementById('byfShopBottomName'),pair=document.getElementById('byfBottomRealProductPair');if(!nameEl||!pair)return;
+  const name=(nameEl.textContent||'').trim(),p=products[name];
+  if(!p){pair.style.display='none';return}
+  let imgs=pair.querySelectorAll('img');if(imgs.length<2){pair.innerHTML='<img alt="" loading="lazy" decoding="async"><img alt="" loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==p.front)imgs[0].src=p.front;if(imgs[1].getAttribute('src')!==p.back)imgs[1].src=p.back;
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';pair.style.display='flex';
+  const price=document.getElementById('byfShopBottomPrice');if(price)price.textContent='US$69.99';
+  const item=nameEl.closest('.byf-fit-item');if(item){const det=item.querySelector('details');if(det){const body=det.querySelector('.byf-details-body')||det.querySelector('div');if(body)body.innerHTML=p.details+tech}}
+ }
+ const nameEl=document.getElementById('byfShopBottomName');if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');if(root){root.addEventListener('click',()=>setTimeout(sync,0));root.addEventListener('pointerup',()=>setTimeout(sync,0))}sync();
+ function cart(){document.querySelectorAll('.gb-cart-line').forEach(row=>{const n=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(),p=products[n],slot=row.querySelector('.gb-cart-thumb-slot');if(!p||!slot)return;let im=slot.querySelector('img');if(!im){im=document.createElement('img');im.className='gb-cart-thumb';im.loading='lazy';im.decoding='async';slot.appendChild(im)}if(im.getAttribute('src')!==p.front)im.src=p.front;im.alt=n})}
+ const lines=document.getElementById('gbCartLines');if(lines&&window.MutationObserver)new MutationObserver(cart).observe(lines,{childList:true,subtree:true});cart();
+})();
+</script>
+
+<script>/* Clear Cart control v45 */
+(function(){
+ const KEY='gbCart';
+ function install(){
+  const footer=document.getElementById('gbCartFooter');
+  if(!footer||document.getElementById('gbCartClear'))return;
+  const b=document.createElement('button');
+  b.type='button'; b.id='gbCartClear'; b.className='gb-cart-clear'; b.textContent='Clear Cart';
+  b.addEventListener('click',function(){
+   const cart=(()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}})();
+   if(!cart.length)return;
+   if(!window.confirm('Remove all items from your cart?'))return;
+   localStorage.setItem(KEY,'[]');
+   if(window.gbCartRefresh)window.gbCartRefresh();
+   else window.dispatchEvent(new Event('storage'));
+  });
+  const subtotal=footer.querySelector('.gb-cart-subtotal');
+  footer.insertBefore(b,subtotal||footer.firstChild);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+<script>/* Workout shorts product data v46 */
+(function(){
+ const common=`<p><strong>Material:</strong> 100% polyester</p><p><strong>Fabric:</strong> Medium-heavy fabric (8.5 oz/yd² (290 g/m²))</p><p>Printed-in size and care label.</p><p>Seam thread colour automatically matched to design (black or white).</p><p>Assembled in the USA from globally sourced parts.</p>`;
+ const products={
+  'Cream Workout Shorts':{front:'IMG_0557.jpeg',back:'IMG_0558.jpeg',details:`<p>Clean, refined and built to move. The Gangster Bougie Signature Essentials Cream Workout Shorts feature a soft Cream foundation finished with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while the signature gold crown finishes the back for a clean luxury-athletic look. Designed to pair with the Cream Sports Bra or mix effortlessly throughout the GB Signature Collection.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>Clean, minimal Signature design</li><li>Comfortable workout-ready silhouette</li><li>Designed for movement and everyday wear</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Oxblood Workout Shorts':{front:'IMG_0555.jpeg',back:'IMG_0556.jpeg',details:`<p>Clean, confident and built to move. The Gangster Bougie Signature Essentials Oxblood Workout Shorts feature a rich Oxblood red foundation finished with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while the signature gold crown finishes the back for a clean luxury-athletic look. Designed to pair with the Oxblood Sports Bra or mix effortlessly throughout the GB Signature Collection.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>Clean, minimal Signature design</li><li>Comfortable workout-ready silhouette</li><li>Designed for movement and everyday wear</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Onyx Workout Shorts':{front:'IMG_0543.jpeg',back:'IMG_0544.jpeg',details:`<p>Clean, confident and built to move. The Gangster Bougie Signature Essentials Onyx Workout Shorts feature a solid Onyx black foundation with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while a signature gold crown finishes the back for a clean luxury-athletic look. Designed to pair seamlessly with the Onyx Sports Bra or mix with pieces throughout the GB Signature Collection.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>Clean, minimal Signature design</li><li>Comfortable workout-ready silhouette</li><li>Designed for movement and everyday wear</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Bougie Houndstooth Workout Shorts':{front:'IMG_0536.jpeg',back:'IMG_0537.jpeg',details:`<p>Make every move a statement in the Gangster Bougie Signature Bougie Houndstooth Workout Shorts. Featuring our elevated black, cream and gold houndstooth design with signature GB detailing, these shorts bring luxury attitude to an athletic silhouette.</p><p>Designed for training, everyday wear and statement styling, they pair with the matching Bougie Houndstooth Sports Bra or other pieces from the GB Signature Collection.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>Comfortable athletic fit</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and High-Waisted Leggings</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Vault Workout Shorts':{front:'IMG_0529.jpeg',back:'IMG_0530.jpeg',details:`<p>Make every move a statement in the Gangster Bougie Signature Vault Workout Shorts. Featuring our espresso, brown and gold Art Deco-inspired Vault design with signature GB detailing, these shorts bring elevated luxury styling to an athletic silhouette.</p><p>Designed for movement, training and everyday wear, they can be worn alone or paired with the Signature Vault Sports Bra for a coordinated look.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>Comfortable athletic fit</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and High-Waisted Leggings</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`},
+  'Heritage Plaid Workout Shorts':{front:'IMG_0515.jpeg',back:'IMG_0516.jpeg',details:`<p>Make every move a statement in the Gangster Bougie Signature Heritage Plaid Workout Shorts. Featuring our signature burgundy, black and gold Heritage Plaid with iconic GB and crown detailing, these fitted shorts bring luxury streetwear attitude to an active silhouette.</p><p>Made from durable 100% polyester with a medium-heavy feel, they’re designed to retain their shape while providing comfort for training, everyday movement or styling as part of the complete Heritage Plaid look.</p><ul><li>Signature burgundy, black &amp; gold Heritage Plaid</li><li>Iconic GB &amp; crown detailing</li><li>100% polyester</li><li>Medium-heavy fabric</li><li>Gusset insert for active movement</li><li>Vibrant all-over print</li><li>Designed to coordinate with the Heritage Plaid Sports Bra and Leggings</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>`}
+ };
+ function sync(){
+  const nameEl=document.getElementById('byfShopBottomName'), pair=document.getElementById('byfBottomRealProductPair'), details=document.querySelector('#byfBottomDetails .byf-details-body'), price=document.getElementById('byfShopBottomPrice');
+  if(!nameEl||!pair)return;
+  const name=(nameEl.textContent||'').trim(), p=products[name];
+  if(!p)return;
+  pair.style.display='flex';
+  pair.innerHTML='<img src="'+p.front+'" alt="'+name+' front" loading="lazy" decoding="async"><img src="'+p.back+'" alt="'+name+' back" loading="lazy" decoding="async">';
+  if(details)details.innerHTML=p.details+common;
+  if(price)price.textContent='US$54.99';
+ }
+ const nameEl=document.getElementById('byfShopBottomName');
+ if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');
+ if(root){root.addEventListener('click',()=>setTimeout(sync,0));root.addEventListener('pointerup',()=>setTimeout(sync,0));}
+ sync();
+
+ // Cart thumbnails: one real product image per shorts line item.
+ const thumbMap={
+  'Cream Workout Shorts':'IMG_0557.jpeg','Oxblood Workout Shorts':'IMG_0555.jpeg','Onyx Workout Shorts':'IMG_0543.jpeg',
+  'Bougie Houndstooth Workout Shorts':'IMG_0536.jpeg','Vault Workout Shorts':'IMG_0529.jpeg','Heritage Plaid Workout Shorts':'IMG_0515.jpeg'
+ };
+ function repairCartThumbs(){
+  document.querySelectorAll('.gb-cart-line').forEach(row=>{
+   const nm=(row.querySelector('.gb-cart-line-name')?.textContent||'').trim(), slot=row.querySelector('.gb-cart-thumb-slot'), src=thumbMap[nm];
+   if(!slot||!src)return;
+   slot.innerHTML=''; const im=document.createElement('img'); im.className='gb-cart-thumb'; im.src=src; im.alt=nm; im.loading='lazy'; im.decoding='async'; slot.appendChild(im);
+  });
+ }
+ // v47: body-wide self-mutating observer removed; cart thumbnails are handled by the lightweight cart observer below.
+})();
+</script>
+
+<script>/* Shorts cart freeze fix v47 */
+(function(){
+ const thumbMap={
+  'Cream Workout Shorts':'IMG_0557.jpeg','Oxblood Workout Shorts':'IMG_0555.jpeg','Onyx Workout Shorts':'IMG_0543.jpeg',
+  'Bougie Houndstooth Workout Shorts':'IMG_0536.jpeg','Vault Workout Shorts':'IMG_0529.jpeg','Heritage Plaid Workout Shorts':'IMG_0515.jpeg'
+ };
+ function repair(){
+  document.querySelectorAll('.gb-cart-line').forEach(function(row){
+   const nameEl=row.querySelector('.gb-cart-line-name'),slot=row.querySelector('.gb-cart-thumb-slot');
+   if(!nameEl||!slot)return;
+   const name=(nameEl.textContent||'').trim(),src=thumbMap[name];
+   if(!src)return;
+   let img=slot.querySelector('img.gb-cart-thumb');
+   if(!img){img=document.createElement('img');img.className='gb-cart-thumb';img.loading='lazy';img.decoding='async';slot.appendChild(img)}
+   if(img.getAttribute('src')!==src)img.src=src;
+   if(img.alt!==name)img.alt=name;
+  });
+ }
+ // Disconnect the v46 body-wide observer by replacing its mutation target before it can self-loop.
+ // A lightweight observer watches only cart line additions and never clears/rebuilds existing thumbnail DOM.
+ const lines=document.getElementById('gbCartLines');
+ if(lines&&window.MutationObserver){
+   let queued=false;
+   new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;repair()})}).observe(lines,{childList:true});
+ }
+ const link=document.getElementById('gbCartLink');if(link)link.addEventListener('click',function(){requestAnimationFrame(repair)});
+ const add=document.getElementById('byfAddFit');if(add)add.addEventListener('click',function(){requestAnimationFrame(function(){requestAnimationFrame(repair)})});
+ repair();
+})();
+</script>
+
+<script>/* Cream Oxblood shorts image swap v48 */
+(function(){
+ const pairs={
+  'Cream Workout Shorts':['IMG_0557.jpeg','IMG_0558.jpeg'],
+  'Oxblood Workout Shorts':['IMG_0555.jpeg','IMG_0556.jpeg']
+ };
+ function sync(){
+  const nameEl=document.getElementById('byfShopBottomName'),pair=document.getElementById('byfBottomRealProductPair');
+  if(!nameEl||!pair)return;
+  const name=(nameEl.textContent||'').trim(),imgs=pairs[name];
+  if(!imgs)return;
+  const nodes=pair.querySelectorAll('img');
+  if(nodes[0]&&nodes[0].getAttribute('src')!==imgs[0])nodes[0].src=imgs[0];
+  if(nodes[1]&&nodes[1].getAttribute('src')!==imgs[1])nodes[1].src=imgs[1];
+ }
+ const nameEl=document.getElementById('byfShopBottomName');
+ if(nameEl&&window.MutationObserver)new MutationObserver(sync).observe(nameEl,{childList:true,characterData:true,subtree:true});
+ const root=document.getElementById('build-your-fit');if(root)root.addEventListener('click',function(){requestAnimationFrame(sync)});
+ sync();
+})();
+</script>
+
+<script>/* Signature Fit Product Details template v49 */
+(function(){
+ function ensure(itemId,detailsId){
+  const name=document.getElementById(itemId);if(!name)return null;
+  const item=name.closest('.byf-fit-item');if(!item)return null;
+  let details=document.getElementById(detailsId)||item.querySelector('details.byf-product-details');
+  if(!details){
+   details=document.createElement('details');details.className='byf-product-details';details.id=detailsId;
+   const summary=document.createElement('summary');summary.textContent='Product Details';
+   const body=document.createElement('div');body.className='byf-details-body';
+   details.appendChild(summary);details.appendChild(body);
+   const pair=item.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair');
+   item.insertBefore(details,pair||null);
+  }
+  details.style.display='block';
+  return details;
+ }
+ function sync(){
+  ensure('byfShopTopName','byfTopDetails');
+  ensure('byfShopBottomName','byfBottomDetails');
+  // Nudge the existing per-product data handlers after the dropdown is guaranteed to exist.
+  const root=document.getElementById('build-your-fit');
+  if(root)root.dispatchEvent(new Event('pointerup',{bubbles:false}));
+ }
+ function install(){
+  ensure('byfShopTopName','byfTopDetails');ensure('byfShopBottomName','byfBottomDetails');
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){ensure(id,id==='byfShopTopName'?'byfTopDetails':'byfBottomDetails')}).observe(el,{childList:true,characterData:true,subtree:true})});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+<script>/* Classic real product previews v51 */
+(function(){
+ const boards={
+  'Cream':'BB251A6A-A1C5-4955-AD45-12977154FDD1.jpeg','Grey':'48A8992E-44EE-4EA0-9216-6151AA482183.jpeg',
+  'Black':'6A0433B5-2CB5-487C-BF0C-BA13AEBF3614.jpeg','Blue':'1319CBE4-7111-42FE-AFB6-72211748DA6B.jpeg',
+  'Green':'7475A5C3-1000-4C72-9498-153934E2DE66.jpeg','Red':'71EA0B6E-ADAC-48A9-972B-6F8B9B4CF6AA.jpeg',
+  'Espresso':'5EA988CF-42B7-475B-BD47-B4E8F6D26456.jpeg'
+ };
+ function colour(name){for(const c in boards)if(name.endsWith('– '+c)||name.endsWith('- '+c))return c;return null}
+ function pairFor(nameId){const n=document.getElementById(nameId);return n&&n.closest('.byf-fit-item')?.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair')}
+ function paint(nameId){
+  const n=document.getElementById(nameId);if(!n)return;
+  const name=(n.textContent||'').trim(),c=colour(name);if(!c)return;
+  const pair=pairFor(nameId);if(!pair)return;
+  pair.style.display='flex';pair.classList.add('show');
+  let a=pair.querySelectorAll('img');
+  if(a.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';a=pair.querySelectorAll('img')}
+  a[0].src=boards[c];a[0].alt=name+' front';a[0].style.objectPosition='0% center';
+  a[1].src=boards[c];a[1].alt=name+' back';a[1].style.objectPosition='33.333333% center';
+ }
+ function sync(){paint('byfShopTopName');paint('byfShopBottomName')}
+ function install(){
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){requestAnimationFrame(sync)}).observe(el,{childList:true,characterData:true,subtree:true})});
+  const v=document.getElementById('byfViewFit');if(v)v.addEventListener('click',function(){requestAnimationFrame(sync)});
+  sync();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+<script>/* Classic Printify front back photos v52 */
+(function(){
+ const products={
+  'GB Classic Sports Bra – Cream':['IMG_0586.jpeg','IMG_0588.jpeg'],
+  'GB Classic Sports Bra – Grey':['IMG_0609.jpeg','IMG_0610.jpeg'],
+  'GB Classic Sports Bra – Black':['IMG_0591.jpeg','IMG_0592.jpeg'],
+  'GB Classic Sports Bra – Blue':['IMG_0607.jpeg','IMG_0608.jpeg'],
+  'GB Classic Sports Bra – Green':['IMG_0584.jpeg','IMG_0585.jpeg'],
+  'GB Classic Sports Bra – Red':['IMG_0589.jpeg','IMG_0590.jpeg'],
+  'GB Classic Sports Bra – Espresso':['IMG_0605.jpeg','IMG_0606.jpeg'],
+  'GB Classic High-Waisted Leggings – Cream':['IMG_0611.jpeg','IMG_0612.jpeg'],
+  'GB Classic High-Waisted Leggings – Grey':['IMG_0601.jpeg','IMG_0602.jpeg'],
+  'GB Classic High-Waisted Leggings – Black':['IMG_0595.jpeg','IMG_0596.jpeg'],
+  'GB Classic High-Waisted Leggings – Blue':['IMG_0599.jpeg','IMG_0600.jpeg'],
+  'GB Classic High-Waisted Leggings – Green':['IMG_0593.jpeg','IMG_0594.jpeg'],
+  'GB Classic High-Waisted Leggings – Red':['IMG_0603.jpeg','IMG_0604.jpeg'],
+  'GB Classic High-Waisted Leggings – Espresso':['IMG_0597.jpeg','IMG_0598.jpeg']
+ };
+ function normalize(name){return (name||'').replace(/\s*-\s*(Cream|Grey|Black|Blue|Green|Red|Espresso)$/,' – $1').trim()}
+ function pairFor(nameEl){return nameEl&&nameEl.closest('.byf-fit-item')?.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair')}
+ function paint(id){
+  const el=document.getElementById(id);if(!el)return;
+  const name=normalize(el.textContent),pics=products[name];if(!pics)return;
+  const pair=pairFor(el);if(!pair)return;
+  pair.style.display='flex';pair.classList.add('show');
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==pics[0])imgs[0].src=pics[0];
+  if(imgs[1].getAttribute('src')!==pics[1])imgs[1].src=pics[1];
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';
+  imgs[0].style.objectPosition='center';imgs[1].style.objectPosition='center';
+ }
+ function sync(){paint('byfShopTopName');paint('byfShopBottomName')}
+ function repairCart(){
+  document.querySelectorAll('.gb-cart-line').forEach(function(row){
+   const n=row.querySelector('.gb-cart-line-name'),slot=row.querySelector('.gb-cart-thumb-slot');if(!n||!slot)return;
+   const name=normalize(n.textContent),pics=products[name];if(!pics)return;
+   let img=slot.querySelector('img.gb-cart-thumb');if(!img){img=document.createElement('img');img.className='gb-cart-thumb';img.loading='lazy';img.decoding='async';slot.appendChild(img)}
+   if(img.getAttribute('src')!==pics[0])img.src=pics[0];img.alt=name;
+  });
+ }
+ function install(){
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){requestAnimationFrame(sync)}).observe(el,{childList:true,characterData:true,subtree:true})});
+  const view=document.getElementById('byfViewFit');if(view)view.addEventListener('click',function(){requestAnimationFrame(sync)});
+  const add=document.getElementById('byfAddFit');if(add)add.addEventListener('click',function(){requestAnimationFrame(function(){requestAnimationFrame(repairCart)})});
+  const lines=document.getElementById('gbCartLines');if(lines&&window.MutationObserver){let queued=false;new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;repairCart()})}).observe(lines,{childList:true})}
+  const cart=document.getElementById('gbCartLink');if(cart)cart.addEventListener('click',function(){requestAnimationFrame(repairCart)});
+  sync();repairCart();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+<script>/* Classic Printify colour mapping v53 */
+(function(){
+ const products={
+  'GB Classic Sports Bra – Cream':['IMG_0589.jpeg','IMG_0590.jpeg'],
+  'GB Classic Sports Bra – Grey':['IMG_0586.jpeg','IMG_0588.jpeg'],
+  'GB Classic Sports Bra – Black':['IMG_0597.jpeg','IMG_0598.jpeg'],
+  'GB Classic Sports Bra – Blue':['IMG_0591.jpeg','IMG_0592.jpeg'],
+  'GB Classic Sports Bra – Green':['IMG_0595.jpeg','IMG_0596.jpeg'],
+  'GB Classic Sports Bra – Red':['IMG_0593.jpeg','IMG_0594.jpeg'],
+  'GB Classic Sports Bra – Espresso':['IMG_0611.jpeg','IMG_0612.jpeg'],
+  'GB Classic High-Waisted Leggings – Cream':['IMG_0584.jpeg','IMG_0585.jpeg'],
+  'GB Classic High-Waisted Leggings – Grey':['IMG_0607.jpeg','IMG_0608.jpeg'],
+  'GB Classic High-Waisted Leggings – Black':['IMG_0605.jpeg','IMG_0606.jpeg'],
+  'GB Classic High-Waisted Leggings – Blue':['IMG_0603.jpeg','IMG_0604.jpeg'],
+  'GB Classic High-Waisted Leggings – Green':['IMG_0601.jpeg','IMG_0602.jpeg'],
+  'GB Classic High-Waisted Leggings – Red':['IMG_0599.jpeg','IMG_0600.jpeg'],
+  'GB Classic High-Waisted Leggings – Espresso':['IMG_0609.jpeg','IMG_0610.jpeg']
+ };
+ function normalize(name){return (name||'').replace(/\s*-\s*(Cream|Grey|Black|Blue|Green|Red|Espresso)$/,' – $1').trim()}
+ function pairFor(el){return el&&el.closest('.byf-fit-item')?.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair')}
+ function paint(id){
+  const el=document.getElementById(id);if(!el)return;
+  const name=normalize(el.textContent),pics=products[name];if(!pics)return;
+  const pair=pairFor(el);if(!pair)return;
+  pair.style.display='flex';pair.classList.add('show');
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==pics[0])imgs[0].src=pics[0];
+  if(imgs[1].getAttribute('src')!==pics[1])imgs[1].src=pics[1];
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';
+ }
+ function sync(){paint('byfShopTopName');paint('byfShopBottomName')}
+ function repairCart(){
+  document.querySelectorAll('.gb-cart-line').forEach(function(row){
+   const n=row.querySelector('.gb-cart-line-name'),slot=row.querySelector('.gb-cart-thumb-slot');if(!n||!slot)return;
+   const name=normalize(n.textContent),pics=products[name];if(!pics)return;
+   let img=slot.querySelector('img.gb-cart-thumb');if(!img){img=document.createElement('img');img.className='gb-cart-thumb';img.loading='lazy';img.decoding='async';slot.appendChild(img)}
+   if(img.getAttribute('src')!==pics[0])img.src=pics[0];img.alt=name;
+  });
+ }
+ function install(){
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){requestAnimationFrame(sync)}).observe(el,{childList:true,characterData:true,subtree:true})});
+  const view=document.getElementById('byfViewFit');if(view)view.addEventListener('click',function(){requestAnimationFrame(sync)});
+  const add=document.getElementById('byfAddFit');if(add)add.addEventListener('click',function(){requestAnimationFrame(function(){requestAnimationFrame(repairCart)})});
+  const cart=document.getElementById('gbCartLink');if(cart)cart.addEventListener('click',function(){requestAnimationFrame(repairCart)});
+  sync();repairCart();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+<script>/* Classic model board colour mapping v54 */</script>
+<script>/* Classic model label correction v55 */</script>
+<script>/* All seven Classic model colours v56 */</script>
+<script>/* Classic Blue Espresso swap v57 */</script>
+
+<script>/* Classic photos persist after size v58 */
+(function(){
+ const products={
+  'GB Classic Sports Bra – Cream':['IMG_0589.jpeg','IMG_0590.jpeg'],
+  'GB Classic Sports Bra – Grey':['IMG_0586.jpeg','IMG_0588.jpeg'],
+  'GB Classic Sports Bra – Black':['IMG_0597.jpeg','IMG_0598.jpeg'],
+  'GB Classic Sports Bra – Blue':['IMG_0591.jpeg','IMG_0592.jpeg'],
+  'GB Classic Sports Bra – Green':['IMG_0595.jpeg','IMG_0596.jpeg'],
+  'GB Classic Sports Bra – Red':['IMG_0593.jpeg','IMG_0594.jpeg'],
+  'GB Classic Sports Bra – Espresso':['IMG_0611.jpeg','IMG_0612.jpeg'],
+  'GB Classic High-Waisted Leggings – Cream':['IMG_0584.jpeg','IMG_0585.jpeg'],
+  'GB Classic High-Waisted Leggings – Grey':['IMG_0607.jpeg','IMG_0608.jpeg'],
+  'GB Classic High-Waisted Leggings – Black':['IMG_0605.jpeg','IMG_0606.jpeg'],
+  'GB Classic High-Waisted Leggings – Blue':['IMG_0603.jpeg','IMG_0604.jpeg'],
+  'GB Classic High-Waisted Leggings – Green':['IMG_0601.jpeg','IMG_0602.jpeg'],
+  'GB Classic High-Waisted Leggings – Red':['IMG_0599.jpeg','IMG_0600.jpeg'],
+  'GB Classic High-Waisted Leggings – Espresso':['IMG_0609.jpeg','IMG_0610.jpeg']
+ };
+ function normalize(n){return (n||'').replace(/\s*-\s*(Cream|Grey|Black|Blue|Green|Red|Espresso)$/,' – $1').trim()}
+ function repaint(id){
+  const nameEl=document.getElementById(id);if(!nameEl)return;
+  const name=normalize(nameEl.textContent),pics=products[name];if(!pics)return;
+  const item=nameEl.closest('.byf-fit-item');if(!item)return;
+  const pair=item.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair');if(!pair)return;
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==pics[0])imgs[0].src=pics[0];
+  if(imgs[1].getAttribute('src')!==pics[1])imgs[1].src=pics[1];
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';
+  pair.style.display='flex';pair.classList.add('show');
+ }
+ function repaintBoth(){repaint('byfShopTopName');repaint('byfShopBottomName')}
+ document.addEventListener('click',function(e){
+  if(e.target.closest('#byfTopSizes .byf-size,#byfBottomSizes .byf-size,#byfTopSizes button,#byfBottomSizes button')){
+   requestAnimationFrame(function(){requestAnimationFrame(repaintBoth)})
+  }
+ });
+})();
+</script>
+
+
+<script>/* Classic authoritative image state v59 */
+(function(){
+ const products={
+  'GB Classic Sports Bra – Cream':['IMG_0589.jpeg','IMG_0590.jpeg'],
+  'GB Classic Sports Bra – Grey':['IMG_0586.jpeg','IMG_0588.jpeg'],
+  'GB Classic Sports Bra – Black':['IMG_0597.jpeg','IMG_0598.jpeg'],
+  'GB Classic Sports Bra – Blue':['IMG_0591.jpeg','IMG_0592.jpeg'],
+  'GB Classic Sports Bra – Green':['IMG_0595.jpeg','IMG_0596.jpeg'],
+  'GB Classic Sports Bra – Red':['IMG_0593.jpeg','IMG_0594.jpeg'],
+  'GB Classic Sports Bra – Espresso':['IMG_0611.jpeg','IMG_0612.jpeg'],
+  'GB Classic High-Waisted Leggings – Cream':['IMG_0584.jpeg','IMG_0585.jpeg'],
+  'GB Classic High-Waisted Leggings – Grey':['IMG_0607.jpeg','IMG_0608.jpeg'],
+  'GB Classic High-Waisted Leggings – Black':['IMG_0605.jpeg','IMG_0606.jpeg'],
+  'GB Classic High-Waisted Leggings – Blue':['IMG_0603.jpeg','IMG_0604.jpeg'],
+  'GB Classic High-Waisted Leggings – Green':['IMG_0601.jpeg','IMG_0602.jpeg'],
+  'GB Classic High-Waisted Leggings – Red':['IMG_0599.jpeg','IMG_0600.jpeg'],
+  'GB Classic High-Waisted Leggings – Espresso':['IMG_0609.jpeg','IMG_0610.jpeg']
+ };
+ function normalize(n){return (n||'').replace(/\s*-\s*(Cream|Grey|Black|Blue|Green|Red|Espresso)$/,' – $1').trim()}
+ function repaintFit(id){
+  const nameEl=document.getElementById(id);if(!nameEl)return;
+  const name=normalize(nameEl.textContent),pics=products[name];if(!pics)return;
+  const item=nameEl.closest('.byf-fit-item');if(!item)return;
+  const pair=item.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair');if(!pair)return;
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==pics[0])imgs[0].src=pics[0];
+  if(imgs[1].getAttribute('src')!==pics[1])imgs[1].src=pics[1];
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';
+  pair.style.display='flex';pair.classList.add('show');
+ }
+ function repaintFitBoth(){repaintFit('byfShopTopName');repaintFit('byfShopBottomName')}
+ function repairCart(){
+  document.querySelectorAll('.gb-cart-line').forEach(function(row){
+   const nameEl=row.querySelector('.gb-cart-line-name');if(!nameEl)return;
+   const name=normalize(nameEl.textContent),pics=products[name];if(!pics)return;
+   let slot=row.querySelector('.gb-cart-thumb-slot');
+   if(!slot){
+    const existing=row.querySelector('img.gb-cart-thumb');
+    if(existing){if(existing.getAttribute('src')!==pics[0])existing.src=pics[0];existing.alt=name;return}
+    return;
+   }
+   let img=slot.querySelector('img.gb-cart-thumb');
+   if(!img){img=document.createElement('img');img.className='gb-cart-thumb';img.loading='lazy';img.decoding='async';slot.appendChild(img)}
+   if(img.getAttribute('src')!==pics[0])img.src=pics[0];img.alt=name;
+  });
+ }
+ function settle(){requestAnimationFrame(function(){requestAnimationFrame(function(){repaintFitBoth();repairCart()})})}
+ function install(){
+  // Add Both is the Classic preview failure point: repaint only after all older handlers finish.
+  const add=document.getElementById('byfAddFit');if(add)add.addEventListener('click',settle);
+  // Cart open/reopen and every quantity +/- operation must re-bind each row by its own product name.
+  const cart=document.getElementById('gbCartLink');if(cart)cart.addEventListener('click',settle);
+  document.addEventListener('click',function(e){
+   if(e.target.closest('.gb-cart-line button,.gb-cart-line .gb-cart-qty button,.gb-cart-line [data-action]'))settle();
+  });
+  const lines=document.getElementById('gbCartLines');
+  if(lines&&window.MutationObserver){let queued=false;new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;repairCart()})}).observe(lines,{childList:true,subtree:true})}
+  repaintFitBoth();repairCart();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+<script>/* Classic Product Details mapping v60 */
+(function(){
+ const colours=['Cream','Grey','Black','Blue','Green','Red','Espresso'];
+ const tone={
+  Cream:'a refined cream', Grey:'a sleek grey', Black:'a sleek black', Blue:'a rich blue',
+  Green:'a rich green', Red:'a bold red', Espresso:'a rich espresso-brown'
+ };
+ function normalize(n){return (n||'').replace(/\s*-\s*(Cream|Grey|Black|Blue|Green|Red|Espresso)$/,' – $1').trim()}
+ function colour(name){for(const c of colours)if(name.endsWith('– '+c))return c;return null}
+ function bra(c){return `
+  <p>Luxury meets performance. The GB Classic Sports Bra combines ${tone[c]} athletic silhouette with signature gold lattice detailing and the crowned GB emblem for an elevated Gangster Bougie look.</p>
+  <ul>
+   <li>100% polyester</li>
+   <li>U-shaped back</li>
+   <li>Size tolerance up to 1.2 in (3 cm)</li>
+   <li>Signature gold lattice detailing</li>
+   <li>Crowned GB emblem</li>
+   <li>Made to order</li>
+  </ul>`}
+ function leggings(c){return `
+  <p>Luxury meets performance. The GB Classic High-Waisted Leggings combine ${tone[c]} silhouette with signature gold lattice detailing running down the outer legs and the crowned GB emblem for an elevated Gangster Bougie look.</p>
+  <ul>
+   <li>83% polyester, 17% spandex</li>
+   <li>Skinny fit</li>
+   <li>Double-layer waistband</li>
+   <li>Runs small — consider sizing up</li>
+   <li>Outside seam thread is colour-matched to the design</li>
+   <li>Interior seam thread is white</li>
+   <li>Slightly see-through when stretched; undyed white may show at seams and sewn areas</li>
+   <li>Assembled in the USA from globally sourced parts</li>
+   <li>Made to order</li>
+  </ul>`}
+ function paint(nameId,detailsId){
+  const n=document.getElementById(nameId),d=document.getElementById(detailsId);if(!n||!d)return;
+  const name=normalize(n.textContent),c=colour(name);if(!c||!name.startsWith('GB Classic'))return;
+  const body=d.querySelector('.byf-details-body');if(!body)return;
+  body.innerHTML=name.includes('Sports Bra')?bra(c):leggings(c);
+ }
+ function sync(){paint('byfShopTopName','byfTopDetails');paint('byfShopBottomName','byfBottomDetails')}
+ function install(){
+  ['byfShopTopName','byfShopBottomName'].forEach(function(id){const el=document.getElementById(id);if(el&&window.MutationObserver)new MutationObserver(function(){requestAnimationFrame(sync)}).observe(el,{childList:true,characterData:true,subtree:true})});
+  const view=document.getElementById('byfViewFit');if(view)view.addEventListener('click',function(){requestAnimationFrame(sync)});
+  sync();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+<script>/* Classic preview persistence v61 */
+(function(){
+ const products={
+  'GB Classic Sports Bra – Cream':['IMG_0589.jpeg','IMG_0590.jpeg'],
+  'GB Classic Sports Bra – Grey':['IMG_0586.jpeg','IMG_0588.jpeg'],
+  'GB Classic Sports Bra – Black':['IMG_0597.jpeg','IMG_0598.jpeg'],
+  'GB Classic Sports Bra – Blue':['IMG_0591.jpeg','IMG_0592.jpeg'],
+  'GB Classic Sports Bra – Green':['IMG_0595.jpeg','IMG_0596.jpeg'],
+  'GB Classic Sports Bra – Red':['IMG_0593.jpeg','IMG_0594.jpeg'],
+  'GB Classic Sports Bra – Espresso':['IMG_0611.jpeg','IMG_0612.jpeg'],
+  'GB Classic High-Waisted Leggings – Cream':['IMG_0584.jpeg','IMG_0585.jpeg'],
+  'GB Classic High-Waisted Leggings – Grey':['IMG_0607.jpeg','IMG_0608.jpeg'],
+  'GB Classic High-Waisted Leggings – Black':['IMG_0605.jpeg','IMG_0606.jpeg'],
+  'GB Classic High-Waisted Leggings – Blue':['IMG_0603.jpeg','IMG_0604.jpeg'],
+  'GB Classic High-Waisted Leggings – Green':['IMG_0601.jpeg','IMG_0602.jpeg'],
+  'GB Classic High-Waisted Leggings – Red':['IMG_0599.jpeg','IMG_0600.jpeg'],
+  'GB Classic High-Waisted Leggings – Espresso':['IMG_0609.jpeg','IMG_0610.jpeg']
+ };
+ function normalize(n){return (n||'').replace(/\s*-\s*(Cream|Grey|Black|Blue|Green|Red|Espresso)$/,' – $1').trim()}
+ function repaint(nameId){
+  const nameEl=document.getElementById(nameId);if(!nameEl)return;
+  const name=normalize(nameEl.textContent),pics=products[name];if(!pics)return;
+  const item=nameEl.closest('.byf-fit-item');if(!item)return;
+  const pair=item.querySelector('.byf-real-product-pair,.byf-bottom-real-product-pair');if(!pair)return;
+  let imgs=pair.querySelectorAll('img');
+  if(imgs.length<2){pair.innerHTML='<img loading="lazy" decoding="async"><img loading="lazy" decoding="async">';imgs=pair.querySelectorAll('img')}
+  if(imgs[0].getAttribute('src')!==pics[0])imgs[0].src=pics[0];
+  if(imgs[1].getAttribute('src')!==pics[1])imgs[1].src=pics[1];
+  imgs[0].alt=name+' front';imgs[1].alt=name+' back';
+  pair.style.setProperty('display','flex','important');pair.classList.add('show');
+ }
+ function repaintBoth(){repaint('byfShopTopName');repaint('byfShopBottomName')}
+ function settle(){requestAnimationFrame(function(){requestAnimationFrame(repaintBoth)})}
+ function install(){
+  // Opening/closing either Product Details row must never hide the Classic product previews.
+  ['byfTopDetails','byfBottomDetails'].forEach(function(id){const d=document.getElementById(id);if(d)d.addEventListener('toggle',settle)});
+  // Preserve the already-correct behavior after size selection and View This Fit.
+  const panel=document.getElementById('byfFitPanel');if(panel)panel.addEventListener('click',function(e){if(e.target.closest('.byf-sizes button'))settle()});
+  const view=document.getElementById('byfViewFit');if(view)view.addEventListener('click',settle);
+  repaintBoth();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+<script>/* Classic sports bra price parity v62 */
+(function(){
+ const PRICE=39.99;
+ function isClassicBra(name){return /^GB Classic Sports Bra\s*[–-]\s*/.test((name||'').trim())}
+ function fixFitPrice(){
+  const n=document.getElementById('byfShopTopName');if(!n||!isClassicBra(n.textContent))return;
+  const item=n.closest('.byf-fit-item');if(!item)return;
+  const price=item.querySelector('.byf-fit-price');if(price)price.textContent='US$39.99';
+ }
+ function fixStoredCart(){
+  try{
+   const cart=JSON.parse(localStorage.getItem('gbCart')||'[]');let changed=false;
+   cart.forEach(function(line){if(line&&isClassicBra(line.name)&&Number(line.price)!==PRICE){line.price=PRICE;changed=true}});
+   if(changed){localStorage.setItem('gbCart',JSON.stringify(cart));if(window.gbCartRefresh)window.gbCartRefresh()}
+  }catch(e){}
+ }
+ function settle(){requestAnimationFrame(function(){fixFitPrice();fixStoredCart()})}
+ function install(){
+  fixFitPrice();fixStoredCart();
+  const n=document.getElementById('byfShopTopName');if(n&&window.MutationObserver)new MutationObserver(settle).observe(n,{childList:true,characterData:true,subtree:true});
+  const panel=document.getElementById('byfFitPanel');if(panel)panel.addEventListener('click',function(e){
+   if(e.target.closest('#byfAddFit,.byf-add-fit,.byf-sizes button'))setTimeout(settle,0);
+  });
+  const cart=document.getElementById('gbCartDrawer')||document.getElementById('gbCartLines');
+  if(cart&&window.MutationObserver)new MutationObserver(function(){fixStoredCart()}).observe(cart,{childList:true,subtree:true});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+<script>/* Women Shop details bridge v79 */
+(function(){
+ var existing={"Shorts – Black":"<p>Sleek, fitted workout shorts designed to pair with the Gangster Bougie activewear collection. Finished with signature GB and Baddie branding for a clean, confident gym-to-street look.</p><ul><li>Women’s high-waisted athletic fit</li><li>Stretch performance design</li><li>Signature GB front branding</li><li>Gold “Baddie” detail on the back</li><li>Made to order.</li></ul>","Shorts – White":"<p>Sleek, fitted workout shorts designed to pair with the Gangster Bougie activewear collection. Finished with signature GB and Baddie branding for a clean, confident gym-to-street look.</p><ul><li>Women’s high-waisted athletic fit</li><li>Stretch performance design</li><li>Signature GB front branding</li><li>Gold “Baddie” detail on the back</li><li>Made to order.</li></ul>","Bougie Houndstooth Sports Bra":"<p>Black, cream &amp; gold Bougie Houndstooth design with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>All-over printed design</li><li>Comfortable, athletic silhouette</li><li>Designed for training and everyday wear</li><li>Coordinates with Signature Houndstooth bottoms</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>","Baby Bougie Tee – Caviar":"<p>A fitted cropped baby tee with the signature Gangster Bougie statement graphic and Baddie back detail. Built for a clean street-luxe look.</p><ul><li>Fitted cropped baby tee silhouette</li><li>Signature Gangster Bougie front graphic</li><li>“Baddie” back detail with GB monogram</li><li>Clean street-luxe styling</li><li>Made to order.</li></ul>","Baby Bougie Tee – Cloud Dancer":"<p>A fitted cropped baby tee with the signature Gangster Bougie statement graphic and Baddie back detail. Built for a clean street-luxe look.</p><ul><li>Fitted cropped baby tee silhouette</li><li>Signature Gangster Bougie front graphic</li><li>“Baddie” back detail with GB monogram</li><li>Clean street-luxe styling</li><li>Made to order.</li></ul>","Heritage Plaid Sports Bra":"<p>Make a statement without saying a word. The Gangster Bougie Heritage Plaid Sports Bra combines deep burgundy, black and gold with our signature GB monogram and crown detailing for a luxury streetwear take on activewear.</p><p>Designed with a supportive U-shaped back and removable chest padding, it delivers comfort and attitude whether you’re training, styling it casually, or building a complete Signature fit.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>Soft, lightweight and breathable polyester</li><li>U-shaped back for added support</li><li>Removable chest padding</li><li>Available in sizes S–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>","Vault Sports Bra":"<p>Make luxury part of the uniform. The Gangster Bougie Signature Vault Sports Bra features our espresso, brown and gold Art Deco-inspired Vault design, finished with signature GB detailing for a rich, elevated look.</p><p>Designed for movement while making a statement, this fitted sports bra combines comfort and attitude with an all-over pattern created to coordinate across the GB Signature collection.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>Comfortable, supportive fit</li><li>All-over printed design</li><li>Designed to coordinate with Vault Leggings and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>","Onyx Sports Bra":"<p>Clean. Elevated, unmistakably Gangster Bougie. The Gangster Bougie Signature Essentials Onyx Sports Bra pairs a solid Onyx black foundation with understated gold GB detailing for a versatile luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or mix effortlessly with Heritage Plaid, Vault, Bougie Houndstooth and matching Signature Essentials bottoms.</p><ul><li>Solid Onyx black</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>","Oxblood Sports Bra":"<p>Bold, elevated and unmistakably Gangster Bougie. The Gangster Bougie Signature Essentials Oxblood Sports Bra combines a rich Oxblood red foundation with understated gold GB detailing for a luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature gold crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or mix effortlessly with pieces throughout the GB Signature Collection.</p><ul><li>Rich Oxblood red</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>","Cream Sports Bra":"<p>Clean, refined and effortlessly Gangster Bougie. The Gangster Bougie Signature Essentials Cream Sports Bra pairs a soft Cream foundation with understated gold GB detailing for an elevated luxury-athletic look.</p><p>A gold GB monogram finishes the front, while the signature gold crown and “What Hustle Looks Like” detail marks the back. Designed to stand on its own or coordinate effortlessly with pieces throughout the GB Signature Collection.</p><ul><li>Soft Cream colour</li><li>Gold GB front detail</li><li>Gold crown + “What Hustle Looks Like” back detail</li><li>Clean, minimal Signature design</li><li>Designed for training and everyday wear</li><li>Made to coordinate across the GB Signature Collection</li><li>Made to order.</li></ul><p><strong>Material:</strong> 100% polyester<br><strong>U-shaped back</strong><br><strong>Please note:</strong> Size tolerance up to 1.2&quot; (3 cm)</p>","Cream Leggings":"<p>Clean luxury built for movement. Soft Cream with understated gold Gangster Bougie detailing.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order.</li></ul>","Cream High-Waisted Leggings":"<p>Clean luxury built for movement. Soft Cream with understated gold Gangster Bougie detailing.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at front-left hip</li><li>Signature gold crown at back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across GB Signature Collection</li><li>Made to order.</li></ul>","Oxblood Leggings":"<p>Clean luxury built for movement. Rich Oxblood red finished with understated gold Gangster Bougie detailing.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across the GB Signature Collection</li><li>Made to order.</li></ul>","Oxblood High-Waisted Leggings":"<p>Clean luxury built for movement. Rich Oxblood red finished with understated gold Gangster Bougie detailing.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates across the GB Signature Collection</li><li>Made to order.</li></ul>","Onyx Leggings":"<p>Clean luxury built for movement. Sleek solid Onyx black finished with understated gold Gangster Bougie detailing.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates with Signature Essentials and patterned Signature pieces</li><li>Made to order.</li></ul>","Onyx High-Waisted Leggings":"<p>Clean luxury built for movement. Sleek solid Onyx black finished with understated gold Gangster Bougie detailing.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>High-waisted silhouette</li><li>Clean, minimal Signature design</li><li>Designed for movement and everyday wear</li><li>Coordinates with Signature Essentials and patterned Signature pieces</li><li>Made to order.</li></ul>","Bougie Houndstooth Leggings":"<p>Luxury meets movement. Black, cream and gold houndstooth with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>High-waisted silhouette</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Bougie Houndstooth High-Waisted Leggings":"<p>Luxury meets movement. Black, cream and gold houndstooth with signature GB detailing.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>High-waisted silhouette</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Vault Leggings":"<p>Luxury meets movement. Espresso, brown and gold Art Deco-inspired Vault design in a sleek, body-contouring silhouette.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>High-rise 4.5-inch waistband</li><li>Four-way stretch</li><li>83% polyester / 17% spandex</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Vault High-Waisted Leggings":"<p>Luxury meets movement. Espresso, brown and gold Art Deco-inspired Vault design in a sleek, body-contouring silhouette.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>High-rise 4.5-inch waistband</li><li>Four-way stretch</li><li>83% polyester / 17% spandex</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and Workout Shorts</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Heritage Plaid Leggings":"<p>Luxury meets movement. Signature burgundy, black and gold plaid with repeating GB monogram and crown detailing.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>83% polyester / 17% spandex</li><li>Four-way stretch for freedom of movement</li><li>Smooth 4.5-inch high-rise waistband</li><li>Full all-over print</li><li>Available in sizes XS–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Heritage Plaid High-Waisted Leggings":"<p>Luxury meets movement. Signature burgundy, black and gold plaid with repeating GB monogram and crown detailing.</p><ul><li>Exclusive Gangster Bougie Heritage Plaid design</li><li>Signature GB monogram and crown detailing</li><li>83% polyester / 17% spandex</li><li>Four-way stretch for freedom of movement</li><li>Smooth 4.5-inch high-rise waistband</li><li>Full all-over print</li><li>Available in sizes XS–2XL</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Cream Workout Shorts":"<p>Clean, refined and built to move. The Gangster Bougie Signature Essentials Cream Workout Shorts feature a soft Cream foundation finished with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while the signature gold crown finishes the back for a clean luxury-athletic look. Designed to pair with the Cream Sports Bra or mix effortlessly throughout the GB Signature Collection.</p><ul><li>Soft Cream colour</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>Clean, minimal Signature design</li><li>Comfortable workout-ready silhouette</li><li>Designed for movement and everyday wear</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Oxblood Workout Shorts":"<p>Clean, confident and built to move. The Gangster Bougie Signature Essentials Oxblood Workout Shorts feature a rich Oxblood red foundation finished with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while the signature gold crown finishes the back for a clean luxury-athletic look. Designed to pair with the Oxblood Sports Bra or mix effortlessly throughout the GB Signature Collection.</p><ul><li>Rich Oxblood red</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>Clean, minimal Signature design</li><li>Comfortable workout-ready silhouette</li><li>Designed for movement and everyday wear</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Onyx Workout Shorts":"<p>Clean, confident and built to move. The Gangster Bougie Signature Essentials Onyx Workout Shorts feature a solid Onyx black foundation with understated gold Gangster Bougie detailing.</p><p>A small gold GB monogram accents the front-left hip, while a signature gold crown finishes the back for a clean luxury-athletic look. Designed to pair seamlessly with the Onyx Sports Bra or mix with pieces throughout the GB Signature Collection.</p><ul><li>Solid Onyx black</li><li>Gold GB detail at the front-left hip</li><li>Signature gold crown at the back</li><li>Clean, minimal Signature design</li><li>Comfortable workout-ready silhouette</li><li>Designed for movement and everyday wear</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Bougie Houndstooth Workout Shorts":"<p>Make every move a statement in the Gangster Bougie Signature Bougie Houndstooth Workout Shorts. Featuring our elevated black, cream and gold houndstooth design with signature GB detailing, these shorts bring luxury attitude to an athletic silhouette.</p><p>Designed for training, everyday wear and statement styling, they pair with the matching Bougie Houndstooth Sports Bra or other pieces from the GB Signature Collection.</p><ul><li>Black, cream &amp; gold Bougie Houndstooth design</li><li>Signature GB detailing</li><li>Comfortable athletic fit</li><li>All-over printed design</li><li>Designed for movement and everyday wear</li><li>Coordinates with the Bougie Houndstooth Sports Bra and High-Waisted Leggings</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Vault Workout Shorts":"<p>Make every move a statement in the Gangster Bougie Signature Vault Workout Shorts. Featuring our espresso, brown and gold Art Deco-inspired Vault design with signature GB detailing, these shorts bring elevated luxury styling to an athletic silhouette.</p><p>Designed for movement, training and everyday wear, they can be worn alone or paired with the Signature Vault Sports Bra for a coordinated look.</p><ul><li>Signature espresso, brown &amp; gold Vault design</li><li>Art Deco-inspired detailing</li><li>Signature GB monogram</li><li>Comfortable athletic fit</li><li>All-over printed design</li><li>Designed to coordinate with the Vault Sports Bra and High-Waisted Leggings</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>","Heritage Plaid Workout Shorts":"<p>Make every move a statement in the Gangster Bougie Signature Heritage Plaid Workout Shorts. Featuring our signature burgundy, black and gold Heritage Plaid with iconic GB and crown detailing, these fitted shorts bring luxury streetwear attitude to an active silhouette.</p><p>Made from durable 100% polyester with a medium-heavy feel, they’re designed to retain their shape while providing comfort for training, everyday movement or styling as part of the complete Heritage Plaid look.</p><ul><li>Signature burgundy, black &amp; gold Heritage Plaid</li><li>Iconic GB &amp; crown detailing</li><li>100% polyester</li><li>Medium-heavy fabric</li><li>Gusset insert for active movement</li><li>Vibrant all-over print</li><li>Designed to coordinate with the Heritage Plaid Sports Bra and Leggings</li><li>Part of the GB Signature Collection</li><li>Made to order.</li></ul>"};
+ window.gbWomenDetailsFor=function(name){
+  name=(name||'').trim();
+  if(existing[name])return existing[name];
+  var m=name.match(/^GB Classic (Sports Bra|High-Waisted Leggings) – (Cream|Grey|Black|Blue|Green|Red|Espresso)$/);
+  if(m){
+   var kind=m[1],c=m[2];
+   var tone={Cream:'a refined cream',Grey:'a sleek grey',Black:'a sleek black',Blue:'a rich blue',Green:'a rich green',Red:'a bold red',Espresso:'a rich espresso-brown'}[c];
+   if(kind==='Sports Bra')return '<p>Luxury meets performance. The GB Classic Sports Bra combines '+tone+' athletic silhouette with signature gold lattice detailing and the crowned GB emblem for an elevated Gangster Bougie look.</p><ul><li>100% polyester</li><li>U-shaped back</li><li>Size tolerance up to 1.2 in (3 cm)</li><li>Made to order</li></ul>';
+   return '<p>Luxury meets performance. The GB Classic High-Waisted Leggings combine '+tone+' silhouette with signature gold lattice detailing running down the outer legs and the crowned GB emblem for an elevated Gangster Bougie look.</p><ul><li>83% polyester, 17% spandex</li><li>Skinny fit</li><li>Double-layer waistband</li><li>Runs small — consider sizing up</li><li>Outside seam thread is colour-matched to the design</li><li>Interior seam thread is white</li><li>Slightly see-through when stretched; undyed white may show at seams and sewn areas</li><li>Assembled in the USA from globally sourced parts</li><li>Made to order</li></ul>';
+  }
+  return '';
+ };
+})();
+</script>
+<script>/* Women Shop preview catalog v63 */
+(function(){
+ if(window.__gbWomenCatalogInit)return;window.__gbWomenCatalogInit=true;
+ const P=[
+  ['Onyx Sports Bra','signature bra',39.99,['S','M','L','XL','2XL'],'IMG_0545.jpeg','IMG_0546.jpeg'],
+  ['Cream Sports Bra','signature bra',39.99,['S','M','L','XL','2XL'],'IMG_0551.jpeg','IMG_0552.jpeg'],
+  ['Oxblood Sports Bra','signature bra',39.99,['S','M','L','XL','2XL'],'IMG_0547.jpeg','IMG_0548.jpeg'],
+  ['Heritage Plaid Sports Bra','signature bra',39.99,['S','M','L','XL','2XL'],'IMG_0522.jpeg','IMG_0523.jpeg'],
+  ['Vault Sports Bra','signature bra',39.99,['S','M','L','XL','2XL'],'IMG_0527.jpeg','IMG_0528.jpeg'],
+  ['Bougie Houndstooth Sports Bra','signature bra',39.99,['S','M','L','XL','2XL'],'IMG_0532.jpeg','IMG_0533.jpeg'],
+  ['GB Classic Sports Bra – Cream','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0590.jpeg','IMG_0589.jpeg'],
+  ['GB Classic Sports Bra – Grey','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0588.jpeg','IMG_0586.jpeg'],
+  ['GB Classic Sports Bra – Black','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0598.jpeg','IMG_0597.jpeg'],
+  ['GB Classic Sports Bra – Blue','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0592.jpeg','IMG_0591.jpeg'],
+  ['GB Classic Sports Bra – Green','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0596.jpeg','IMG_0595.jpeg'],
+  ['GB Classic Sports Bra – Red','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0594.jpeg','IMG_0593.jpeg'],
+  ['GB Classic Sports Bra – Espresso','classic bra',39.99,['S','M','L','XL','2XL'],'IMG_0612.jpeg','IMG_0611.jpeg'],
+  ['GB Classic High-Waisted Leggings – Cream','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0585.jpeg','IMG_0584.jpeg'],
+  ['GB Classic High-Waisted Leggings – Grey','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0608.jpeg','IMG_0607.jpeg'],
+  ['GB Classic High-Waisted Leggings – Black','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0606.jpeg','IMG_0605.jpeg'],
+  ['GB Classic High-Waisted Leggings – Blue','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0604.jpeg','IMG_0603.jpeg'],
+  ['GB Classic High-Waisted Leggings – Green','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0602.jpeg','IMG_0601.jpeg'],
+  ['GB Classic High-Waisted Leggings – Red','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0600.jpeg','IMG_0599.jpeg'],
+  ['GB Classic High-Waisted Leggings – Espresso','classic leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0610.jpeg','IMG_0609.jpeg'],
+  ['Cream Leggings','signature leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0554.jpeg','IMG_0553.jpeg'],
+  ['Oxblood Leggings','signature leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0550.jpeg','IMG_0549.jpeg'],
+  ['Onyx Leggings','signature leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0542.jpeg','IMG_0541.jpeg'],
+  ['Bougie Houndstooth Leggings','signature leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0535.jpeg','IMG_0534.jpeg'],
+  ['Vault Leggings','signature leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0526.jpeg','IMG_0525.jpeg'],
+  ['Heritage Plaid Leggings','signature leggings',69.99,['XS','S','M','L','XL','2XL'],'IMG_0521.jpeg','IMG_0520.jpeg'],
+  ['Cream Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0558.jpeg','IMG_0557.jpeg'],
+  ['Oxblood Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0556.jpeg','IMG_0555.jpeg'],
+  ['Onyx Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0544.jpeg','IMG_0543.jpeg'],
+  ['Bougie Houndstooth Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0537.jpeg','IMG_0536.jpeg'],
+  ['Vault Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0530.jpeg','IMG_0529.jpeg'],
+  ['Heritage Plaid Workout Shorts','signature shorts',54.99,['XS','S','M','L','XL'],'IMG_0516.jpeg','IMG_0515.jpeg'],
+  ['Shorts – Black','shorts',59.99,['XS','S','M','L','XL'],'IMG_0313.jpeg','IMG_0312.jpeg'],
+  ['Shorts – White','shorts',59.99,['XS','S','M','L','XL'],'IMG_0301.jpeg','IMG_0300.jpeg'],
+  ['Baby Bougie Tee – Caviar','babytee',49.99,['S','M','L','XL','2XL'],'IMG_1917.jpeg','IMG_1916.jpeg'],
+  ['Baby Bougie Tee – Cloud Dancer','babytee',49.99,['S','M','L','XL','2XL'],'IMG_1913.jpeg','IMG_1905.jpeg']
+ ];
+ const grid=document.getElementById('gbWomenGrid'),modal=document.getElementById('gbWomenQuick');if(!grid||!modal)return;
+ let current=null,size='';
+ function money(v){return 'US$'+v.toFixed(2)}
+ const signatureDesktop=[
+  'Heritage Plaid Sports Bra','Bougie Houndstooth Sports Bra','Vault Sports Bra',
+  'Heritage Plaid Leggings','Bougie Houndstooth Leggings','Vault Leggings',
+  'Heritage Plaid Workout Shorts','Bougie Houndstooth Workout Shorts','Vault Workout Shorts',
+  'Onyx Sports Bra','Cream Sports Bra','Oxblood Sports Bra',
+  'Onyx Leggings','Cream Leggings','Oxblood Leggings',
+  'Onyx Workout Shorts','Cream Workout Shorts','Oxblood Workout Shorts'
+ ];
+ const signatureMobile=[
+  'Heritage Plaid Sports Bra','Bougie Houndstooth Sports Bra',
+  'Heritage Plaid Leggings','Bougie Houndstooth Leggings',
+  'Heritage Plaid Workout Shorts','Bougie Houndstooth Workout Shorts',
+  'Vault Sports Bra','Onyx Sports Bra',
+  'Vault Leggings','Onyx Leggings',
+  'Vault Workout Shorts','Onyx Workout Shorts',
+  'Cream Sports Bra','Oxblood Sports Bra',
+  'Cream Leggings','Oxblood Leggings',
+  'Cream Workout Shorts','Oxblood Workout Shorts'
+ ];
+ const classicDesktop=[
+  'GB Classic Sports Bra – Cream','GB Classic Sports Bra – Grey','GB Classic Sports Bra – Black',
+  'GB Classic High-Waisted Leggings – Cream','GB Classic High-Waisted Leggings – Grey','GB Classic High-Waisted Leggings – Black',
+  'GB Classic Sports Bra – Red','GB Classic Sports Bra – Blue','GB Classic Sports Bra – Green',
+  'GB Classic High-Waisted Leggings – Red','GB Classic High-Waisted Leggings – Blue','GB Classic High-Waisted Leggings – Green',
+  'GB Classic Sports Bra – Espresso','GB Classic High-Waisted Leggings – Espresso'
+ ];
+ const classicMobile=[
+  'GB Classic Sports Bra – Cream','GB Classic Sports Bra – Grey',
+  'GB Classic High-Waisted Leggings – Cream','GB Classic High-Waisted Leggings – Grey',
+  'GB Classic Sports Bra – Black','GB Classic Sports Bra – Red',
+  'GB Classic High-Waisted Leggings – Black','GB Classic High-Waisted Leggings – Red',
+  'GB Classic Sports Bra – Blue','GB Classic Sports Bra – Green',
+  'GB Classic High-Waisted Leggings – Blue','GB Classic High-Waisted Leggings – Green',
+  'GB Classic Sports Bra – Espresso','GB Classic High-Waisted Leggings – Espresso'
+ ];
+ const shortsDesktop=[
+  'Onyx Workout Shorts','Heritage Plaid Workout Shorts','Oxblood Workout Shorts',
+  'Cream Workout Shorts','Vault Workout Shorts','Bougie Houndstooth Workout Shorts',
+  'Shorts – Black','Shorts – White'
+ ];
+ const shortsMobile=[
+  'Onyx Workout Shorts','Heritage Plaid Workout Shorts',
+  'Cream Workout Shorts','Vault Workout Shorts',
+  'Oxblood Workout Shorts','Bougie Houndstooth Workout Shorts',
+  'Shorts – Black','Shorts – White'
+ ];
+ function orderedProducts(filter){
+  const mobile=innerWidth<=680;
+  let order=null;
+  if(filter==='all'){
+   const signature=mobile?signatureMobile:signatureDesktop;
+   const classic=mobile?classicMobile:classicDesktop;
+   order=signature.concat(classic.slice(0,-2),[
+    'GB Classic Sports Bra – Espresso','Baby Bougie Tee – Caviar',
+    'GB Classic High-Waisted Leggings – Espresso','Shorts – Black',
+    'Baby Bougie Tee – Cloud Dancer','Shorts – White'
+   ]);
+   if(!mobile)order=signature.concat(classic.slice(0,-2),[
+    'GB Classic Sports Bra – Espresso','Baby Bougie Tee – Caviar','Baby Bougie Tee – Cloud Dancer',
+    'GB Classic High-Waisted Leggings – Espresso','Shorts – Black','Shorts – White'
+   ]);
+  }
+  else if(filter==='signature')order=mobile?signatureMobile:signatureDesktop;
+  else if(filter==='classic')order=mobile?classicMobile:classicDesktop;
+  else if(filter==='shorts')order=mobile?shortsMobile:shortsDesktop;
+  if(!order)return P.map(function(p,i){return {p:p,i:i}});
+  const rank=new Map(order.map(function(name,i){return [name,i]}));
+  return P.map(function(p,i){return {p:p,i:i}}).sort(function(a,b){
+   const ar=rank.has(a.p[0])?rank.get(a.p[0]):order.length+a.i;
+   const br=rank.has(b.p[0])?rank.get(b.p[0]):order.length+b.i;
+   return ar-br;
+  });
+ }
+ function womenCardImage(p){return p[1]==='signature bra'?p[4]:p[5]}
+ function womenSecondImage(p){return p[1]==='signature bra'?p[5]:p[4]}
+ function render(filter){grid.innerHTML='';orderedProducts(filter).forEach(function(item){const p=item.p,i=item.i;if(filter!=='all'&&!p[1].split(' ').includes(filter))return;const c=document.createElement('article');c.className='gb-women-card';c.innerHTML='<div class="gb-women-img"><img loading="lazy" decoding="async" src="'+womenCardImage(p)+'" alt="'+p[0]+'"></div><div class="gb-women-info"><div class="gb-women-tag">'+p[1].split(' ')[0]+' Collection</div><div class="gb-women-name">'+p[0]+'</div><div class="gb-women-price">'+money(p[2])+'</div><button class="gb-women-view" data-i="'+i+'">View Item</button></div>';grid.appendChild(c)})}
+ function openItem(i){current=P[i];size='';document.getElementById('gbWqFront').src=womenCardImage(current);document.getElementById('gbWqBack').src=womenSecondImage(current);document.getElementById('gbWqName').textContent=current[0];document.getElementById('gbWqTag').textContent=current[1].split(' ')[0]+' Collection';document.getElementById('gbWqPrice').textContent=money(current[2]);const s=document.getElementById('gbWqSizes');s.innerHTML='';current[3].forEach(function(x){const b=document.createElement('button');b.className='gb-wq-size';b.textContent=x;b.onclick=function(){size=x;s.querySelectorAll('button').forEach(q=>q.classList.remove('active'));b.classList.add('active')};s.appendChild(b)});modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
+ function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');var f=document.getElementById('gbWqFront'),b=document.getElementById('gbWqBack');if(f)f.removeAttribute('src');if(b)b.removeAttribute('src')}
+ grid.addEventListener('click',function(e){const b=e.target.closest('.gb-women-view');if(b)openItem(Number(b.dataset.i))});
+ document.querySelectorAll('.gb-women-filter').forEach(function(b){b.onclick=function(){document.querySelectorAll('.gb-women-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.filter)}});
+ modal.querySelector('.gb-wq-close').onclick=close;modal.addEventListener('click',function(e){if(e.target===modal)close()});
+ document.getElementById('gbWqAdd').onclick=function(){if(!current)return;if(!size){alert('Please choose a size first.');return}try{let cart=JSON.parse(localStorage.getItem('gbCart')||'[]');const hit=cart.find(x=>x.name===current[0]&&x.size===size);if(hit)hit.qty=(hit.qty||1)+1;else cart.push({name:current[0],size:size,price:current[2],qty:1,image:womenCardImage(current)});localStorage.setItem('gbCart',JSON.stringify(cart));if(window.gbCartRefresh)window.gbCartRefresh();close();const link=document.getElementById('gbCartLink');if(link)link.click()}catch(e){}};
+ render('all');
+ let signatureLayoutMobile=innerWidth<=680;
+ addEventListener('resize',function(){
+  const next=innerWidth<=680;
+  if(next!==signatureLayoutMobile){
+   signatureLayoutMobile=next;
+   const active=document.querySelector('.gb-women-filter.active');
+   render(active?active.dataset.filter:'all');
+  }
+ },{passive:true});
+})();
+</script>
+
+
+<script>/* Homepage hierarchy v64 */
+(function(){
+ if(window.__gbWomenHierarchyInit)return;window.__gbWomenHierarchyInit=true;
+ function install(){
+  const nav=document.querySelector('.nav-links');
+  if(nav&&!nav.querySelector('.byf-nav-link')){
+   const cart=nav.querySelector('#gbCartLink');
+   const a=document.createElement('a');a.className='byf-nav-link';a.href='#build-your-fit';a.textContent='Build Your Fit';
+   nav.insertBefore(a,cart||null);
+  }
+  const catalog=document.getElementById('gbWomenCatalog');
+  // Homepage section order is defined in the HTML; do not reposition Shop Women at runtime.
+  if(!catalog)return;
+  const container=catalog.querySelector('.container'),grid=document.getElementById('gbWomenGrid');
+  if(!container||!grid)return;
+  let more=container.querySelector('.gb-women-more');
+  if(!more){const wrap=document.createElement('div');wrap.className='gb-women-more-wrap';more=document.createElement('button');more.className='gb-women-more';more.type='button';more.textContent='View More';wrap.appendChild(more);grid.insertAdjacentElement('afterend',wrap)}
+  let expanded=false;
+  function applyLimit(){
+   const cards=[...grid.querySelectorAll('.gb-women-card')];
+   cards.forEach((card,i)=>card.classList.toggle('gb-women-collapsed',!expanded&&i>=8));
+   more.style.display=cards.length>8?'inline-block':'none';
+   more.textContent=expanded?'Show Less':'View More';
+  }
+  more.onclick=function(){expanded=!expanded;applyLimit();if(!expanded)catalog.scrollIntoView({behavior:'smooth',block:'start'})};
+  const observer=new MutationObserver(applyLimit);observer.observe(grid,{childList:true});
+  catalog.querySelectorAll('.gb-women-filter').forEach(function(b){b.addEventListener('click',function(){expanded=false;setTimeout(applyLimit,0)})});
+  applyLimit();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+<script>/* Mobile nav refinement v65 */
+(function(){
+ function install(){
+  const nav=document.querySelector('.nav-links');if(!nav)return;
+  // Remove only the Lookbook navigation link; the actual Lookbook section remains intact.
+  [...nav.querySelectorAll('a')].forEach(function(a){if((a.textContent||'').trim().toLowerCase()==='lookbook')a.remove()});
+  let byf=nav.querySelector('.byf-nav-link');
+  if(!byf){byf=document.createElement('a');byf.className='byf-nav-link';byf.href='#build-your-fit';byf.textContent='Build Your Fit'}
+  const links=[...nav.querySelectorAll('a')];
+  function find(label){return links.find(a=>(a.textContent||'').trim().toLowerCase().startsWith(label))}
+  const shop=find('shop'),about=find('about'),contact=find('contact'),cart=nav.querySelector('#gbCartLink')||find('cart');
+  // Exact requested order: Shop, About, Build Your Fit, Contact, Cart.
+  [shop,about,byf,contact,cart].forEach(function(el){if(el)nav.appendChild(el)});
+  if(cart&&!cart.querySelector('.gb-jeweled-cart')){
+   const icon=document.createElement('span');icon.className='gb-jeweled-cart';icon.setAttribute('aria-hidden','true');
+   icon.innerHTML='<svg viewBox="0 0 24 20" xmlns="http://www.w3.org/2000/svg"><path class="cart-stroke" d="M1.5 2h2.4l2.1 10.2h11.8l2.3-7.4H5.1M7.2 15.6h.1M17.1 15.6h.1"/><circle class="cart-stroke" cx="7.3" cy="16.2" r="1.35"/><circle class="cart-stroke" cx="17.2" cy="16.2" r="1.35"/><path class="gem" d="M8 6.2l1.6-1.5 1.7 1.5-1.7 2.1z"/><path class="gem" d="M12.2 6.2l1.6-1.5 1.7 1.5-1.7 2.1z"/><path class="spark" d="M18.7 1.2l.45 1.05 1.05.45-1.05.45-.45 1.05-.45-1.05-1.05-.45 1.05-.45z"/></svg>';
+   cart.insertBefore(icon,cart.firstChild);
+  }
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+<script>/* Persistent jeweled cart v66 */
+(function(){
+ const ICON='<span class="gb-jeweled-cart" aria-hidden="true"><svg viewBox="0 0 24 20" xmlns="http://www.w3.org/2000/svg"><path class="cart-stroke" d="M1.5 2h2.4l2.1 10.2h11.8l2.3-7.4H5.1M7.2 15.6h.1M17.1 15.6h.1"/><circle class="cart-stroke" cx="7.3" cy="16.2" r="1.35"/><circle class="cart-stroke" cx="17.2" cy="16.2" r="1.35"/><path class="gem" d="M8 6.2l1.6-1.5 1.7 1.5-1.7 2.1z"/><path class="gem" d="M12.2 6.2l1.6-1.5 1.7 1.5-1.7 2.1z"/><path class="spark" d="M18.7 1.2l.45 1.05 1.05.45-1.05.45-.45 1.05-.45-1.05-1.05-.45 1.05-.45z"/></svg></span>';
+ let repairing=false;
+ function ensureIcon(){
+  const cart=document.getElementById('gbCartLink');if(!cart||repairing)return;
+  if(!cart.querySelector('.gb-jeweled-cart')){
+   repairing=true;
+   cart.insertAdjacentHTML('afterbegin',ICON);
+   repairing=false;
+  }
+ }
+ function install(){
+  ensureIcon();
+  const nav=document.querySelector('.nav-links');
+  if(nav){new MutationObserver(function(){ensureIcon()}).observe(nav,{subtree:true,childList:true,characterData:true})}
+  // Existing cart refreshes can rewrite the link text; re-apply icon immediately afterward.
+  let tries=0;
+  const hook=setInterval(function(){
+   ensureIcon();tries++;
+   if(window.gbCartRefresh&&!window.gbCartRefresh.__gbIconHooked){
+    const original=window.gbCartRefresh;
+    const wrapped=function(){const r=original.apply(this,arguments);ensureIcon();requestAnimationFrame(ensureIcon);return r};
+    wrapped.__gbIconHooked=true;window.gbCartRefresh=wrapped;clearInterval(hook)
+   }else if(tries>80)clearInterval(hook)
+  },100);
+  document.addEventListener('click',function(e){if(e.target.closest('#gbCartLink')||e.target.closest('.gb-cart-close'))setTimeout(ensureIcon,0)},true);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
+
+
+<script>/* Women Shop details population v79 */
+(function(){
+ if(window.__gbWomenDetailsPopulation79)return;window.__gbWomenDetailsPopulation79=true;
+ function populate(){
+  var nameEl=document.getElementById('gbWqName'),det=document.getElementById('gbWqDetails'),body=document.getElementById('gbWqDetailsBody');
+  if(!nameEl||!det||!body)return;
+  det.open=false;
+  var html=window.gbWomenDetailsFor?window.gbWomenDetailsFor(nameEl.textContent):'';
+  body.innerHTML=html||'<p>Made to order.</p>';
+ }
+ document.addEventListener('click',function(e){
+  if(e.target.closest('#gbWomenGrid .gb-women-view'))setTimeout(populate,0);
+ },false);
+})();
+</script>
+
+<script>/* Build Your Fit cart icon v81 */
+(function(){
+ function apply(){
+  var candidates=document.querySelectorAll('#build-your-fit button');
+  candidates.forEach(function(b){
+   var t=(b.textContent||'').replace(/\s+/g,' ').trim();
+   if(/^add both to cart$/i.test(t))b.textContent='🛒  '+t;
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
+ document.addEventListener('click',function(e){
+  if(e.target.closest('#build-your-fit'))setTimeout(apply,0);
+ },false);
+})();
+</script>
+
+
+
+
+
+<script>/* Seven-panel 3D continuous coverflow v91 + all Shop the Look cards */
+(function(){
+ function init(){
+  var car=document.getElementById('gbOutfitCarousel');if(!car)return;
+  var slides=[...car.children],dots=[...document.querySelectorAll('.gb-outfit-dots span')],n=slides.length,active=0,timer,startX=null,lookOrigin=0;
+  var modal=document.getElementById('gbLookModal'),itemsBox=document.getElementById('gbLookItems'),returnBtn=document.getElementById('gbLookReturn');
+  var looks=[
+   {label:'Grey Activewear Look',items:[
+    {name:'GB Classic Sports Bra – Grey',price:'US$39.99',img:'IMG_0586.jpeg',women:'GB Classic Sports Bra – Grey'},
+    {name:'GB Classic High-Waisted Leggings – Grey',price:'US$69.99',img:'IMG_0607.jpeg',women:'GB Classic High-Waisted Leggings – Grey'},
+    {name:'Stainless Steel Gym Bottle',price:'US$49.99–54.99',img:'IMG_0412.jpeg',access:'openGymBottle'},
+    {name:'Gym Face Towel',price:'US$24.99',img:'IMG_0098.jpeg',access:'openGymTowel'},
+    {name:'Gym Bag',price:'US$54.99',img:'IMG_0093.jpeg',access:'openGymBag'}]},
+   {label:'Green Activewear Look',items:[
+    {name:'GB Classic Sports Bra – Green',price:'US$39.99',img:'IMG_0595.jpeg',women:'GB Classic Sports Bra – Green'},
+    {name:'GB Classic High-Waisted Leggings – Green',price:'US$69.99',img:'IMG_0601.jpeg',women:'GB Classic High-Waisted Leggings – Green'},
+    {name:'Stainless Steel Gym Bottle',price:'US$49.99–54.99',img:'IMG_0412.jpeg',access:'openGymBottle'},
+    {name:'Gym Face Towel',price:'US$24.99',img:'IMG_0098.jpeg',access:'openGymTowel'},
+    {name:'Embroidered Structured Cap',price:'US$39.99',img:'IMG_0319.jpeg',access:'openCap'},
+    {name:'“Baddie” Faux Leather Travel Bag',price:'US$109.99',img:'IMG_0414.jpeg',access:'openTravelBag'}]},
+   {label:'Onyx/Gold Men’s Look',items:[
+    {name:'Onyx/Gold Crowned Luxury Full-Zip Hoodie',price:'US$89.99',img:'IMG_0627.jpeg',men:'Onyx/Gold Crowned Luxury Full-Zip Hoodie'},
+    {name:'Black Crowned Luxury Cotton Tee',price:'US$39.99',img:'IMG_0633.jpeg',men:'Black Crowned Luxury Cotton Tee'},
+    {name:'Onyx/Gold Gangster Bougie Basketball Rib Shorts',price:'US$57.99',img:'IMG_0629.jpeg',men:'Onyx/Gold Gangster Bougie Basketball Rib Shorts'},
+    {name:'Crowned Luxury Signature Cap',price:'US$49.99',img:'IMG_0638.jpeg',men:'Crowned Luxury Signature Cap'},
+    {name:'Crowned Luxury Crew Socks',price:'US$19.99',img:'IMG_0635.jpeg',men:'Crowned Luxury Crew Socks'}]},
+   {label:'Black & White Signature Look',items:[
+    {name:'Onyx Sports Bra',price:'US$39.99',img:'IMG_0546.jpeg',women:'Onyx Sports Bra'},
+    {name:'Cream Sports Bra',price:'US$39.99',img:'IMG_0552.jpeg',women:'Cream Sports Bra'},
+    {name:'Onyx Leggings',price:'US$69.99',img:'IMG_0541.jpeg',women:'Onyx Leggings'},
+    {name:'Cream Leggings',price:'US$69.99',img:'IMG_0553.jpeg',women:'Cream Leggings'},
+    {name:'Stainless Steel Gym Bottle',price:'US$49.99–54.99',img:'IMG_0412.jpeg',access:'openGymBottle'},
+    {name:'Gym Face Towel',price:'US$24.99',img:'IMG_0098.jpeg',access:'openGymTowel'},
+    {name:'“Baddie” Faux Leather Travel Bag',price:'US$109.99',img:'IMG_0414.jpeg',access:'openTravelBag'}]},
+   {label:'Baby Bougie Black & White Look',items:[
+    {name:'Baby Bougie Tee – Caviar',price:'US$49.99',img:'IMG_1916.jpeg',women:'Baby Bougie Tee – Caviar'},
+    {name:'Baby Bougie Tee – Cloud Dancer',price:'US$49.99',img:'IMG_1905.jpeg',women:'Baby Bougie Tee – Cloud Dancer'},
+    {name:'Shorts – Black',price:'US$59.99',img:'IMG_0312.jpeg',women:'Shorts – Black'},
+    {name:'Shorts – White',price:'US$59.99',img:'IMG_0300.jpeg',women:'Shorts – White'},
+    {name:'“Baddie” Faux Leather Travel Bag',price:'US$109.99',img:'IMG_0414.jpeg',access:'openTravelBag'}]},
+   {label:'Heritage Plaid Activewear Look',items:[
+    {name:'Heritage Plaid Sports Bra',price:'US$39.99',img:'IMG_0523.jpeg',women:'Heritage Plaid Sports Bra'},
+    {name:'Heritage Plaid Leggings',price:'US$69.99',img:'IMG_0520.jpeg',women:'Heritage Plaid Leggings'},
+    {name:'Stainless Steel Gym Bottle',price:'US$49.99–54.99',img:'IMG_0412.jpeg',access:'openGymBottle'},
+    {name:'Gym Face Towel',price:'US$24.99',img:'IMG_0098.jpeg',access:'openGymTowel'}]},
+   {label:'Cream/Gold Men’s Look',items:[
+    {name:'Cream/Gold Crowned Luxury Full-Zip Hoodie',price:'US$89.99',img:'IMG_0625.jpeg',men:'Cream/Gold Crowned Luxury Full-Zip Hoodie'},
+    {name:'White Crowned Luxury Cotton Tee',price:'US$39.99',img:'IMG_0631.jpeg',men:'White Crowned Luxury Cotton Tee'},
+    {name:'Cream/Gold Gangster Bougie Basketball Rib Shorts',price:'US$57.99',img:'IMG_0630.jpeg',men:'Cream/Gold Gangster Bougie Basketball Rib Shorts'},
+    {name:'Crowned Luxury Signature Cap',price:'US$49.99',img:'IMG_0638.jpeg',men:'Crowned Luxury Signature Cap'},
+    {name:'Crowned Luxury Crew Socks',price:'US$19.99',img:'IMG_0635.jpeg',men:'Crowned Luxury Crew Socks'}]}
+  ];
+  function signed(i){var d=(i-active+n)%n;if(d>n/2)d-=n;return d}
+  function draw(){
+   var mobile=innerWidth<=680,step=mobile?42:48,depth=mobile?105:135,angle=mobile?23:28;
+   slides.forEach(function(s,i){var d=signed(i),ad=Math.abs(d),x=d*step,z=-ad*depth,ry=d===0?0:(d<0?angle:-angle),scale=d===0?1:Math.max(.62,1-ad*.10);s.style.zIndex=String(20-ad);s.style.opacity=ad>3?'0':String(Math.max(.18,1-ad*.20));s.style.filter=d===0?'brightness(1)':'brightness('+(Math.max(.48,.9-ad*.10))+')';s.style.pointerEvents=ad>2?'none':'auto';s.style.transform='translate(-50%,-50%) translateX('+x+'%) translateZ('+z+'px) rotateY('+ry+'deg) scale('+scale+')';s.classList.toggle('gb-look-active',i===active)});dots.forEach(function(d,i){d.classList.toggle('active',i===active)});
+  }
+  function go(dir){active=(active+dir+n)%n;draw()} function restart(){clearInterval(timer);timer=setInterval(function(){go(1)},3600)}
+  slides.forEach(function(s,i){s.addEventListener('click',function(e){var sb=e.target.closest('.gb-look-shop-btn');if(sb){e.stopPropagation();openLook(i);return}var d=signed(i);if(d){active=i;draw();restart()}})});
+  car.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;clearInterval(timer)},{passive:true});car.addEventListener('touchend',function(e){if(startX!==null){var dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>35)go(dx<0?1:-1);startX=null}restart()},{passive:true});car.addEventListener('mouseenter',function(){clearInterval(timer)});car.addEventListener('mouseleave',restart);
+  function renderLook(i){var look=looks[i];lookOrigin=i;var eye=modal.querySelector('.eyebrow');if(eye)eye.textContent=look.label;itemsBox.innerHTML=look.items.map(function(x){var data=x.women?' data-women="'+x.women+'"':x.men?' data-men="'+x.men+'"':' data-access="'+x.access+'"';return '<div class="gb-look-item"><img src="'+x.img+'" alt="'+x.name+'"><div class="gb-look-item-name">'+x.name+'</div><div class="gb-look-item-price">'+x.price+'</div><button type="button"'+data+'>Shop Item</button></div>'}).join('')}
+  function openLook(i){clearInterval(timer);renderLook(i);modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+  function closeLook(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';restart()}
+  modal.querySelector('.gb-look-close').onclick=closeLook;modal.querySelector('.gb-look-back').onclick=closeLook;modal.addEventListener('click',function(e){if(e.target===modal)closeLook()});
+  function showReturn(){clearInterval(timer);returnBtn.classList.add('show')} function highlight(el){if(!el)return;el.classList.remove('gb-look-highlight');void el.offsetWidth;el.classList.add('gb-look-highlight');setTimeout(function(){el.classList.remove('gb-look-highlight')},6000)}
+  modal.addEventListener('click',function(e){
+   var b=e.target.closest('.gb-look-item button');if(!b)return;var wanted=b.dataset.women||b.dataset.men||b.dataset.access;closeLook();showReturn();
+   if(b.dataset.women){var all=[...document.querySelectorAll('#gbWomenCatalog .gb-women-filter')].find(function(x){return x.dataset.filter==='all'});if(all)all.click();var more=document.querySelector('#gbWomenCatalog .gb-women-more');if(more&&more.textContent.trim()==='View More')more.click();setTimeout(function(){var card=[...document.querySelectorAll('#gbWomenGrid .gb-women-card')].find(function(c){var x=c.querySelector('.gb-women-name');return x&&x.textContent.trim()===wanted});if(card){card.classList.remove('gb-women-collapsed');card.style.display='flex';card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},120)}
+   else if(b.dataset.men){setTimeout(function(){var card=[...document.querySelectorAll('#gbMenGrid .gb-men-card')].find(function(c){var x=c.querySelector('.gb-men-name');return x&&x.textContent.trim()===wanted});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}},80)}
+   else if(b.dataset.access){var card=[...document.querySelectorAll('#gbAccessoriesCatalog .gb-access-card')].find(function(c){var x=c.querySelector('.gb-access-view');return x&&x.dataset.open===wanted});if(card){card.scrollIntoView({behavior:'smooth',block:'center'});highlight(card)}}
+  });
+  returnBtn.onclick=function(){clearInterval(timer);returnBtn.classList.remove('show');document.querySelectorAll('.modal.open,#gbWomenQuick.open,#gbMenQuick.open').forEach(function(m){m.classList.remove('open');m.setAttribute('aria-hidden','true')});document.body.style.overflow='';active=lookOrigin;draw();car.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(restart,900)};
+  addEventListener('resize',draw,{passive:true});draw();restart();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<script>/* Accessories cart connection v90 */
+(function(){
+ function add(name,size,price,image){
+  try{
+   var cart=JSON.parse(localStorage.getItem('gbCart')||'[]');
+   var hit=cart.find(function(x){return x.name===name&&x.size===size});
+   if(hit)hit.qty=(Number(hit.qty)||1)+1;else cart.push({name:name,size:size,price:price,qty:1,image:image});
+   localStorage.setItem('gbCart',JSON.stringify(cart));
+   if(window.gbCartRefresh)window.gbCartRefresh();
+   document.body.style.overflow='';
+   document.querySelectorAll('.modal.open').forEach(function(m){m.classList.remove('open');m.setAttribute('aria-hidden','true')});
+   var link=document.getElementById('gbCartLink');if(link)link.click();
+  }catch(e){}
+ }
+ function wire(id,getItem){
+  var m=document.getElementById(id);if(!m)return;
+  var b=m.querySelector('.sports-add');if(!b)return;
+  b.removeAttribute('aria-label');b.onclick=function(){var x=getItem(m);add(x.name,x.size,x.price,x.image)};
+  var note=m.querySelector('.sports-preview-note');if(note)note.style.display='none';
+ }
+ function activeText(m,sel,fallback){var x=m.querySelector(sel);return x?(x.textContent||x.getAttribute('aria-label')||fallback).trim():fallback}
+ wire('gymBottleModal',function(m){var s=activeText(m,'.gym-bottle-size.active','12 oz'),is18=s.indexOf('18')===0;return{name:'Gangster Bougie Stainless Steel Gym Bottle',size:s,price:is18?54.99:49.99,image:is18?'IMG_0413.jpeg':'IMG_0412.jpeg'}});
+ wire('gymTowelModal',function(){var colour=(document.getElementById('gymTowelColourName')||{}).textContent||'White';return{name:'Gangster Bougie Gym Face Towel',size:colour+' • 13&quot; × 13&quot;',price:24.99,image:colour==='Black'?'IMG_0099.jpeg':'IMG_0098.jpeg'}});
+ wire('gymBagModal',function(m){var colour=(document.getElementById('gymBagColourName')||{}).textContent||'Black';var files={Black:'IMG_0093.jpeg',Gold:'IMG_0096.jpeg',Hunter:'IMG_0097.jpeg',Maroon:'IMG_0095.jpeg','Tropical Pink':'IMG_0092.jpeg',Royal:'IMG_0094.jpeg'};return{name:'Gangster Bougie Gym Bag',size:colour+' • One Size',price:54.99,image:files[colour]||'IMG_0093.jpeg'}});
+ wire('yogaMatModal',function(m){var colour=(document.getElementById('yogaMatColourName')||{}).textContent||'Black';var files={Black:'IMG_0204.jpeg','Dark Grey':'IMG_0203.jpeg','Dark Red':'IMG_0201.jpeg','Dark Blue':'IMG_0200.jpeg',Turquoise:'IMG_0199.jpeg','Dark Green':'IMG_0198.jpeg'};return{name:'Gangster Bougie Foam Yoga Mat',size:colour+' • 24&quot; × 72&quot;',price:109.99,image:files[colour]||'IMG_0204.jpeg'}});
+ wire('gbTravelBagModal',function(){return{name:'Gangster Bougie GB Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:109.99,image:'IMG_0416.jpeg'}});
+ wire('travelBagModal',function(){return{name:'Gangster Bougie “Baddie” Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:109.99,image:'IMG_0414.jpeg'}});
+ wire('bandanaModal',function(){return{name:'Gangster Bougie Mini Wrap Bandana',size:'27&quot; × 13&quot;',price:27.99,image:'IMG_0321.jpeg'}});
+ wire('capModal',function(){return{name:'Gangster Bougie Embroidered Structured Cap',size:'One Size',price:39.99,image:'IMG_0319.jpeg'}});
+})();
+</script>
+
+<style>/* Checkout success experience v92 */
+.gb-order-success{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:22px}
+.gb-order-success.open{display:flex}
+.gb-order-success-card{width:min(620px,100%);background:#0b0b0b;border:1px solid var(--gold);padding:42px 28px;text-align:center;box-shadow:0 18px 70px rgba(0,0,0,.65)}
+.gb-order-success-check{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;display:grid;place-items:center;background:linear-gradient(135deg,#a87912,var(--gold-light));color:#111;font-size:2.2rem;font-weight:900}
+.gb-order-success h2{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-size:clamp(2rem,6vw,3.2rem);margin-bottom:12px}
+.gb-order-success p{color:#c7c7c7;margin:0 auto 22px;max-width:480px}
+.gb-order-success .btn{min-width:210px}
+</style>
+<div id="gbOrderSuccess" class="gb-order-success" aria-hidden="true">
+ <div class="gb-order-success-card" role="dialog" aria-modal="true" aria-labelledby="gbOrderSuccessTitle">
+  <div class="gb-order-success-check" aria-hidden="true">✓</div>
+  <h2 id="gbOrderSuccessTitle">Thank You for Your Order</h2>
+  <p>Your payment was successful. We've received your order and a confirmation will be sent to the email used at checkout.</p>
+  <button id="gbContinueShopping" class="btn btn-gold" type="button">Continue Shopping</button>
+ </div>
+</div>
+<script>/* Checkout success experience v92 */
+(function(){
+ function init(){
+  var q=new URLSearchParams(location.search);
+  if(q.get('checkout')!=='success')return;
+  try{localStorage.removeItem('gbCart')}catch(e){}
+  if(window.gbCartRefresh)try{window.gbCartRefresh()}catch(e){}
+  var modal=document.getElementById('gbOrderSuccess'),btn=document.getElementById('gbContinueShopping');
+  if(!modal||!btn)return;
+  modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  try{history.replaceState({},document.title,location.pathname+location.hash)}catch(e){}
+  btn.addEventListener('click',function(){
+   modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';
+   window.scrollTo({top:0,behavior:'smooth'});
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+
+<style id="gb-byf-contained-shimmer-v1">
+/* Keep the Build Your Fit shine strictly inside the pill. */
+.nav-links .byf-nav-link{overflow:hidden!important;isolation:isolate}
+.nav-links .byf-nav-link::after{
+  top:0!important;
+  bottom:0!important;
+  height:100%!important;
+  inset-block:0!important;
+  width:22%!important;
+  filter:none!important;
+  box-shadow:none!important;
+  background:linear-gradient(90deg,transparent,rgba(255,241,171,.16),rgba(255,255,235,.72),rgba(255,218,83,.28),transparent)!important;
+}
+@keyframes gbByfShine{0%{left:-28%;opacity:.25}15%{opacity:.75}85%{opacity:.75}100%{left:108%;opacity:.25}}
+</style>
+<style id="gb-account-preview-v1">
+.gb-account-link{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;color:var(--gold-light);cursor:pointer}
+.gb-account-icon{width:23px;height:23px;display:block;flex:0 0 auto}
+.gb-account-icon svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gb-account-text{font:inherit}
+.gb-account-preview{position:fixed;inset:0;z-index:320;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px}
+.gb-account-preview.open{display:flex}
+.gb-account-card{position:relative;width:min(480px,100%);background:#0b0b0b;border:1px solid var(--gold);padding:34px 24px;text-align:center;box-shadow:0 18px 70px rgba(0,0,0,.7)}
+.gb-account-card h2{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-size:2rem;margin-bottom:8px}
+.gb-account-card p{color:#bbb;margin:0 auto 18px;max-width:380px}
+.gb-account-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--gold-light);font-size:1.7rem;cursor:pointer}
+@media(max-width:680px){
+ .nav{position:relative}
+ /* Preserve the proven five-item mobile nav proportions from before Account was added. */
+ .nav-links{display:grid!important;grid-template-columns:minmax(0,.9fr) minmax(0,.9fr) minmax(108px,1.4fr) minmax(0,.95fr) minmax(94px,1.25fr)!important;gap:4px!important;width:100%!important;overflow:visible!important}
+ .nav-links .byf-nav-link{grid-column:3!important;white-space:nowrap!important;overflow:hidden!important;padding:8px 2px!important;font-size:clamp(.56rem,2.35vw,.69rem)!important}
+ #gbCartLink{max-width:100%!important;min-width:0!important;padding-left:5px!important;padding-right:7px!important;gap:2px!important;font-size:clamp(.54rem,2.25vw,.68rem)!important}
+ #gbCartLink .gb-jeweled-cart{width:19px!important;height:17px!important;flex-basis:19px!important}
+ #gbCartLink .gb-jeweled-cart svg{width:19px!important;height:17px!important}
+ /* Account is independent of the nav row and lives in the empty upper-right header area. */
+ .gb-account-link{position:absolute!important;right:10px;top:8px;width:42px;height:42px;padding:0!important;border:1px solid var(--gold);border-radius:50%;background:rgba(5,5,5,.78);z-index:25}
+ .gb-account-icon{width:23px;height:23px}
+ .gb-account-text{display:none}
+}
+</style>
+<div id="gbAccountPreview" class="gb-account-preview" aria-hidden="true">
+ <div class="gb-account-card" role="dialog" aria-modal="true" aria-labelledby="gbAccountTitle" style="max-height:86vh;overflow:auto">
+  <button class="gb-account-close" type="button" aria-label="Close account">×</button>
+  <div class="gb-account-icon" style="width:38px;height:38px;margin:0 auto 12px" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></div>
+  <h2 id="gbAccountTitle">My Account</h2>
+  <p id="gbAccountIntro">Sign in securely to view your Gangster Bougie order history.</p>
+  <form id="gbAccountEmailForm" style="margin-top:16px;display:grid;gap:10px">
+   <input id="gbAccountEmail" type="email" autocomplete="email" placeholder="Email address" required style="width:100%;padding:12px;border:1px solid rgba(216,169,40,.5);border-radius:8px;background:#0b0b0b;color:#fff">
+   <button type="submit" style="padding:11px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:#111;font-weight:800">Email My Code</button>
+  </form>
+  <form id="gbAccountCodeForm" hidden style="margin-top:12px;display:none;gap:10px">
+   <input id="gbAccountCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6-digit code" required style="width:100%;padding:12px;text-align:center;letter-spacing:6px;border:1px solid rgba(216,169,40,.5);border-radius:8px;background:#0b0b0b;color:#fff">
+   <button type="submit" style="padding:11px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:#111;font-weight:800">Verify & View My Orders</button>
+  </form>
+  <p id="gbAccountMessage" style="margin-top:12px;font-size:.85rem;color:var(--muted)"></p>
+  <div id="gbOrdersList" style="margin-top:16px;text-align:left"></div>
+ </div>
+</div>
+<script id="gb-account-preview-script-v2">
+(function(){
+ function money(cents,currency){try{return new Intl.NumberFormat('en-CA',{style:'currency',currency:currency||'CAD'}).format((Number(cents)||0)/100)}catch(_){return ((Number(cents)||0)/100).toFixed(2)}}
+ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
+ function renderOrders(orders){
+  var box=document.getElementById('gbOrdersList');
+  if(!orders.length){box.innerHTML='<div style="padding:16px;border:1px solid rgba(216,169,40,.35);border-radius:10px">No orders found for this email yet.</div>';return}
+  box.innerHTML='<h3 style="color:var(--gold);margin:4px 0 12px">My Orders</h3>'+orders.map(function(o){
+   var items=(o.items||[]).map(function(x){return '<div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0"><span>'+esc(x.name)+(x.selection?' — '+esc(x.selection):'')+'</span><strong>× '+esc(x.quantity)+'</strong></div>'}).join('');
+   var date=o.created_at?new Date(o.created_at).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'';
+   return '<article style="border:1px solid rgba(216,169,40,.42);border-radius:12px;padding:14px;margin:0 0 12px;background:#090909"><div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><strong style="color:var(--gold)">'+esc(o.order_number)+'</strong><div style="font-size:.78rem;color:var(--muted)">'+esc(date)+'</div></div><span style="text-transform:capitalize;font-size:.8rem;border:1px solid rgba(216,169,40,.5);border-radius:999px;padding:4px 8px">'+esc(o.status||'confirmed')+'</span></div><div style="margin-top:10px">'+items+'</div><div style="border-top:1px solid #333;margin-top:8px;padding-top:10px;display:flex;justify-content:space-between"><strong>Total</strong><strong>'+esc(money(o.amount_total,o.currency))+'</strong></div></article>'
+  }).join('');
+ }
+ async function loadOrders(token,msg){
+  msg.textContent='Loading your orders…';
+  var r=await fetch('/.netlify/functions/customer-orders',{headers:{Authorization:'Bearer '+token}}),d=await r.json();
+  if(!r.ok)throw new Error(d.error||'Unable to load orders.');
+  renderOrders(d.orders||[]);msg.textContent='Signed in as '+d.email;
+  document.getElementById('gbAccountEmailForm').style.display='none';document.getElementById('gbAccountCodeForm').style.display='none';
+ }
+ function install(){
+  var nav=document.querySelector('.nav-links'),cart=document.getElementById('gbCartLink');if(!nav||!cart||document.getElementById('gbAccountLink'))return;
+  var a=document.createElement('a');a.href='#';a.id='gbAccountLink';a.className='gb-account-link';a.setAttribute('aria-label','My Account');
+  a.innerHTML='<span class="gb-account-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg></span><span class="gb-account-text">Account</span>';
+  if(window.matchMedia('(max-width:680px)').matches){nav.parentElement.appendChild(a)}else{nav.insertBefore(a,cart)}
+  var m=document.getElementById('gbAccountPreview'),emailForm=document.getElementById('gbAccountEmailForm'),codeForm=document.getElementById('gbAccountCodeForm'),msg=document.getElementById('gbAccountMessage'),pendingEmail='';
+  function close(){m.classList.remove('open');m.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+  a.addEventListener('click',async function(e){e.preventDefault();m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';var t=sessionStorage.getItem('gbCustomerToken');if(t){try{await loadOrders(t,msg)}catch(_){sessionStorage.removeItem('gbCustomerToken')}}});
+  m.querySelector('.gb-account-close').addEventListener('click',close);m.addEventListener('click',function(e){if(e.target===m)close()});
+  emailForm.addEventListener('submit',async function(e){e.preventDefault();msg.textContent='Sending your verification code…';pendingEmail=document.getElementById('gbAccountEmail').value.trim();try{var r=await fetch('/.netlify/functions/customer-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'request_code',email:pendingEmail})}),d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to send code.');codeForm.hidden=false;codeForm.style.display='grid';emailForm.style.display='none';msg.textContent='We emailed a 6-digit code to '+pendingEmail+'. It expires in 10 minutes.';document.getElementById('gbAccountCode').focus()}catch(err){msg.textContent=err.message}});
+  codeForm.addEventListener('submit',async function(e){e.preventDefault();msg.textContent='Verifying…';try{var r=await fetch('/.netlify/functions/customer-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify_code',email:pendingEmail,code:document.getElementById('gbAccountCode').value.trim()})}),d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to verify code.');sessionStorage.setItem('gbCustomerToken',d.token);await loadOrders(d.token,msg)}catch(err){msg.textContent=err.message}});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+</body></html>+(u*q).toFixed(2)+'</strong></div>'}).join('')}
  function money(a){if(!a)return '—';return (a.amount?String(a.amount):('US$'+((Number(a.minorUnitsAmount)||0)/100).toFixed(2)))}
  function closeCheckout(){if(coOverlay){coOverlay.classList.remove('open');coOverlay.setAttribute('aria-hidden','true')}}
  function resetCheckoutMounts(){['gbShippingAddress','gbPaymentElement'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=''});gbCheckout=gbActions=gbSession=gbShippingEl=gbPaymentEl=null;gbLastQuote='';if(coContinue)coContinue.disabled=true}
