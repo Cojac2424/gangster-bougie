@@ -48,3 +48,12 @@ export async function listGbOrdersByEmail(email){
  }
  return orders;
 }
+
+export async function updateGbOrderFulfillment(orderNumber,{printify_order_id=null,status=null}={}){
+ const store=getStore(STORE);
+ const current=await getGbOrderByNumber(orderNumber);
+ if(!current)return {ok:false,error:'order_not_found'};
+ const updated={...current,printify_order_id:printify_order_id||current.printify_order_id||null,status:status||current.status,updated_at:new Date().toISOString()};
+ await store.setJSON(orderKey(updated),updated);
+ return {ok:true,record:updated};
+}
