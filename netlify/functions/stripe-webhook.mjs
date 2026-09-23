@@ -1,10 +1,11 @@
 // Stripe webhook endpoint for Gangster Bougie.
 // SECURITY: verifies Stripe's signature before accepting a payment event.
-// SAFETY: does NOT create a Printify order yet.
+// SAFETY: Printify submission is gated to verified Stripe live-mode payments and an explicit Netlify enable flag.
 
 import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
 import { buildGbOrderRecord } from './lib/gb-order-record.mjs';
-import { saveGbOrder } from './lib/gb-order-store.mjs';
+import { saveGbOrder, updateGbOrderFulfillment } from './lib/gb-order-store.mjs';
+import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 import { sendOrderConfirmation } from './lib/gb-email.mjs';
 
 const enc=new TextEncoder();
@@ -72,13 +73,27 @@ export default async(req)=>{
      console.error('GB ORDER STORAGE REJECTED',JSON.stringify({event_id:event.id,session_id:s.id,error:saved.error}));
      return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
    }
+   // Printify auto-fulfillment is intentionally gated twice:
+   // 1) only real Stripe live-mode payments can submit; sandbox/test payments never can;
+   // 2) PRINTIFY_AUTO_FULFILLMENT must be explicitly set to "true" in Netlify.
+   let printify={ok:true,skipped:true,reason:full.livemode?'auto_fulfillment_disabled':'stripe_sandbox'};
+   const allowPrintify=full.livemode===true && String(process.env.PRINTIFY_AUTO_FULFILLMENT||'').toLowerCase()==='true';
+   if(saved.created && allowPrintify){
+    try{printify=await submitPrintifyOrder(built.payload,{allow:true})}catch(e){printify={ok:false,error:String(e?.message||e)}}
+    if(printify.ok && printify.order_id){
+     const updated=await updateGbOrderFulfillment(saved.record.order_number,{printify_order_id:printify.order_id,status:'submitted_to_printify'}).catch(()=>null);
+     if(updated?.ok)saved.record=updated.record;
+    }else if(!printify.ok){
+     console.error('PRINTIFY SUBMISSION FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:printify.error,status:printify.status||null}));
+    }
+   }
    let confirmation={ok:true,skipped:!saved.created};
    if(saved.created){
     try{confirmation=await sendOrderConfirmation(saved.record)}catch(e){confirmation={ok:false,error:String(e?.message||e)}}
     if(!confirmation.ok)console.error('ORDER CONFIRMATION EMAIL FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:confirmation.error,status:confirmation.status||null}));
    }
-   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:false}));
-   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:false});
+   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
