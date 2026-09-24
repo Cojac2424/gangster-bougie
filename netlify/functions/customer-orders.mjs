@@ -20,6 +20,7 @@ export default async(req)=>{
   const action=String(b.action||''), e=email(b.email);
   if(action==='request_code'){
    if(!/^\S+@\S+\.\S+$/.test(e))return Response.json({error:'Enter a valid email.'},{status:400});
+   const rateKey='rate/'+await digest(e), now=Date.now(), rate=await store.get(rateKey,{type:'json'}).catch(()=>null);if(rate&&rate.until>now)return Response.json({error:'Please wait before requesting another code.'},{status:429,headers:{'Retry-After':String(Math.max(1,Math.ceil((rate.until-now)/1000)))}});await store.setJSON(rateKey,{until:now+60*1000});
    const c=code(), expires=Date.now()+10*60*1000;
    await store.setJSON('code/'+await digest(e),{hash:await digest(e+'|'+c),expires,attempts:0});
    const sent=await sendVerificationCode({to:e,code:c});
