@@ -57,3 +57,12 @@ export async function updateGbOrderFulfillment(orderNumber,{printify_order_id=nu
  await store.setJSON(orderKey(updated),updated);
  return {ok:true,record:updated};
 }
+
+export async function markGbOrderConfirmationSent(orderNumber){
+ const store=getStore(STORE);
+ const current=await getGbOrderByNumber(orderNumber);
+ if(!current)return {ok:false,error:'order_not_found'};
+ const updated={...current,confirmation_email_sent_at:current.confirmation_email_sent_at||new Date().toISOString(),updated_at:new Date().toISOString()};
+ await store.setJSON(orderKey(updated),updated);
+ return {ok:true,record:updated};
+}
