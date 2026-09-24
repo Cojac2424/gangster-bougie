@@ -1,7 +1,8 @@
 // Gangster Bougie transactional email sender via Resend.
 // Server-side only. RESEND_API_KEY never reaches the browser.
 const API='https://api.resend.com/emails';
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function decodeEntities(v){return String(v??'').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
+function esc(v){return decodeEntities(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function from(){return process.env.GB_EMAIL_FROM||'Gangster Bougie <onboarding@resend.dev>'}
 async function send({to,subject,html}){
  const key=process.env.RESEND_API_KEY;
