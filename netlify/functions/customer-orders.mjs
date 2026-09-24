@@ -10,7 +10,8 @@ function hex(b){return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'
 async function digest(v){return hex(await crypto.subtle.digest('SHA-256',enc.encode(String(v))))}
 function token(){const b=crypto.getRandomValues(new Uint8Array(32));return [...b].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function code(){const a=new Uint32Array(1);crypto.getRandomValues(a);return String(100000+(a[0]%900000))}
-function cleanOrder(o){return {order_number:o.order_number,status:o.status,payment_status:o.payment_status,currency:o.currency,amount_total:o.amount_total,created_at:o.created_at,items:o.items,shipping:{city:o.shipping?.city||'',region:o.shipping?.region||'',country:o.shipping?.country||''},printify_order_id:o.printify_order_id||null}}
+function decodeEntities(v){return String(v??'').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
+function cleanOrder(o){return {order_number:o.order_number,status:o.status,payment_status:o.payment_status,currency:o.currency,amount_total:o.amount_total,created_at:o.created_at,items:(o.items||[]).map(x=>({...x,name:decodeEntities(x.name),selection:decodeEntities(x.selection)})),shipping:{city:o.shipping?.city||'',region:o.shipping?.region||'',country:o.shipping?.country||''},printify_order_id:o.printify_order_id||null}}
 
 export default async(req)=>{
  const store=getStore(STORE);
