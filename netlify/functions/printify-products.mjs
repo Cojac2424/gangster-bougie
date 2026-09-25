@@ -26,7 +26,8 @@ export default async (req) => {
     }
 
     const source = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
-    const products = source.map((product) => ({
+    const target = new URL(req.url).searchParams.get('id');
+    const products = source.filter(product=>!target||product.id===target).map((product) => ({
       id: product.id,
       title: product.title,
       blueprint_id: product.blueprint_id,
