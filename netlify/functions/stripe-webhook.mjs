@@ -4,7 +4,7 @@
 
 import { buildPrintifyOrder } from './lib/printify-order-builder.mjs';
 import { buildGbOrderRecord } from './lib/gb-order-record.mjs';
-import { saveGbOrder, updateGbOrderFulfillment } from './lib/gb-order-store.mjs';
+import { saveGbOrder, updateGbOrderFulfillment, markGbOrderConfirmationSent } from './lib/gb-order-store.mjs';
 import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 import { sendOrderConfirmation } from './lib/gb-email.mjs';
 
@@ -87,13 +87,20 @@ export default async(req)=>{
      console.error('PRINTIFY SUBMISSION FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:printify.error,status:printify.status||null}));
     }
    }
-   let confirmation={ok:true,skipped:!saved.created};
-   if(saved.created){
+   // Retry confirmation on a later Stripe webhook delivery until a successful send is recorded.
+   // This avoids losing the email when order storage succeeds but Resend temporarily fails.
+   const confirmationAlreadySent=!!saved.record.confirmation_email_sent_at;
+   let confirmation={ok:true,skipped:confirmationAlreadySent};
+   if(!confirmationAlreadySent){
     try{confirmation=await sendOrderConfirmation(saved.record)}catch(e){confirmation={ok:false,error:String(e?.message||e)}}
-    if(!confirmation.ok)console.error('ORDER CONFIRMATION EMAIL FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:confirmation.error,status:confirmation.status||null}));
+    if(confirmation.ok){
+     const marked=await markGbOrderConfirmationSent(saved.record.order_number).catch(()=>null);
+     if(marked?.ok)saved.record=marked.record;
+     else console.error('ORDER CONFIRMATION SENT BUT STATUS MARK FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number}));
+    }else console.error('ORDER CONFIRMATION EMAIL FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:confirmation.error,status:confirmation.status||null}));
    }
-   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped}));
-   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.created&&confirmation.ok),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped});
+   console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.record.confirmation_email_sent_at||(!confirmationAlreadySent&&confirmation.ok)),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped}));
+   return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.record.confirmation_email_sent_at||(!confirmationAlreadySent&&confirmation.ok)),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };

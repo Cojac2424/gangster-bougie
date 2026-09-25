@@ -10,7 +10,8 @@ function hex(b){return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'
 async function digest(v){return hex(await crypto.subtle.digest('SHA-256',enc.encode(String(v))))}
 function token(){const b=crypto.getRandomValues(new Uint8Array(32));return [...b].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function code(){const a=new Uint32Array(1);crypto.getRandomValues(a);return String(100000+(a[0]%900000))}
-function cleanOrder(o){return {order_number:o.order_number,status:o.status,payment_status:o.payment_status,currency:o.currency,amount_total:o.amount_total,created_at:o.created_at,items:o.items,shipping:{city:o.shipping?.city||'',region:o.shipping?.region||'',country:o.shipping?.country||''},printify_order_id:o.printify_order_id||null}}
+function decodeEntities(v){return String(v??'').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
+function cleanOrder(o){return {order_number:o.order_number,status:o.status,payment_status:o.payment_status,currency:o.currency,amount_total:o.amount_total,created_at:o.created_at,items:(o.items||[]).map(x=>({...x,name:decodeEntities(x.name),selection:decodeEntities(x.selection)})),shipping:{city:o.shipping?.city||'',region:o.shipping?.region||'',country:o.shipping?.country||''},printify_order_id:o.printify_order_id||null}}
 
 export default async(req)=>{
  const store=getStore(STORE);
@@ -19,6 +20,7 @@ export default async(req)=>{
   const action=String(b.action||''), e=email(b.email);
   if(action==='request_code'){
    if(!/^\S+@\S+\.\S+$/.test(e))return Response.json({error:'Enter a valid email.'},{status:400});
+   const now=Date.now(), emailRateKey='rate/email/'+await digest(e), ip=String(req.headers.get('x-nf-client-connection-ip')||req.headers.get('x-forwarded-for')||'').split(',')[0].trim(), ipRateKey=ip?'rate/ip/'+await digest(ip):null, emailRate=await store.get(emailRateKey,{type:'json'}).catch(()=>null), ipRate=ipRateKey?await store.get(ipRateKey,{type:'json'}).catch(()=>null):null;if(emailRate&&emailRate.until>now)return Response.json({error:'Please wait before requesting another code.'},{status:429,headers:{'Retry-After':String(Math.max(1,Math.ceil((emailRate.until-now)/1000)))}});if(ipRate&&ipRate.until>now&&Number(ipRate.count||0)>=10)return Response.json({error:'Too many verification requests. Please wait and try again.'},{status:429,headers:{'Retry-After':String(Math.max(1,Math.ceil((ipRate.until-now)/1000)))}});await store.setJSON(emailRateKey,{until:now+60*1000});if(ipRateKey){const state=ipRate&&ipRate.until>now?ipRate:{count:0,until:now+10*60*1000};state.count=Number(state.count||0)+1;await store.setJSON(ipRateKey,state)}
    const c=code(), expires=Date.now()+10*60*1000;
    await store.setJSON('code/'+await digest(e),{hash:await digest(e+'|'+c),expires,attempts:0});
    const sent=await sendVerificationCode({to:e,code:c});
