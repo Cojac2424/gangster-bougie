@@ -25,7 +25,7 @@ async function verifySignature(raw,header,secret){
 async function printifyOrder(id){
  const token=process.env.PRINTIFY_API_TOKEN;
  if(!token)throw new Error('printify_token_missing');
- const r=await fetch(`${API}/shops/${encodeURIComponent(SHOP_ID)}/orders/${encodeURIComponent(id)}.json`,{headers:{Authorization:'Bearer '+token}});
+ const r=await fetch(`${API}/shops/${encodeURIComponent(SHOP_ID)}/orders/${encodeURIComponent(id)}.json`,{headers:{Authorization:'Bearer '+token,'User-Agent':'Gangster-Bougie'}});
  if(!r.ok)throw new Error('printify_order_lookup_failed_'+r.status);
  return r.json();
 }
