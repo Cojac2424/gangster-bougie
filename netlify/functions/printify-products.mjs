@@ -26,8 +26,10 @@ export default async (req) => {
     }
 
     const source = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
-    const target = new URL(req.url).searchParams.get('id');
-    const products = source.filter(product=>!target||product.id===target).map((product) => ({
+    const params = new URL(req.url).searchParams;
+    const target = params.get('id');
+    const title = String(params.get('title')||'').toLowerCase();
+    const products = source.filter(product=>(!target||product.id===target)&&(!title||String(product.title||'').toLowerCase().includes(title))).map((product) => ({
       id: product.id,
       title: product.title,
       blueprint_id: product.blueprint_id,
