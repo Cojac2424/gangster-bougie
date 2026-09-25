@@ -66,3 +66,16 @@ export async function markGbOrderConfirmationSent(orderNumber){
  await store.setJSON(orderKey(updated),updated);
  return {ok:true,record:updated};
 }
+
+
+export async function updateGbOrderTracking(orderNumber,{printify_order_id=null,tracking=null,tracking_email_sent_at=null}={}){
+ const store=getStore(STORE), current=await getGbOrderByNumber(orderNumber);
+ if(!current)return {ok:false,error:'order_not_found'};
+ const existing=Array.isArray(current.tracking)?current.tracking:[];
+ const next=tracking&&tracking.number?[...existing.filter(x=>String(x.number)!==String(tracking.number)),tracking]:existing;
+ const already_notified=Boolean(current.tracking_email_sent_at)||Boolean(tracking&&existing.some(x=>String(x.number)===String(tracking.number)&&x.email_sent_at));
+ const updated={...current,printify_order_id:printify_order_id||current.printify_order_id||null,status:'shipped',tracking:next,tracking_email_sent_at:tracking_email_sent_at||current.tracking_email_sent_at||null,updated_at:new Date().toISOString()};
+ await store.setJSON(orderKey(updated),updated);
+ if(updated.printify_order_id)await store.set('printify/'+encodeURIComponent(updated.printify_order_id),updated.order_number);
+ return {ok:true,record:updated,already_notified};
+}
