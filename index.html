@@ -2643,4 +2643,63 @@
  });
 })();
 </script>
+
+<style id="gb-size-guide-styles">
+.gb-size-guide-btn{margin-top:9px;border:0;background:transparent;color:var(--gold-light);font-weight:900;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 0;font-size:.82rem}
+#gbSizeGuide{position:fixed;inset:0;z-index:260;background:rgba(0,0,0,.88);display:none;padding:18px;overflow:auto}
+#gbSizeGuide.open{display:grid;place-items:center}
+.gb-size-box{width:min(760px,100%);background:#0b0b0b;border:1px solid var(--gold);border-radius:12px;padding:22px;position:relative}
+.gb-size-close{position:absolute;right:12px;top:10px;width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:#111;color:var(--gold-light);font-size:1.3rem;cursor:pointer}
+.gb-size-box h3{font-family:'Bodoni Moda',serif;color:var(--gold-light);text-transform:uppercase;font-size:1.55rem;padding-right:48px;margin-bottom:4px}
+.gb-size-sub{color:#aaa;font-size:.8rem;margin-bottom:12px}
+.gb-size-note{color:#f4cf63;font-weight:800;font-size:.82rem;margin:0 0 10px}
+.gb-size-units{display:flex;gap:7px;margin-bottom:12px}.gb-size-unit{border:1px solid #555;background:#111;color:#fff;padding:7px 13px;border-radius:999px;cursor:pointer;font-weight:800}.gb-size-unit.active{border-color:var(--gold);color:var(--gold-light)}
+.gb-size-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.gb-size-table{width:100%;border-collapse:collapse;min-width:520px;font-size:.84rem}.gb-size-table th,.gb-size-table td{padding:9px 8px;border-bottom:1px solid #292929;text-align:center}.gb-size-table th:first-child,.gb-size-table td:first-child{text-align:left;color:var(--gold-light);font-weight:800}.gb-size-table thead th{color:#fff;background:#141414}
+@media(max-width:680px){.gb-size-box{padding:18px 12px}.gb-size-box h3{font-size:1.25rem}.gb-size-table{font-size:.76rem}.gb-size-table th,.gb-size-table td{padding:8px 6px}}
+</style>
+<script id="gb-size-guide-script">
+(function(){
+ const charts={
+  sports:{title:'Sports Bra Size Guide',sizes:['S','M','L','XL','2XL'],rows:[['Bust',14.57,15.35,16.14,16.93,17.72],['Waist',12.20,12.99,13.78,14.57,15.35],['Size tolerance',1,1,1,1,1]]},
+  leggings:{title:'High-Waisted Leggings Size Guide',sizes:['XS','S','M','L','XL','2XL'],note:'Runs small — consider sizing up.',rows:[['Waist width',13.39,13.58,13.78,13.98,14.17,14.37],['Hip width',16.14,16.54,17.40,18.31,19.21,20.08],['Outseam length',36.81,37.40,37.99,38.58,39.17,39.76],['Inseam length',26.97,27.56,28.15,28.74,29.33,29.92]]},
+  shorts:{title:'Workout Shorts Size Guide',sizes:['XS','S','M','L','XL'],rows:[['Waist width','12–13','14–15','15–16','17–18','18–19'],['Hip width',16,17.5,19,21,22.5],['Inseam',13,13.8,14.4,15.3,17.4]]},
+  baby:{title:'Baby Bougie Tee Size Guide',sizes:['S','M','L','XL','2XL'],rows:[['Chest width',15.5,16.5,17.8,19,19.8],['Bottom width',14.5,15.5,16.8,18,18.8],['Front length',18.5,19,19.5,20,20.5],['Shoulders',14.2,14.5,14.9,15.2,15.6]]},
+  hoodie:{title:"Crowned Luxury Full-Zip Hoodie Size Guide",sizes:['S','M','L','XL','2XL'],rows:[['Length',27.20,28.20,29.10,30.20,31.10]]},
+  rib:{title:'Basketball Rib Shorts Size Guide',sizes:['S','M','L','XL','2XL','3XL'],rows:[['Waist',13.50,14.49,15.47,16.50,17.48,18.50]]}
+ };
+ function keyFor(name){
+  const n=(name||'').toLowerCase();
+  if(n.includes('baby bougie')||n.includes('baby tee'))return'baby';
+  if(n.includes('sports bra'))return'sports';
+  if(n.includes('legging'))return'leggings';
+  if(n.includes('workout shorts')||n==='shorts – black'||n==='shorts – white'||n==='shorts - black'||n==='shorts - white')return'shorts';
+  if(n.includes('full-zip hoodie')||n.includes('full zip hoodie'))return'hoodie';
+  if(n.includes('basketball rib shorts'))return'rib';
+  return null;
+ }
+ const overlay=document.createElement('div');overlay.id='gbSizeGuide';overlay.setAttribute('aria-hidden','true');
+ overlay.innerHTML='<div class="gb-size-box" role="dialog" aria-modal="true" aria-labelledby="gbSizeTitle"><button class="gb-size-close" type="button" aria-label="Close size guide">×</button><h3 id="gbSizeTitle"></h3><div class="gb-size-sub">All measurements refer to garment dimensions.</div><div class="gb-size-note" id="gbSizeNote"></div><div class="gb-size-units"><button type="button" class="gb-size-unit active" data-unit="in">IN</button><button type="button" class="gb-size-unit" data-unit="cm">CM</button></div><div class="gb-size-scroll" id="gbSizeTable"></div></div>';
+ document.body.appendChild(overlay);
+ let active=null,unit='in';
+ function val(v){if(typeof v==='string'&&v.includes('–')){const p=v.split('–').map(Number);return unit==='in'?v:p.map(x=>(x*2.54).toFixed(1)).join('–')}if(typeof v!=='number')return v;return unit==='in'?(Number.isInteger(v)?String(v):v.toFixed(2).replace(/0$/,'')):(v*2.54).toFixed(1)}
+ function render(){if(!active)return;const c=charts[active];document.getElementById('gbSizeTitle').textContent=c.title;document.getElementById('gbSizeNote').textContent=c.note||'';let h='<table class="gb-size-table"><thead><tr><th>Measurement</th>'+c.sizes.map(s=>'<th>'+s+'</th>').join('')+'</tr></thead><tbody>';c.rows.forEach(r=>{h+='<tr><td>'+r[0]+'</td>'+r.slice(1).map(v=>'<td>'+val(v)+(unit==='in'?'"':' cm')+'</td>').join('')+'</tr>'});h+='</tbody></table>';document.getElementById('gbSizeTable').innerHTML=h;overlay.querySelectorAll('.gb-size-unit').forEach(b=>b.classList.toggle('active',b.dataset.unit===unit))}
+ function open(k){active=k;unit='in';render();overlay.classList.add('open');overlay.setAttribute('aria-hidden','false')}
+ function close(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true')}
+ overlay.querySelector('.gb-size-close').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close()});overlay.querySelectorAll('.gb-size-unit').forEach(b=>b.onclick=()=>{unit=b.dataset.unit;render()});
+ function install(){
+  document.querySelectorAll('.modal').forEach(modal=>{
+   if(modal.querySelector('.gb-size-guide-btn'))return;
+   const heading=modal.querySelector('.sports-info h2,.detail-copy h2,h2');
+   if(!heading)return;const k=keyFor(heading.textContent);if(!k)return;
+   const sizes=modal.querySelector('.sports-size-block,.sizes');
+   if(!sizes)return;
+   const btn=document.createElement('button');btn.type='button';btn.className='gb-size-guide-btn';btn.textContent='📏 Size Guide';btn.onclick=e=>{e.preventDefault();e.stopPropagation();open(k)};
+   const block=sizes.closest('.sports-size-block')||sizes.parentElement;block.appendChild(btn);
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+ new MutationObserver(install).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
 </body></html>
