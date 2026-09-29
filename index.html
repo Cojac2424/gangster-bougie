@@ -2689,9 +2689,11 @@
  function install(){
   document.querySelectorAll('.modal').forEach(modal=>{
    if(modal.querySelector('.gb-size-guide-btn'))return;
+   const idMap={sportsBraModal:'sports',leggingsModal:'leggings',shortsModal:'shorts',babyTeeModal:'baby',ribShortsModal:'rib'};
    const heading=modal.querySelector('.sports-info h2,.detail-copy h2,h2');
-   if(!heading)return;const k=keyFor(heading.textContent);if(!k)return;
-   const sizes=modal.querySelector('.sports-size-block,.sizes');
+   const k=idMap[modal.id]||keyFor(heading?heading.textContent:'');
+   if(!k)return;
+   const sizes=modal.querySelector('.sports-size-block,.sizes,[id$="Sizes"]');
    if(!sizes)return;
    const btn=document.createElement('button');btn.type='button';btn.className='gb-size-guide-btn';btn.textContent='📏 Size Guide';btn.onclick=e=>{e.preventDefault();e.stopPropagation();open(k)};
    const block=sizes.closest('.sports-size-block')||sizes.parentElement;block.appendChild(btn);
