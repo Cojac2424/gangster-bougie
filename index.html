@@ -2603,4 +2603,23 @@
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
+<script>/* Full product-card click targets */
+(function(){
+ function clickExistingButton(card, selector, e){
+  if(!card || e.target.closest('button,a,input,select,textarea,label,summary,details')) return;
+  var button=card.querySelector(selector);
+  if(button) button.click();
+ }
+ document.addEventListener('click',function(e){
+  var card=e.target.closest('.gb-women-card');
+  if(card){clickExistingButton(card,'.gb-women-view',e);return}
+  card=e.target.closest('.gb-men-card');
+  if(card){clickExistingButton(card,'.gb-men-view',e);return}
+  card=e.target.closest('.gb-access-card');
+  if(card){clickExistingButton(card,'.gb-access-view',e);return}
+  card=e.target.closest('.product-card');
+  if(card){clickExistingButton(card,'.view-item',e);return}
+ });
+})();
+</script>
 </body></html>
