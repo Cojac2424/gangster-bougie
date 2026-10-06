@@ -48,7 +48,7 @@
         if(added.length)send('add_to_cart',{currency:CURRENCY,value:value(added),items:added});
       },0);
     }
-  },false);
+  },true);
   document.addEventListener('gb:checkout-start',function(){
     var items=cart();if(items.length)send('begin_checkout',{currency:CURRENCY,value:value(items),items:items});
   });
