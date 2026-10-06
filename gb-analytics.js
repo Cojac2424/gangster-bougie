@@ -2,7 +2,21 @@
 (function(){
   'use strict';
   var CURRENCY='USD';
+  var META_PIXEL_ID='4066826013612662';
+  (function(f,b,e,v,n,t,s){
+    if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+    t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);
+  })(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  window.fbq('init',META_PIXEL_ID);
+  window.fbq('track','PageView');
   function send(name,params){if(typeof window.gtag==='function')window.gtag('event',name,params||{});}
+  function meta(name,p){
+    if(typeof window.fbq!=='function'||!p)return;
+    var items=p.items||[];
+    var mp={currency:p.currency||CURRENCY,value:Number(p.value)||0,content_type:'product',contents:items.map(function(x){return {id:x.item_name,quantity:Number(x.quantity)||1,item_price:Number(x.price)||0};}),content_ids:items.map(function(x){return x.item_name;})};
+    window.fbq('track',name,mp);
+  }
   function moneyText(v){var m=String(v||'').replace(/,/g,'').match(/([0-9]+(?:\.[0-9]+)?)/);return m?Number(m[1]):0;}
   function item(name,variant,price,qty){return {item_name:String(name||'Gangster Bougie Item').trim(),item_variant:String(variant||'').trim(),price:Number(price)||0,quantity:Number(qty)||1};}
   function cart(){
@@ -27,7 +41,7 @@
     var view=e.target.closest('.gb-women-view,.gb-men-view,.gb-access-view,.view-item');
     if(view){
       var cp=cardProduct(view.closest('.gb-women-card,.gb-men-card,.gb-access-card,.product-card'));
-      if(cp)send('view_item',{currency:CURRENCY,value:cp.price,items:[cp]});
+      if(cp){var vp={currency:CURRENCY,value:cp.price,items:[cp]};send('view_item',vp);meta('ViewContent',vp);}
       return;
     }
     var add=e.target.closest('#gbWqAdd,#gbMqAdd,.sports-add');
@@ -37,7 +51,7 @@
         var after=cart(),afterCount=after.reduce(function(n,x){return n+x.quantity;},0);
         if(afterCount>beforeCount){
           var p=visibleProduct()||after[after.length-1];
-          if(p)send('add_to_cart',{currency:CURRENCY,value:p.price,items:[p]});
+          if(p){var ap={currency:CURRENCY,value:p.price,items:[p]};send('add_to_cart',ap);meta('AddToCart',ap);}
         }
       },0);
     }
@@ -45,12 +59,12 @@
       var beforeFit=cart();
       setTimeout(function(){
         var afterFit=cart(),added=afterFit.slice(beforeFit.length);
-        if(added.length)send('add_to_cart',{currency:CURRENCY,value:value(added),items:added});
+        if(added.length){var fp={currency:CURRENCY,value:value(added),items:added};send('add_to_cart',fp);meta('AddToCart',fp);}
       },0);
     }
   },true);
   document.addEventListener('gb:checkout-start',function(){
-    var items=cart();if(items.length)send('begin_checkout',{currency:CURRENCY,value:value(items),items:items});
+    var items=cart();if(items.length){var cp={currency:CURRENCY,value:value(items),items:items};send('begin_checkout',cp);meta('InitiateCheckout',cp);}
   });
   function purchase(){
     var q=new URLSearchParams(location.search),sid=q.get('session_id');
@@ -59,7 +73,7 @@
     var raw=sessionStorage.getItem('gbGa4CheckoutCart'),items=[];
     try{items=JSON.parse(raw||'[]');}catch(_){}
     if(!items.length)items=cart();
-    send('purchase',{transaction_id:sid,currency:CURRENCY,value:value(items),items:items});
+    var pp={transaction_id:sid,currency:CURRENCY,value:value(items),items:items};send('purchase',pp);meta('Purchase',pp);
     sessionStorage.setItem(key,'1');sessionStorage.removeItem('gbGa4CheckoutCart');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',purchase);else purchase();
