@@ -6,10 +6,10 @@ function esc(v){return decodeEntities(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<'
 function from(){return process.env.GB_EMAIL_FROM||'Gangster Bougie <onboarding@resend.dev>'}
 async function send({to,subject,html}){
  const key=process.env.RESEND_API_KEY;
- if(!key)return {ok:false,error:'resend_not_configured'};
+ if(!key)throw new Error('RESEND_API_KEY is not configured');
  const r=await fetch(API,{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({from:from(),to:[to],subject,html})});
  const d=await r.json().catch(()=>({}));
- if(!r.ok)return {ok:false,error:'resend_send_failed',status:r.status,details:d};
+ if(!r.ok)throw new Error('Resend rejected email ('+r.status+'): '+JSON.stringify(d).slice(0,500));
  return {ok:true,id:d.id||null};
 }
 export async function sendVerificationCode({to,code}){
