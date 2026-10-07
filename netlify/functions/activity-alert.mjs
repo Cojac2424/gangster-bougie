@@ -18,5 +18,5 @@ export default async(req)=>{
  if(!allowed.has(body.event))return Response.json({ok:false,error:'unsupported_event'},{status:400});
  const items=(Array.isArray(body.items)?body.items:[]).slice(0,20).map(x=>({name:clean(x.name||x.item_name,180),variant:clean(x.variant||x.item_variant||x.size,100),price:Number(x.price)||0,quantity:Math.max(1,Math.min(20,Number(x.quantity||x.qty)||1))}));
  const payload={event:body.event,source:sourceFrom(body.referrer,body.source),device:clean(body.device,100)||'Unknown device',browser:clean(body.browser,100)||'Unknown browser',items,value:body.value===null||body.value===undefined?null:Number(body.value)||0,currency:'USD',time:new Date().toISOString()};
- try{const sent=await sendAdminActivityAlert(payload);return Response.json({ok:!!sent.ok})}catch(e){console.error('GB ACTIVITY ALERT FAILED',String(e?.message||e));return Response.json({ok:false},{status:502})}
+ try{const sent=await sendAdminActivityAlert(payload);console.log('GB ACTIVITY ALERT SENT',JSON.stringify({event:payload.event,source:payload.source,email_id:sent.id||null}));return Response.json({ok:true})}catch(e){console.error('GB ACTIVITY ALERT FAILED',JSON.stringify({event:payload.event,error:String(e?.message||e)}));return Response.json({ok:false,error:'email_delivery_failed'},{status:502})}
 };
