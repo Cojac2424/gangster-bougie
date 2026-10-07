@@ -7,6 +7,7 @@ import { buildGbOrderRecord } from './lib/gb-order-record.mjs';
 import { saveGbOrder, updateGbOrderFulfillment, markGbOrderConfirmationSent } from './lib/gb-order-store.mjs';
 import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 import { sendOrderConfirmation } from './lib/gb-email.mjs';
+import { sendGangsterBougieActivityEmail } from './visitor-email.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -72,6 +73,31 @@ export default async(req)=>{
    if(!saved.ok){
      console.error('GB ORDER STORAGE REJECTED',JSON.stringify({event_id:event.id,session_id:s.id,error:saved.error}));
      return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
+   }
+   // Send the owner a verified-purchase alert only for a newly created paid order.
+   // This is non-fatal: an email problem can never block Stripe/Printify/order processing.
+   if(saved.created){
+    try{
+     const saleItems=(full.line_items?.data||[]).map(li=>({
+      name:li.price?.product?.metadata?.storefront_name||li.price?.product?.name||li.description||'Item',
+      variant:li.price?.product?.metadata?.storefront_selection||'',
+      quantity:li.quantity||1,
+      price:(Number(li.amount_total)||0)/Math.max(1,Number(li.quantity)||1)/100
+     }));
+     await sendGangsterBougieActivityEmail({
+      event:'purchase',
+      path:'/checkout',
+      source:'Verified Stripe payment',
+      device:'Stripe Checkout',
+      items:saleItems,
+      value:(Number(full.amount_total)||0)/100,
+      currency:String(full.currency||'usd').toUpperCase(),
+      orderNumber:saved.record.order_number,
+      customerEmail:full.customer_details?.email||full.customer_email||''
+     });
+    }catch(e){
+     console.error('GB PURCHASE ALERT FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:String(e?.message||e)}));
+    }
    }
    // Printify auto-fulfillment is intentionally gated twice:
    // 1) only real Stripe live-mode payments can submit; sandbox/test payments never can;
