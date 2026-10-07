@@ -29,3 +29,14 @@ export async function sendShippingConfirmation(order){
  const links=tracks.map(t=>`<div style="margin:14px 0;padding:14px;border:1px solid #444;border-radius:10px"><p style="margin:0 0 6px"><strong>Carrier:</strong> ${esc(t.carrier||'Shipping carrier')}</p><p style="margin:0 0 10px"><strong>Tracking:</strong> ${esc(t.number||'')}</p>${t.url?`<a href="${esc(t.url)}" style="display:inline-block;background:#d8a928;color:#070707;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:8px">TRACK YOUR ORDER</a>`:''}</div>`).join('');
  return send({to:order.customer?.email,subject:`Your Gangster Bougie order ${order.order_number} has shipped`,html:`<div style="background:#070707;color:#fff;padding:32px;font-family:Arial,sans-serif"><div style="max-width:600px;margin:auto;border:1px solid #d8a928;border-radius:14px;padding:28px"><h1 style="color:#d8a928;margin-top:0">YOUR ORDER HAS SHIPPED</h1><p><strong>Order:</strong> ${esc(order.order_number)}</p><p>Your tracking information is below.</p>${links}<p style="color:#d8a928;font-weight:700">Gangster Bougie</p></div></div>`});
 }
+
+
+export async function sendAdminActivityAlert({event,source='Direct / Unknown',device='Unknown device',browser='Unknown browser',items=[],value=null,currency='USD',order_number='',time=''}) {
+ const admin=process.env.GB_ADMIN_EMAIL||'gangsterbougie@gmail.com';
+ const labels={visit:'👀 New Gangster Bougie Visitor',view_item:'🔥 Product Viewed',add_to_cart:'🛒 Added to Cart',begin_checkout:'💳 Checkout Started',purchase:'💰 SALE — Gangster Bougie Order'};
+ const title=labels[event]||'Gangster Bougie Activity';
+ const money=n=>Number.isFinite(Number(n))?Number(n).toLocaleString('en-US',{style:'currency',currency:currency||'USD'}):'';
+ const rows=(Array.isArray(items)?items:[]).map(x=>`<tr><td style="padding:6px 10px 6px 0">${esc(x.name||x.item_name||'Item')}${x.variant||x.item_variant||x.size||x.selection?' — '+esc(x.variant||x.item_variant||x.size||x.selection):''}</td><td style="padding:6px 0;text-align:right">× ${esc(x.quantity||x.qty||1)}${Number.isFinite(Number(x.price))?' · '+esc(money(x.price)):''}</td></tr>`).join('');
+ const details=`${order_number?`<p><strong>Order:</strong> ${esc(order_number)}</p>`:''}<p><strong>Time:</strong> ${esc(time||new Date().toISOString())}</p><p><strong>Source:</strong> ${esc(source)}</p><p><strong>Device:</strong> ${esc(device)}</p><p><strong>Browser:</strong> ${esc(browser)}</p>${rows?`<table style="width:100%;color:#fff;border-collapse:collapse">${rows}</table>`:''}${value!==null?`<p><strong>Value:</strong> ${esc(money(value))}</p>`:''}`;
+ return send({to:admin,subject:title,html:`<div style="background:#070707;color:#fff;padding:28px;font-family:Arial,sans-serif"><div style="max-width:600px;margin:auto;border:1px solid #d8a928;border-radius:14px;padding:24px"><h2 style="color:#d8a928;margin-top:0">${esc(title)}</h2>${details}<p style="color:#d8a928;font-weight:700">Gangster Bougie</p></div></div>`});
+}
