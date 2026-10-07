@@ -39,7 +39,7 @@ export default async(req)=>{
   console.error('GB VISITOR EMAIL FAILED: RESEND_API_KEY missing');
   return Response.json({ok:false,error:'email_not_configured'},{status:500});
  }
- const to=String(process.env.GB_ADMIN_EMAIL||'gangsterbougie@gmail.com').trim();
+ const to='gangsterbougie@gmail.com';
  const from=process.env.GB_EMAIL_FROM||'Gangster Bougie <onboarding@resend.dev>';
  const path=String(body.path||'/').slice(0,400);
  const referrer=String(body.referrer||'').slice(0,500);
