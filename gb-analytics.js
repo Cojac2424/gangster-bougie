@@ -11,6 +11,18 @@
   window.fbq('init',META_PIXEL_ID);
   window.fbq('track','PageView');
   function send(name,params){if(typeof window.gtag==='function')window.gtag('event',name,params||{});}
+  function source(){
+    var q=new URLSearchParams(location.search),u=(q.get('utm_source')||'').trim();
+    if(u)return u;
+    var r=document.referrer||'',h='';try{h=new URL(r).hostname.toLowerCase()}catch(_){}
+    if(/tiktok/.test(h))return 'TikTok';if(/instagram/.test(h))return 'Instagram';if(/facebook|fb\\.com|l\\.facebook/.test(h))return 'Facebook';if(/google/.test(h))return 'Google';return h||'Direct / Unknown';
+  }
+  function device(){var u=navigator.userAgent||'';if(/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))return 'iPad';if(/iPhone/.test(u))return 'iPhone';if(/Android/.test(u))return 'Android';return /Mobi/.test(u)?'Mobile':'Desktop';}
+  function browser(){var u=navigator.userAgent||'';if(/Edg\\//.test(u))return 'Edge';if(/CriOS|Chrome\\//.test(u))return 'Chrome';if(/FxiOS|Firefox\\//.test(u))return 'Firefox';if(/Safari\\//.test(u))return 'Safari';return 'Other';}
+  function alertAdmin(event,p){
+    p=p||{};var body={event:event,source:source(),referrer:document.referrer||'',device:device(),browser:browser(),items:(p.items||[]).map(function(x){return {name:x.item_name,variant:x.item_variant,price:x.price,quantity:x.quantity};}),value:p.value==null?null:p.value};
+    try{fetch('/.netlify/functions/activity-alert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true}).catch(function(){});}catch(_){}
+  }
   function meta(name,p){
     if(typeof window.fbq!=='function'||!p)return;
     var items=p.items||[];
@@ -37,11 +49,12 @@
     var p=card.querySelector('.gb-women-price,.gb-men-price,.gb-access-price,.product-price,.price');
     return item(n&&n.textContent,'',moneyText(p&&p.textContent),1);
   }
+  alertAdmin('visit',{});
   document.addEventListener('click',function(e){
     var view=e.target.closest('.gb-women-view,.gb-men-view,.gb-access-view,.view-item');
     if(view){
       var cp=cardProduct(view.closest('.gb-women-card,.gb-men-card,.gb-access-card,.product-card'));
-      if(cp){var vp={currency:CURRENCY,value:cp.price,items:[cp]};send('view_item',vp);meta('ViewContent',vp);}
+      if(cp){var vp={currency:CURRENCY,value:cp.price,items:[cp]};send('view_item',vp);meta('ViewContent',vp);alertAdmin('view_item',vp);}
       return;
     }
     var add=e.target.closest('#gbWqAdd,#gbMqAdd,.sports-add');
@@ -51,7 +64,7 @@
         var after=cart(),afterCount=after.reduce(function(n,x){return n+x.quantity;},0);
         if(afterCount>beforeCount){
           var p=visibleProduct()||after[after.length-1];
-          if(p){var ap={currency:CURRENCY,value:p.price,items:[p]};send('add_to_cart',ap);meta('AddToCart',ap);}
+          if(p){var ap={currency:CURRENCY,value:p.price,items:[p]};send('add_to_cart',ap);meta('AddToCart',ap);alertAdmin('add_to_cart',ap);}
         }
       },0);
     }
@@ -59,12 +72,12 @@
       var beforeFit=cart();
       setTimeout(function(){
         var afterFit=cart(),added=afterFit.slice(beforeFit.length);
-        if(added.length){var fp={currency:CURRENCY,value:value(added),items:added};send('add_to_cart',fp);meta('AddToCart',fp);}
+        if(added.length){var fp={currency:CURRENCY,value:value(added),items:added};send('add_to_cart',fp);meta('AddToCart',fp);alertAdmin('add_to_cart',fp);}
       },0);
     }
   },true);
   document.addEventListener('gb:checkout-start',function(){
-    var items=cart();if(items.length){var cp={currency:CURRENCY,value:value(items),items:items};send('begin_checkout',cp);meta('InitiateCheckout',cp);}
+    var items=cart();if(items.length){var cp={currency:CURRENCY,value:value(items),items:items};send('begin_checkout',cp);meta('InitiateCheckout',cp);alertAdmin('begin_checkout',cp);}
   });
   function purchase(){
     var q=new URLSearchParams(location.search),sid=q.get('session_id');
