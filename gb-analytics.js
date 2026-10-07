@@ -21,7 +21,7 @@
   function browser(){var u=navigator.userAgent||'';if(/Edg\\//.test(u))return 'Edge';if(/CriOS|Chrome\\//.test(u))return 'Chrome';if(/FxiOS|Firefox\\//.test(u))return 'Firefox';if(/Safari\\//.test(u))return 'Safari';return 'Other';}
   function alertAdmin(event,p){
     p=p||{};var body={event:event,source:source(),referrer:document.referrer||'',device:device(),browser:browser(),items:(p.items||[]).map(function(x){return {name:x.item_name,variant:x.item_variant,price:x.price,quantity:x.quantity};}),value:p.value==null?null:p.value};
-    try{fetch('/.netlify/functions/activity-alert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true}).catch(function(){});}catch(_){}
+    try{fetch('/.netlify/functions/activity-alert',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify(body),keepalive:true}).then(function(r){if(!r.ok)console.error('GB activity alert HTTP '+r.status);}).catch(function(e){console.error('GB activity alert request failed',e);});}catch(e){console.error('GB activity alert request failed',e);}
   }
   function meta(name,p){
     if(typeof window.fbq!=='function'||!p)return;
