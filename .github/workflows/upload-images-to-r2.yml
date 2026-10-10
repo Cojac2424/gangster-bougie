@@ -2,6 +2,11 @@ name: Upload storefront images to R2
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - optimization/bandwidth-lazy-carousel
+    paths:
+      - '.github/workflows/upload-images-to-r2.yml'
 
 jobs:
   upload:
