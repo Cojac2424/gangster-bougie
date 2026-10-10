@@ -577,6 +577,42 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
 gtag('config','G-MRHDQKCTCX');
 </script>
+
+<script id="gb-image-origin-switch">
+/* GB_IMAGE_ORIGIN_SWITCH_V1
+   Default: Cloudflare R2. Test override: ?gb_images=netlify or ?gb_images=r2.
+   Override is session-only; remove the query parameter to return to R2.
+*/
+(function(){
+  var R2='https://assets.gangster-bougie.com/';
+  var q=new URLSearchParams(location.search).get('gb_images');
+  var mode=(q==='netlify'||q==='r2')?q:'r2';
+  window.GB_IMAGE_ORIGIN=mode;
+  if(mode!=='netlify') return;
+  function localize(v){
+    if(typeof v!=='string'||v.indexOf(R2)!==0) return v;
+    return v.slice(R2.length);
+  }
+  document.querySelectorAll('img').forEach(function(img){
+    ['src','data-src'].forEach(function(a){
+      var v=img.getAttribute(a); if(v) img.setAttribute(a,localize(v));
+    });
+  });
+  document.querySelectorAll('[style]').forEach(function(el){
+    var s=el.getAttribute('style');
+    if(s&&s.indexOf(R2)!==-1) el.setAttribute('style',s.split(R2).join(''));
+  });
+  var mo=new MutationObserver(function(ms){
+    ms.forEach(function(m){
+      if(m.type==='attributes'&&(m.attributeName==='src'||m.attributeName==='data-src')){
+        var v=m.target.getAttribute(m.attributeName), n=localize(v);
+        if(v!==n) m.target.setAttribute(m.attributeName,n);
+      }
+    });
+  });
+  mo.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['src','data-src']});
+})();
+</script>
 </head><body>
 <div class="topbar">Gangster Bougie — What Hustle Looks Like</div><header><div class="container nav"><a class="brand" href="#"><div class="brand-mark"><img src="https://assets.gangster-bougie.com/C48AD54C-E4ED-42AE-A74B-7A354C337BDA.png" alt="Gangster Bougie logo" loading="eager" decoding="async" fetchpriority="high"></div><div>Gangster <span class="bougie-display">Bougie</span></div></a><nav class="nav-links"><a href="#lookbook">Lookbook</a><a href="#shop">Shop</a><a href="#about">About</a><a href="#contact">Contact</a><a class="cart-link" href="#" id="gbCartLink">Cart (0)</a></nav></div></header>
 <main><section class="hero"><div class="container hero-grid"><div><div class="eyebrow">Luxury streetwear • Est. 2026</div><h1>Gangster<span class="bougie-display">Bougie</span></h1><p class="hero-copy">Street energy meets luxury taste. Gangster Bougie is for women who hustle hard, move bold, and still like the finer things.</p><div class="hero-actions"><a class="btn btn-gold" href="#lookbook">View Lookbook</a><a class="btn btn-outline" href="#shop">Shop the Drop</a></div></div><div class="hero-card"><img class="hero-logo" src="https://assets.gangster-bougie.com/9DA992EE-4CDE-46D9-A21E-D8EC820F7FBC.png" alt="Gangster Bougie logo" loading="lazy" decoding="async"></div></div></section>
