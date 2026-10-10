@@ -164,3 +164,5 @@ Inventory derived from static image references in index.html on branch optimizat
 - IMG_2029.jpeg
 - IMG_2030.jpeg
 - IMG_2108.jpeg
+
+<!-- Netlify branch-deploy trigger: 2026-10-10. No storefront behavior change. -->
