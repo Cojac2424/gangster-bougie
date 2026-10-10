@@ -1,0 +1,31 @@
+name: Upload storefront images to R2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout optimization branch
+        uses: actions/checkout@v4
+
+      - name: Configure R2 client
+        run: |
+          aws configure set aws_access_key_id "${{ secrets.R2_ACCESS_KEY_ID }}"
+          aws configure set aws_secret_access_key "${{ secrets.R2_SECRET_ACCESS_KEY }}"
+          aws configure set region auto
+
+      - name: Upload image assets only
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+        run: |
+          aws s3 sync . "s3://$R2_BUCKET_NAME" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --exclude "*" \
+            --include "*.png" --include "*.PNG" \
+            --include "*.jpg" --include "*.JPG" \
+            --include "*.jpeg" --include "*.JPEG" \
+            --include "*.webp" --include "*.WEBP" \
+            --no-progress
