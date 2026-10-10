@@ -579,38 +579,21 @@ gtag('config','G-MRHDQKCTCX');
 </script>
 
 <script id="gb-image-origin-switch">
-/* GB_IMAGE_ORIGIN_SWITCH_V1
-   Default: Cloudflare R2. Test override: ?gb_images=netlify or ?gb_images=r2.
-   Override is session-only; remove the query parameter to return to R2.
+/* GB_IMAGE_ORIGIN_SWITCH_V2
+   Default: Cloudflare R2.
+   Test override: ?gb_images=netlify rewrites the complete HTML source before parsing,
+   so HTML, CSS, inline styles and JavaScript image references all use local Netlify paths.
 */
 (function(){
-  var R2='https://assets.gangster-bougie.com/';
-  var q=new URLSearchParams(location.search).get('gb_images');
-  var mode=(q==='netlify'||q==='r2')?q:'r2';
+  var R2="https://assets.gangster-bougie.com/";
+  var q=new URLSearchParams(location.search).get("gb_images");
+  var mode=(q==="netlify"||q==="r2")?q:"r2";
   window.GB_IMAGE_ORIGIN=mode;
-  if(mode!=='netlify') return;
-  function localize(v){
-    if(typeof v!=='string'||v.indexOf(R2)!==0) return v;
-    return v.slice(R2.length);
+  if(mode!=="netlify") return;
+  var html=document.documentElement.innerHTML;
+  if(html.indexOf(R2)!==-1){
+    document.documentElement.innerHTML=html.split(R2).join("");
   }
-  document.querySelectorAll('img').forEach(function(img){
-    ['src','data-src'].forEach(function(a){
-      var v=img.getAttribute(a); if(v) img.setAttribute(a,localize(v));
-    });
-  });
-  document.querySelectorAll('[style]').forEach(function(el){
-    var s=el.getAttribute('style');
-    if(s&&s.indexOf(R2)!==-1) el.setAttribute('style',s.split(R2).join(''));
-  });
-  var mo=new MutationObserver(function(ms){
-    ms.forEach(function(m){
-      if(m.type==='attributes'&&(m.attributeName==='src'||m.attributeName==='data-src')){
-        var v=m.target.getAttribute(m.attributeName), n=localize(v);
-        if(v!==n) m.target.setAttribute(m.attributeName,n);
-      }
-    });
-  });
-  mo.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['src','data-src']});
 })();
 </script>
 </head><body>
