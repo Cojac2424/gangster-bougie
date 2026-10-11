@@ -44,4 +44,15 @@ export async function recordCommission({affiliateId,orderNumber,stripeSessionId,
  const record={id:crypto.randomUUID(),affiliate_id:affiliateId,order_number:orderNumber,stripe_session_id:stripeSessionId,commission_cents:total,status:'unpaid',lines,earned_at:new Date().toISOString()};
  await store.setJSON(key,record); await store.setJSON('commission-id/'+encodeURIComponent(record.id),record); return {created:true,record};
 }
+export async function recordAffiliateClick({affiliateId,code:affiliateCode}){
+ if(!affiliateId)return null;
+ const store=getStore(STORE), day=new Date().toISOString().slice(0,10), key='clicks/'+encodeURIComponent(affiliateId)+'/'+day;
+ const current=await store.get(key,{type:'json'}).catch(()=>null), record={affiliate_id:affiliateId,affiliate_code:code(affiliateCode),day,count:Math.max(0,Number(current?.count)||0)+1,updated_at:new Date().toISOString()};
+ await store.setJSON(key,record);return record;
+}
+export async function voidCommissionByStripeSession(stripeSessionId,reason='refunded'){
+ const store=getStore(STORE), key='commission/'+encodeURIComponent(stripeSessionId), current=await store.get(key,{type:'json'}).catch(()=>null);
+ if(!current)return {ok:true,found:false}; if(current.status==='void')return {ok:true,found:true,record:current};
+ const record={...current,status:'void',void_reason:String(reason),voided_at:new Date().toISOString()};await store.setJSON(key,record);await store.setJSON('commission-id/'+encodeURIComponent(record.id),record);return {ok:true,found:true,record};
+}
 export {code as normalizeAffiliateCode};
