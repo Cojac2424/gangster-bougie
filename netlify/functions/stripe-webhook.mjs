@@ -8,6 +8,7 @@ import { saveGbOrder, updateGbOrderFulfillment, markGbOrderConfirmationSent } fr
 import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 import { sendOrderConfirmation } from './lib/gb-email.mjs';
 import { sendGangsterBougieActivityEmail } from './visitor-email.mjs';
+import { recordCommission } from './lib/gb-affiliate-store.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -74,7 +75,17 @@ export default async(req)=>{
      console.error('GB ORDER STORAGE REJECTED',JSON.stringify({event_id:event.id,session_id:s.id,error:saved.error}));
      return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
    }
-   // Send the owner a verified-purchase alert only for a newly created paid order.
+   // Credit exactly one affiliate after a verified paid checkout. Payouts are private fixed-dollar amounts per product.
+   const affiliateId=String(full.metadata?.gb_affiliate_id||'').trim();
+   let affiliateCommission=null;
+   if(saved.created && affiliateId){
+    try{
+     affiliateCommission=await recordCommission({affiliateId,orderNumber:saved.record.order_number,stripeSessionId:s.id,items});
+    }catch(e){
+     console.error('GB AFFILIATE COMMISSION RECORD FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:String(e?.message||e)}));
+    }
+   }
+      // Send the owner a verified-purchase alert only for a newly created paid order.
    // This is non-fatal: an email problem can never block Stripe/Printify/order processing.
    if(saved.created){
     try{
