@@ -579,10 +579,10 @@ gtag('config','G-MRHDQKCTCX');
 </script>
 
 <script id="gb-image-origin-switch">
-/* GB_IMAGE_ORIGIN_SWITCH_V2
-   Default: Cloudflare R2.
-   Test override: ?gb_images=netlify rewrites the complete HTML source before parsing,
-   so HTML, CSS, inline styles and JavaScript image references all use local Netlify paths.
+/* GB_IMAGE_ORIGIN_SWITCH_V3
+   Default: Cloudflare R2. Test override: ?gb_images=netlify.
+   In Netlify test mode, keep document parsing intact and rewrite R2 URLs as
+   elements/styles are added or changed. A DOMContentLoaded pass catches static markup.
 */
 (function(){
   var R2="https://assets.gangster-bougie.com/";
@@ -590,10 +590,26 @@ gtag('config','G-MRHDQKCTCX');
   var mode=(q==="netlify"||q==="r2")?q:"r2";
   window.GB_IMAGE_ORIGIN=mode;
   if(mode!=="netlify") return;
-  var html=document.documentElement.innerHTML;
-  if(html.indexOf(R2)!==-1){
-    document.documentElement.innerHTML=html.split(R2).join("");
+  function localize(v){return typeof v==="string"?v.split(R2).join(""):v;}
+  function fixElement(el){
+    if(!el||el.nodeType!==1)return;
+    ["src","data-src","srcset","style"].forEach(function(a){
+      var v=el.getAttribute&&el.getAttribute(a);var n=localize(v);if(v&&n!==v)el.setAttribute(a,n);
+    });
+    if(el.tagName==="STYLE"&&el.textContent&&el.textContent.indexOf(R2)!==-1)el.textContent=localize(el.textContent);
+    if(el.querySelectorAll)el.querySelectorAll("[src],[data-src],[srcset],[style],style").forEach(fixElement);
   }
+  function fixAll(){
+    document.querySelectorAll("[src],[data-src],[srcset],[style],style").forEach(fixElement);
+  }
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){
+      if(m.type==="childList")m.addedNodes.forEach(fixElement);
+      else if(m.type==="attributes")fixElement(m.target);
+      else if(m.type==="characterData"&&m.target.parentElement)fixElement(m.target.parentElement);
+    });
+  }).observe(document.documentElement,{subtree:true,childList:true,attributes:true,characterData:true,attributeFilter:["src","data-src","srcset","style"]});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",fixAll);else fixAll();
 })();
 </script>
 </head><body>
