@@ -41,7 +41,7 @@ export async function recordCommission({affiliateId,orderNumber,stripeSessionId,
  if(existing)return {created:false,record:existing};
  let total=0; const lines=[];
  for(const x of items||[]){const qty=Math.max(1,Math.floor(Number(x.quantity||x.qty)||1)),unit=await getPayoutCents(affiliateId,x.name),amount=unit*qty;total+=amount;lines.push({product:x.name,quantity:qty,payout_per_item_cents:unit,commission_cents:amount});}
- const record={id:crypto.randomUUID(),affiliate_id:affiliateId,order_number:orderNumber,stripe_session_id:stripeSessionId,commission_cents:total,status:'unpaid',lines,earned_at:new Date().toISOString()};
+ const earnedAt=new Date(), eligibleAt=new Date(earnedAt.getTime()+30*24*60*60*1000);const record={id:crypto.randomUUID(),affiliate_id:affiliateId,order_number:orderNumber,stripe_session_id:stripeSessionId,commission_cents:total,status:'pending',lines,earned_at:earnedAt.toISOString(),eligible_for_payout_at:eligibleAt.toISOString()};
  await store.setJSON(key,record); await store.setJSON('commission-id/'+encodeURIComponent(record.id),record); return {created:true,record};
 }
 export async function recordAffiliateClick({affiliateId,code:affiliateCode}){
