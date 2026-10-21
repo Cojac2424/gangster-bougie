@@ -18,7 +18,29 @@ export const COMMISSION_PRODUCT_ALIASES=Object.freeze({
   "Gangster Bougie Embroidered Structured Cap": "Embroidered Structured Cap"
 });
 export const AFFILIATE_LEGACY_UNMAPPED_NAMES=Object.freeze(["Cream High-Waisted Leggings","Oxblood High-Waisted Leggings","Onyx High-Waisted Leggings","Bougie Houndstooth High-Waisted Leggings","Vault High-Waisted Leggings","Heritage Plaid High-Waisted Leggings"]);
-export const AFFILIATE_RATE_PRODUCTS=Object.freeze(SELLABLE_PRODUCT_NAMES.filter(
+// All 52 distinct physical products still need individual cost and shipping verification.
+// Women’s garments share a BASE production cost by type, regardless of pattern or colour.
+// A common affiliate rate must be calculated against the LEAST profitable member of its family.
+export const AFFILIATE_COST_PRODUCTS=Object.freeze(SELLABLE_PRODUCT_NAMES.filter(
  name=>!Object.hasOwn(COMMISSION_PRODUCT_ALIASES,name)&&!AFFILIATE_LEGACY_UNMAPPED_NAMES.includes(name)
 ));
-export const canonicalCommissionName=name=>COMMISSION_PRODUCT_ALIASES[String(name||'').trim()]||String(name||'').trim();
+export const AFFILIATE_RATE_GROUP_LABELS=Object.freeze({
+ 'Onyx Sports Bra':'Women’s Sports Bras — All Designs',
+ 'Onyx Leggings':'Women’s Leggings — All Designs',
+ 'Onyx Workout Shorts':'Women’s Workout Shorts — All Designs'
+});
+export function canonicalCommissionName(value){
+ const raw=String(value||'').trim(),name=COMMISSION_PRODUCT_ALIASES[raw]||raw;
+ if(!AFFILIATE_COST_PRODUCTS.includes(name))return name;
+ if(name.endsWith('Sports Bra')||name.includes('Sports Bra – '))return 'Onyx Sports Bra';
+ if(name.endsWith('Leggings'))return 'Onyx Leggings';
+ if(name.endsWith('Workout Shorts')||name==='Shorts – Black'||name==='Shorts – White')return 'Onyx Workout Shorts';
+ return name;
+}
+export const AFFILIATE_RATE_PRODUCTS=Object.freeze(
+ [...new Set(AFFILIATE_COST_PRODUCTS.map(canonicalCommissionName))].sort()
+);
+export const AFFILIATE_RATE_MEMBERS=Object.freeze(Object.fromEntries(AFFILIATE_RATE_PRODUCTS.map(key=>[
+ key,Object.freeze(AFFILIATE_COST_PRODUCTS.filter(name=>canonicalCommissionName(name)===key))
+])));
+
