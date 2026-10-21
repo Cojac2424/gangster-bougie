@@ -7,6 +7,7 @@ import { normalizeReferralCode, referralExpiryMs, referralIsValid, commissionFor
 import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS} from '../netlify/functions/lib/gb-affiliate-cost-math.mjs';
 import {customerShippingContribution} from '../netlify/functions/lib/gb-shipping-contribution.mjs';
 import {readPrintifyCost} from '../netlify/functions/lib/gb-affiliate-printify-reader.mjs';
+import {affiliateMappedVariants} from '../netlify/functions/lib/fulfillment-resolver.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
  assert.ok(SELLABLE_PRODUCT_NAMES.length >= 50);
@@ -140,6 +141,7 @@ test('verified Printify cost planner rounds DOWN to fixed whole-dollar USD, requ
  assert.equal(row.estimated_profit_cents,2230);
  assert.equal(row.twenty_percent_cents,446);
  assert.equal(row.proposed_commission_cents,400);
+ assert.equal(row.estimated_retained_after_commission_cents,1830);
  assert.equal(planProductCommission({
   name:'Unsafe',retailCents:1999,variantCosts:[],shippingByVariant:[],customerContributionCents:299
  }).status,'needs_review');
@@ -148,10 +150,21 @@ test('verified Printify cost planner rounds DOWN to fixed whole-dollar USD, requ
   shippingByVariant:[{firstItemCents:1000}],customerContributionCents:0
  }).status,'needs_review');
 });
+test('every affiliate product has exact Printify variants and a customer shipping contribution',()=>{
+ for(const name of AFFILIATE_RATE_PRODUCTS){
+   const variants=affiliateMappedVariants(name);
+   assert.ok(variants.length>0,'Missing Printify mapping: '+name);
+   assert.ok(variants.every(v=>v.productId&&Number.isSafeInteger(v.variantId)&&v.variantId>0),'Invalid variant: '+name);
+   assert.ok(Number.isSafeInteger(customerShippingContribution(name)),'Missing customer shipping contribution: '+name);
+ }
+ assert.equal(customerShippingContribution('Gangster Bougie Women’s Signature Crop Tee – Black'),299);
+ assert.equal(customerShippingContribution('Gangster Bougie Women’s Signature Crop Tee – White'),299);
+});
 test('owner admin has private Printify syncing and proposal approval UI',()=>{
  const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
  assert.match(admin,/id="syncPrintifyCosts"/);
  assert.match(admin,/id="approvePrintifyCosts"/);
+ assert.match(admin,/You keep after commission/);
  assert.match(admin,/approve_all_cost_rates/);
  assert.match(admin,/sync_printify_costs/);
 });
