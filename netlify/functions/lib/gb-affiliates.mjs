@@ -79,7 +79,7 @@ export async function getCommissionRate(name){return data().get(await rateKey(na
 export async function listCommissionRates(){return listRecords(data(),'rate/')}
 export async function listCommissions(){return (await listRecords(ledger(),'commission/')).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))}
 export async function getCommissionBySession(session){return ledger().get(ledgerKey(session),{type:'json'})}
-export async function recordVerifiedSale({session,affiliate,items,customerEmail,orderNumber}) {
+export async function recordVerifiedSale({session,affiliate,items,customerEmail,orderNumber,referralCode=''}) {
  if(!session?.id||session.payment_status!=='paid'||!affiliate?.id||!orderNumber)return {ok:false,error:'unverified_sale'};
  const st=ledger(),key=ledgerKey(session.id),existing=await st.get(key,{type:'json'});
  if(existing)return {ok:true,created:false,record:existing};
@@ -93,7 +93,7 @@ export async function recordVerifiedSale({session,affiliate,items,customerEmail,
  const pending=calculated.some(x=>x.commission_cents===null);
  const selfReferral=cleanEmail(customerEmail)===cleanEmail(affiliate.email);
  const now=new Date().toISOString();
- const record={stripe_session_id:session.id,payment_intent:typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null,order_number:orderNumber,affiliate_id:affiliate.id,affiliate_code:affiliate.code,currency:String(session.currency||'usd').toUpperCase(),items:calculated,commission_total_cents:pending?null:calculated.reduce((sum,x)=>sum+x.commission_cents,0),status:selfReferral?'review_self_referral':pending?'needs_rates':'pending_hold',created_at:now,hold_until:new Date(Date.now()+HOLD_DAYS*86400000).toISOString(),paid_at:null,updated_at:now};
+ const record={stripe_session_id:session.id,payment_intent:typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null,order_number:orderNumber,affiliate_id:affiliate.id,affiliate_code:referralCode||affiliate.code,currency:String(session.currency||'usd').toUpperCase(),items:calculated,commission_total_cents:pending?null:calculated.reduce((sum,x)=>sum+x.commission_cents,0),status:selfReferral?'review_self_referral':affiliate.status!=='approved'||(referralCode&&referralCode!==affiliate.code)?'review_inactive_affiliate':pending?'needs_rates':'pending_hold',created_at:now,hold_until:new Date(Date.now()+HOLD_DAYS*86400000).toISOString(),paid_at:null,updated_at:now};
  await st.setJSON(key,record);return {ok:true,created:true,record};
 }
 export async function adminUpdateCommission(session,action,updates={}) {
@@ -115,7 +115,7 @@ export async function adminUpdateCommission(session,action,updates={}) {
   if(row.status==='paid')return {ok:false,error:'Already paid: handle any recovery manually.'};
   row.status='void';row.review_note=String(updates.note||'').trim().slice(0,160);
  }else if(action==='approve_for_payout'){
-  if(!['review_self_referral','pending_hold','needs_rates','refund_review'].includes(row.status)||!Number.isInteger(row.commission_total_cents))return {ok:false,error:'Set all product rates before approval.'};
+  if(!['review_self_referral','review_inactive_affiliate','pending_hold','needs_rates','refund_review'].includes(row.status)||!Number.isInteger(row.commission_total_cents))return {ok:false,error:'Set all product rates before approval.'};
   row.status='approved_for_payout';row.review_note=String(updates.note||'').trim().slice(0,160);
  }else return {ok:false,error:'Invalid action.'};
  row.updated_at=now;await st.setJSON(key,row);return {ok:true,record:row};
