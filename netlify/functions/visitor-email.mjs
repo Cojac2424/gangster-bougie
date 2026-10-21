@@ -56,6 +56,13 @@ function labels(event){
 export async function sendGangsterBougieActivityEmail({
  event='visit',path='/',referrer='',source='',ua='',device='',items=[],value=null,currency='USD',orderNumber='',customerEmail=''
 }={}){
+ // Browsing-activity alerts are paused by default to protect the Resend quota.
+ // Owner may explicitly re-enable later using GB_BROWSING_EMAIL_ALERTS=true in Netlify.
+ // Verified purchase alerts continue unaffected; customer orders, verification codes,
+ // and affiliate emails use separate transactional mail functions.
+ if(event!=='purchase'&&process.env.GB_BROWSING_EMAIL_ALERTS!=='true'){
+  return {ok:true,paused:true};
+ }
  const key=process.env.RESEND_API_KEY;
  if(!key)throw new Error('RESEND_API_KEY is not configured');
  const to='gangsterbougie@gmail.com';
@@ -94,7 +101,7 @@ export default async(req)=>{
  const allowed=new Set(['visit','view_item','add_to_cart','begin_checkout']);
  if(!allowed.has(body.event))return Response.json({ok:false,error:'unsupported_event'},{status:400});
  try{
-  await sendGangsterBougieActivityEmail({
+  const result=await sendGangsterBougieActivityEmail({
    event:body.event,
    path:clean(body.path||'/',400),
    referrer:clean(body.referrer||'',500),
@@ -104,7 +111,7 @@ export default async(req)=>{
    value:body.value===null||body.value===undefined?null:Number(body.value)||0,
    currency:'USD'
   });
-  return Response.json({ok:true});
+  return Response.json(result.paused?{ok:true,paused:true}:{ok:true});
  }catch(e){
   console.error('GB ACTIVITY EMAIL FAILED',JSON.stringify({event:body.event,error:String(e?.message||e)}));
   return Response.json({ok:false,error:'send_failed'},{status:502});
