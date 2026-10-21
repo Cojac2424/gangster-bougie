@@ -59,3 +59,19 @@ export function resolveCart(items){
  const bad=resolved.filter(x=>!x.ok);
  return {ok:bad.length===0,error:bad.length?'unresolved_items':null,items:resolved,unresolved:bad};
 }
+
+/**
+ * Read-only list of exact configured Printify variants for a commissionable product.
+ * Used by the owner-only Printify cost sync, never by public checkout.
+ */
+export function affiliateMappedVariants(name){
+ const key=canonicalName(name),entry=ALL[key];if(!entry)return [];
+ const rows=[];
+ if(entry.sizes)for(const [option,variantId] of Object.entries(entry.sizes))rows.push({productId:entry.product_id,variantId:Number(variantId),option});
+ else if(entry.colors)for(const [option,value] of Object.entries(entry.colors))rows.push({
+  productId:typeof value==='number'?entry.product_id:value.product_id,
+  variantId:Number(typeof value==='number'?value:value.variant_id),option
+ });
+ else if(entry.variant_id)rows.push({productId:entry.product_id,variantId:Number(entry.variant_id),option:'One Size'});
+ return rows.filter(r=>r.productId&&Number.isSafeInteger(r.variantId)&&r.variantId>0);
+}
