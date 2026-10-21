@@ -1400,9 +1400,9 @@ gtag('config','G-MRHDQKCTCX');
   const sig=[name,a.country,a.state,a.city,a.postal_code,a.line1,a.line2||'',gbCheckoutCart.map(x=>x.name+'|'+x.size+'|'+x.qty).join(';')].join('|');
   if(sig===gbQuotedAddress&&gbActions.getSession().shipping){gbQuoteBusy=false;updateSummary(gbActions.getSession());return}
   gbLastQuote=sig;gbQuoteBusy=true;gbQuoteError='';gbAddressEntered=true;gbQuotedAddress='';updateSummary(gbActions.getSession());
-  // Save the complete address into the Stripe Checkout Session before quoting shipping.
-  const saved=await gbActions.updateShippingAddress({name,address:{country:a.country,line1:a.line1,line2:a.line2||null,city:a.city,state:a.state,postal_code:a.postal_code}});
-  if(saved.type==='error')throw new Error(saved.error?.message||'Unable to confirm delivery address.');
+  // The mounted Stripe Shipping Address Element owns the shipping address at confirm().
+  // Never call updateShippingAddress() while it is mounted: Stripe rejects that combination.
+  // Quote Printify from the Element's completed value without separately overwriting Stripe's address.
   if(version!==gbQuoteVersion)return;
   const s=gbActions.getSession(),body={session_id:s.id,items:gbCheckoutCart,address:{name,email:s.email||coEmail?.value||'',country:a.country,region:a.state,address1:a.line1,address2:a.line2||'',city:a.city,zip:a.postal_code}};
   const result=await gbActions.runServerUpdate(async()=>{const r=await fetch('/.netlify/functions/calculate-shipping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error((d.error||'Unable to calculate shipping.')+(d.stage?' ['+d.stage+']':''));return d});

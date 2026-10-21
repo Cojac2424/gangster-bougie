@@ -101,9 +101,11 @@ test('mobile checkout confirms shipping address and recalculates before enabling
  assert.match(home,/gbShippingEl\.on\('blur'/);
  assert.match(home,/gbQuoteTimer=setTimeout\(\(\)=>refreshShippingQuote\(version\),350\)/);
  assert.match(home,/gbShippingEl\.getValue\(\)/);
- assert.match(home,/gbActions\.updateShippingAddress\(\{name,address:/);
+ assert.doesNotMatch(home,/await gbActions\.updateShippingAddress\(/);
  assert.match(home,/await gbActions\.runServerUpdate\(/);
- assert.ok(home.indexOf('await gbActions.updateShippingAddress')<home.indexOf('await gbActions.runServerUpdate'));
+ assert.match(home,/const current=await gbShippingEl\.getValue\(\)/);
+ assert.match(home,/gbCheckout\.createShippingAddressElement\(/);
+ assert.match(home,/await gbActions\.confirm\(\{redirect:'if_required'\}\)/);
  assert.match(home,/gbCheckout\.on\('change',session=>updateSummary\(session\)\)/);
  assert.match(home,/gbQuoteBusy\?'Calculating shipping/);
  assert.match(home,/gbQuoteVersion/);
