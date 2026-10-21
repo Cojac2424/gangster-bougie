@@ -49,3 +49,16 @@ test('affiliate page scripts parse as JavaScript', () => {
   scripts.forEach((match,i)=>assert.doesNotThrow(()=>new Script(match[1],{filename:filename+'#script'+i})));
  }
 });
+
+test('storefront connects affiliate login and application with the right pages', () => {
+ const home=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ const affiliate=readFileSync(new URL('../affiliate.html',import.meta.url),'utf8');
+ const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
+ assert.match(home, /<footer>[\s\S]*?href="\/affiliate\.html"[\s\S]*?Become a Gangster Bougie Affiliate[\s\S]*?<\/footer>/);
+ assert.match(home, /id="gbAccountIntro"[\s\S]*?href="\/affiliate\.html"[\s\S]*?>Affiliate Login<\/a>/);
+ assert.match(affiliate, /id="applyForm"/);
+ assert.match(affiliate, /id="signForm"/);
+ assert.match(affiliate, /id="affiliatePanel"/);
+ assert.match(admin, /id="authForm"/);
+ assert.match(admin, /id="commissions"/);
+});
