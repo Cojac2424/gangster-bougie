@@ -3,8 +3,8 @@
 export const FEE_ESTIMATE_BASIS_POINTS=450; // 4.5% conservative planning allowance
 export const FEE_ESTIMATE_FIXED_CENTS=30; // conservative per-item allocation
 export const PLAN_COUNTRIES=Object.freeze(['US','CA']);
-const cents=n=>Number.isSafeInteger(n)&&n>=0?n:null;
-const itemCents=x=>cents(Number(x?.cost));
+const cents=n=>typeof n==='number'&&Number.isSafeInteger(n)&&n>=0?n:null;
+const itemCents=x=>x?.currency==='USD'?cents(x.cost):null;
 function relevantProfiles(profiles,variantId,country){
  const eligible=(profiles||[]).filter(p=>(p.variant_ids||[]).some(v=>Number(v)===Number(variantId)));
  const exact=eligible.filter(p=>(p.countries||[]).includes(country));
@@ -27,11 +27,11 @@ export function planProductCommission({
  name,retailCents,variantCosts,shippingByVariant,customerContributionCents,
  feeRateBasisPoints=FEE_ESTIMATE_BASIS_POINTS,feeFixedCents=FEE_ESTIMATE_FIXED_CENTS
 }){
- const sell=cents(Number(retailCents)),contribution=cents(Number(customerContributionCents));
+ const sell=cents(retailCents),contribution=cents(customerContributionCents);
  if(!name||sell===null||sell===0||contribution===null)return {name,status:'needs_review',reason:'invalid_retail_or_contribution'};
  const list=Array.isArray(variantCosts)?variantCosts:[];
- if(!list.length||list.some(v=>cents(Number(v.costCents))===null))return {name,status:'needs_review',reason:'unverified_printify_variant_cost'};
- if(!Array.isArray(shippingByVariant)||shippingByVariant.length===0||shippingByVariant.some(v=>cents(Number(v.firstItemCents))===null))
+ if(!list.length||list.some(v=>cents(v.costCents)===null))return {name,status:'needs_review',reason:'unverified_printify_variant_cost'};
+ if(!Array.isArray(shippingByVariant)||shippingByVariant.length===0||shippingByVariant.some(v=>cents(v.firstItemCents)===null))
   return {name,status:'needs_review',reason:'shipping_country_or_variant_unverified'};
  const highCost=Math.max(...list.map(v=>Number(v.costCents))),lowCost=Math.min(...list.map(v=>Number(v.costCents)));
  const shipping=Math.max(...shippingByVariant.map(v=>Number(v.firstItemCents)));
