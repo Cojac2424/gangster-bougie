@@ -8,6 +8,7 @@ import { saveGbOrder, updateGbOrderFulfillment, markGbOrderConfirmationSent } fr
 import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 import { sendOrderConfirmation } from './lib/gb-email.mjs';
 import { sendGangsterBougieActivityEmail } from './visitor-email.mjs';
+import { getAffiliateById, recordVerifiedSale, flagRefund } from './lib/gb-affiliates.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -74,6 +75,23 @@ export default async(req)=>{
      console.error('GB ORDER STORAGE REJECTED',JSON.stringify({event_id:event.id,session_id:s.id,error:saved.error}));
      return Response.json({error:'Verified payment could not be persisted.',received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:false},{status:500});
    }
+   // Affiliate commissions are an internal ledger only: no Stripe affiliate payouts.
+   // Reconcile after every successfully persisted verified payment (including webhook retries).
+   const refId=String(full.metadata?.gb_affiliate_id||'');
+   if(refId){
+    try{
+     const affiliate=await getAffiliateById(refId);
+     if(affiliate&&affiliate.status==='approved'&&affiliate.code===full.metadata?.gb_affiliate_code){
+      const saleItems=(full.line_items?.data||[]).map(li=>({
+       name:li.price?.product?.metadata?.storefront_name||li.price?.product?.name||li.description||'',
+       quantity:li.quantity||1
+      }));
+      const result=await recordVerifiedSale({session:full,affiliate,items:saleItems,
+       customerEmail:full.customer_details?.email||full.customer_email||'',orderNumber:saved.record.order_number});
+      if(!result.ok)console.error('AFFILIATE COMMISSION RECORD FAILED',result.error);
+     }else console.error('AFFILIATE REFERRAL NO LONGER ACTIVE',JSON.stringify({session_id:full.id,affiliate_id:refId}));
+    }catch(err){console.error('AFFILIATE LEDGER PERSISTENCE FAILED',JSON.stringify({session_id:full.id,error:String(err?.message||err)}))}
+   }
    // Send the owner a verified-purchase alert only for a newly created paid order.
    // This is non-fatal: an email problem can never block Stripe/Printify/order processing.
    if(saved.created){
@@ -127,6 +145,11 @@ export default async(req)=>{
    }
    console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.record.confirmation_email_sent_at||(!confirmationAlreadySent&&confirmation.ok)),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped}));
    return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.record.confirmation_email_sent_at||(!confirmationAlreadySent&&confirmation.ok)),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped});
+ }
+ if(event.type==='charge.refunded'){
+  const charge=event.data?.object||{};
+  if(charge.payment_intent){try{await flagRefund(typeof charge.payment_intent==='string'?charge.payment_intent:charge.payment_intent.id)}catch(err){console.error('AFFILIATE REFUND FLAG FAILED',String(err?.message||err));return Response.json({error:'Unable to flag affiliate refund'},{status:500})}}
+  return Response.json({received:true,refund_review:true});
  }
  return Response.json({received:true,ignored:true,type:event.type});
 };
