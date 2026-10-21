@@ -18,7 +18,7 @@ export async function readPrintifyCost(name,token,fetcher=fetch){
  const review=(reason,extra={})=>({name,status:'needs_review',reason,retail_cents:unitsFromPrice(name),
   customer_shipping_contribution_cents:customerShippingContribution(name),...extra});
  if(!mapped.length)return review('product_has_no_verified_mapping');
- const products=new Map(),shipping=new Map(),variantCosts=[],shippingCosts=[];
+ const products=new Map(),shipping=new Map(),v2Shipping=new Map(),variantCosts=[],shippingCosts=[];
  let usedV2Shipping=false;
  // Fetch each underlying Printify product concurrently; colour variants may use separate product IDs.
  const productIds=[...new Set(mapped.map(x=>x.productId))];
@@ -56,15 +56,18 @@ export async function readPrintifyCost(name,token,fetcher=fetch){
   // Never use a guessed or historical shipping price as a verified quote.
   if(!shippingInfo.ok&&name==='Foam Yoga Mat'){
    try{
-    const v2=await requestPrintify('/v2/catalog/blueprints/'+product.blueprint_id+
-      '/print_providers/'+product.print_provider_id+'/shipping/standard.json',token,fetcher);
-    const profiles=(Array.isArray(v2.data)?v2.data:[]).map(row=>row?.attributes)
-     .filter(a=>Number.isSafeInteger(a?.variantId)&&Number.isSafeInteger(a?.shippingCost?.firstItem?.amount)&&
-       a.shippingCost.firstItem.amount>=0&&a.shippingCost.firstItem.currency==='USD'&&
-       typeof a?.country?.code==='string'&&a.shippingType==='standard')
-     .map(a=>({variant_ids:[a.variantId],countries:[a.country.code],
-       first_item:{currency:'USD',cost:a.shippingCost.firstItem.amount}}));
-    const verified=getWorstShippingCents(profiles,required.map(x=>x.variantId));
+    if(!v2Shipping.has(shipKey)){
+     const v2=await requestPrintify('/v2/catalog/blueprints/'+product.blueprint_id+
+       '/print_providers/'+product.print_provider_id+'/shipping/standard.json',token,fetcher);
+     const profiles=(Array.isArray(v2.data)?v2.data:[]).map(row=>row?.attributes)
+      .filter(a=>Number.isSafeInteger(a?.variantId)&&Number.isSafeInteger(a?.shippingCost?.firstItem?.amount)&&
+        a.shippingCost.firstItem.amount>=0&&a.shippingCost.firstItem.currency==='USD'&&
+        typeof a?.country?.code==='string'&&a.shippingType==='standard')
+      .map(a=>({variant_ids:[a.variantId],countries:[a.country.code],
+        first_item:{currency:'USD',cost:a.shippingCost.firstItem.amount}}));
+     v2Shipping.set(shipKey,profiles);
+    }
+    const verified=getWorstShippingCents(v2Shipping.get(shipKey),required.map(x=>x.variantId));
     if(verified.ok){shippingInfo=verified;usedV2Shipping=true;}
    }catch(_error){/* Keep the V1 failure; shipping remains unverified. */}
   }
