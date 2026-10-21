@@ -112,7 +112,8 @@ export async function adminUpdateCommission(session,action,updates={}) {
   if(row.status!=='pending_hold'&&row.status!=='approved_for_payout')return {ok:false,error:'Commission needs review before payment.'};
   if(Date.parse(row.hold_until)>Date.now())return {ok:false,error:'30-day holding period has not elapsed.'};
   if(!Number.isInteger(row.commission_total_cents)||row.commission_total_cents<=0)return {ok:false,error:'No commission payable.'};
-  row.status='paid';row.paid_at=now;row.payout_note=String(updates.note||'').trim().slice(0,160);
+  const confirmation=String(updates.note||'').trim().slice(0,160);if(confirmation.length<4)return {ok:false,error:'Enter an actual manual payment confirmation/reference before marking paid.'};
+  row.status='paid';row.paid_at=now;row.payout_note=confirmation;
  }else if(action==='void'){
   if(row.status==='paid')return {ok:false,error:'Already paid: handle any recovery manually.'};
   row.status='void';row.review_note=String(updates.note||'').trim().slice(0,160);
