@@ -3,6 +3,7 @@
 import {digest,listAffiliates,listCommissions,listCommissionRates,setCommissionRate,updateAffiliate,adminUpdateCommission} from './lib/gb-affiliates.mjs';
 import {sendAffiliateApprovalNotice} from './lib/gb-email.mjs';
 import {AFFILIATE_RATE_PRODUCTS} from './lib/gb-product-catalog.mjs';
+import {listCostSnapshots,syncCostBatch,applyProposedRates} from './lib/gb-affiliate-cost-sync.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 async function authorized(req){
  const expected=String(process.env.GB_AFFILIATE_ADMIN_SECRET||'');
@@ -17,13 +18,15 @@ export default async req=>{
  if(!process.env.GB_AFFILIATE_ADMIN_SECRET||process.env.GB_AFFILIATE_ADMIN_SECRET.length<24)return json({error:'Affiliate admin access has not been configured.'},503);
  if(!await authorized(req))return json({error:'Unauthorized.'},401);
  if(req.method==='GET'){
-  const [affiliates,commissions,rates]=await Promise.all([listAffiliates(),listCommissions(),listCommissionRates()]);
-  return json({ok:true,affiliates,commissions,rates,catalog_products:AFFILIATE_RATE_PRODUCTS,hold_days:30});
+  const [affiliates,commissions,rates,printify_costs]=await Promise.all([listAffiliates(),listCommissions(),listCommissionRates(),listCostSnapshots()]);
+  return json({ok:true,affiliates,commissions,rates,printify_costs,catalog_products:AFFILIATE_RATE_PRODUCTS,hold_days:30});
  }
  if(req.method!=='POST')return json({error:'Method not allowed.'},405);
  let b;try{b=await req.json()}catch{return json({error:'Invalid request.'},400)}
  let result;
- if(b.action==='set_rate')result=await setCommissionRate(b.name,b.cents);
+ if(b.action==='sync_printify_costs')result=await syncCostBatch({offset:b.offset,batchSize:3});
+ else if(b.action==='approve_all_cost_rates')result=await applyProposedRates({offset:b.offset,batchSize:4});
+ else if(b.action==='set_rate')result=await setCommissionRate(b.name,b.cents);
  else if(['approve','reject','suspend','reactivate'].includes(b.action))result=await updateAffiliate(String(b.affiliate_id||''),b.action,b.code||'');
  else if(['recalculate','mark_paid','void','approve_for_payout'].includes(b.action))result=await adminUpdateCommission(String(b.stripe_session_id||''),b.action,{note:b.note||''});
  else return json({error:'Unsupported action.'},400);
