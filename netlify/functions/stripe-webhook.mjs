@@ -37,7 +37,7 @@ export default async(req)=>{
  const raw=await req.text();
  if(!(await verify(raw,req.headers.get('stripe-signature'),secret)))return Response.json({error:'Invalid Stripe signature.'},{status:400});
  let event;try{event=JSON.parse(raw)}catch(_){return Response.json({error:'Invalid payload.'},{status:400})}
- if(event.type==='checkout.session.completed'){
+ if(event.type==='checkout.session.completed'||event.type==='checkout.session.async_payment_succeeded'){
    const s=event.data?.object||{};
    if(s.payment_status!=='paid')return Response.json({received:true,accepted:false,reason:'payment_not_paid'});
    // Fetch the authoritative paid session + line items from Stripe; never trust browser cart data here.
