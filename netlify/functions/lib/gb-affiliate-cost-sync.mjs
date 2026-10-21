@@ -1,7 +1,7 @@
 // Private Printify cost synchronizer. Called only from affiliate-admin after owner auth.
 // Never expose this module through an unauthenticated function or the affiliate dashboard.
 import {getStore} from '@netlify/blobs';
-import {AFFILIATE_RATE_PRODUCTS,AFFILIATE_RATE_MEMBERS,AFFILIATE_COST_PRODUCTS} from './gb-product-catalog.mjs';
+import {AFFILIATE_ELIGIBLE_RATE_PRODUCTS,AFFILIATE_RATE_MEMBERS,AFFILIATE_COST_PRODUCTS,isAffiliateExcluded} from './gb-product-catalog.mjs';
 import {readPrintifyCost} from './gb-affiliate-printify-reader.mjs';
 import {setCommissionRate} from './gb-affiliates.mjs';
 import {conservativeFamilyCommission} from './gb-affiliate-cost-math.mjs';
@@ -34,16 +34,17 @@ export async function syncCostBatch({offset=0,batchSize=3,fetcher=fetch}={}){
 }
 export async function applyProposedRates({offset=0,batchSize=4}={}){
  const start=Number(offset);
- if(!Number.isSafeInteger(start)||start<0||start>AFFILIATE_RATE_PRODUCTS.length)return {ok:false,error:'Invalid batch offset.'};
+ if(!Number.isSafeInteger(start)||start<0||start>AFFILIATE_ELIGIBLE_RATE_PRODUCTS.length)return {ok:false,error:'Invalid batch offset.'};
  // Block approval until every single physical garment has verified current costs.
  const s=store(),snapshots=await Promise.all(AFFILIATE_COST_PRODUCTS.map(name=>s.get(key(name),{type:'json'})));
  const now=Date.now();
- const unready=snapshots.filter((r,i)=>r?.name!==AFFILIATE_COST_PRODUCTS[i]||r.status!=='proposal_ready'||
+ const unready=snapshots.filter((r,i)=>!isAffiliateExcluded(AFFILIATE_COST_PRODUCTS[i])&&(
+  r?.name!==AFFILIATE_COST_PRODUCTS[i]||r.status!=='proposal_ready'||
   !Number.isSafeInteger(r.proposed_commission_cents)||r.proposed_commission_cents<=0||
-  !Number.isFinite(Date.parse(r.checked_at))||now-Date.parse(r.checked_at)>14*86400000);
- if(unready.length)return {ok:false,error:'Every current product needs fresh verified costs and a positive proposed rate before bulk approval.',remaining:unready.length};
+  !Number.isFinite(Date.parse(r.checked_at))||now-Date.parse(r.checked_at)>14*86400000));
+ if(unready.length)return {ok:false,error:'Every eligible product needs a fresh verified cost and a positive proposed rate before bulk approval. Excluded products are not paid.',remaining:unready.length};
  const byName=new Map(snapshots.map(s=>[s.name,s]));
- const sharedRates=AFFILIATE_RATE_PRODUCTS.map(name=>({
+ const sharedRates=AFFILIATE_ELIGIBLE_RATE_PRODUCTS.map(name=>({
    name,members:AFFILIATE_RATE_MEMBERS[name],
    // Use the smallest safe payout in a family so even the least profitable design is covered.
    cents:conservativeFamilyCommission(AFFILIATE_RATE_MEMBERS[name],byName)
