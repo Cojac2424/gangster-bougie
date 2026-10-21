@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Script } from 'node:vm';
-import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES } from '../netlify/functions/lib/gb-product-catalog.mjs';
+import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES, AFFILIATE_RATE_PRODUCTS, AFFILIATE_LEGACY_UNMAPPED_NAMES, COMMISSION_PRODUCT_ALIASES, canonicalCommissionName } from '../netlify/functions/lib/gb-product-catalog.mjs';
 import { normalizeReferralCode, referralExpiryMs, referralIsValid, commissionForPaidItems, commissionTotalCents, commissionHoldUntil, REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS } from '../netlify/functions/lib/gb-affiliate-rules.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
@@ -81,4 +81,24 @@ test('Printify fulfillment picks exact sizes and accessory variants', async () =
  assert.equal(resolveFulfillment('Embroidered Structured Cap','L/XL').variant_id,118703);
  assert.equal(resolveFulfillment('Gangster Bougie Gym Face Towel','Black').variant_id,75135);
  assert.equal(resolveFulfillment('Gangster Bougie Foam Yoga Mat','Dark Blue').variant_id,71786);
+});
+
+test('one commission amount per real product, including every accessory alias', () => {
+ assert.equal(AFFILIATE_RATE_PRODUCTS.length,52);
+ assert.equal(Object.keys(COMMISSION_PRODUCT_ALIASES).length,8);
+ assert.equal(AFFILIATE_LEGACY_UNMAPPED_NAMES.length,6);
+ for(const name of AFFILIATE_RATE_PRODUCTS) assert.ok(SELLABLE_PRODUCT_NAMES.includes(name));
+ for(const [alias,canonical] of Object.entries(COMMISSION_PRODUCT_ALIASES)){
+   assert.equal(canonicalCommissionName(alias),canonical);
+   assert.ok(AFFILIATE_RATE_PRODUCTS.includes(canonical));
+   assert.equal(PRICE_CENTS[alias],PRICE_CENTS[canonical]);
+   assert.ok(!AFFILIATE_RATE_PRODUCTS.includes(alias));
+ }
+ for(const name of AFFILIATE_LEGACY_UNMAPPED_NAMES){
+  assert.ok(!AFFILIATE_RATE_PRODUCTS.includes(name));
+ }
+ assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gangster Bougie Women’s Signature Crop Tee – Black'));
+ assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gangster Bougie Women’s Signature Crop Tee – White'));
+ assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gym Face Towel'));
+ assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Foam Yoga Mat'));
 });
