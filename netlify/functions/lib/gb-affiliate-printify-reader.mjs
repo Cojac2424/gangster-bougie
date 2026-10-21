@@ -39,7 +39,7 @@ export async function readPrintifyCost(name,token,fetcher=fetch){
   const required=mapped.filter(x=>x.productId===id);
   for(const row of required){
    const variant=(product.variants||[]).find(v=>Number(v.id)===row.variantId);
-   if(!variant||!Number.isSafeInteger(Number(variant.cost))||Number(variant.cost)<0){
+   if(!variant||!Number.isSafeInteger(variant.cost)||variant.cost<0){
     return {name,status:'needs_review',reason:'printify_variant_cost_missing',printify_product_id:id,variant_id:row.variantId};
    }
    if(variant.is_enabled===false||variant.is_available===false){
