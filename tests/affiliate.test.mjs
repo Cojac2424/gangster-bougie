@@ -122,6 +122,8 @@ test('Printify US and Canada shipping quotes choose highest first-item cost for 
  assert.equal(result.maxFirstItemCents,1199);
  assert.equal(result.perDestination.length,4);
  assert.equal(getWorstShippingCents(profiles.slice(0,1),[10]).ok,false);
+ assert.equal(getWorstShippingCents([{variant_ids:[10],countries:['US','CA'],first_item:{currency:'CAD',cost:799}}],[10]).ok,false);
+ assert.equal(getWorstShippingCents([{variant_ids:[10],countries:['US','CA'],first_item:{currency:'USD',cost:null}}],[10]).ok,false);
 });
 test('verified Printify cost planner rounds DOWN to fixed whole-dollar USD, requiring owner approval',()=>{
  const row=planProductCommission({
@@ -213,4 +215,18 @@ test('Printify importer blocks suggestions when a required variant lacks its act
  assert.equal(x.status,'needs_review');
  assert.equal(x.reason,'printify_variant_cost_missing');
  assert.equal(x.proposed_commission_cents,undefined);
+});
+test('Printify null production cost cannot be interpreted as zero-cost product',async()=>{
+ const id='6aa0d82a6279c5ea5c03596f';
+ const mock=async url=>{
+  if(url.endsWith('/products/'+id+'.json'))return {ok:true,json:async()=>({id,blueprint_id:100,print_provider_id:200,variants:[
+   {id:76801,cost:2000,is_enabled:true},{id:76802,cost:null,is_enabled:true}]})};
+  return {ok:true,json:async()=>({profiles:[
+   {variant_ids:[76801,76802],countries:['US','CA'],first_item:{currency:'USD',cost:700}}
+  ]})};
+ };
+ const row=await readPrintifyCost('Stainless Steel Gym Bottle','TEST_TOKEN',mock);
+ assert.equal(row.status,'needs_review');
+ assert.equal(row.reason,'printify_variant_cost_missing');
+ assert.equal(row.proposed_commission_cents,undefined);
 });
