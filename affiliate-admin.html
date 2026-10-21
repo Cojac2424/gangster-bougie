@@ -9,7 +9,7 @@
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
 <p id="costState" role="status">No verified cost report has been loaded yet.</p>
 <div class="scroll"><table><thead><tr><th>Product</th><th>Retail</th><th>Highest Printify cost</th><th>Highest shipping subsidy</th><th>Estimated payment fee</th><th>Estimated net profit</th><th>20% target</th><th>Suggested fixed commission</th><th>You keep after commission</th><th>Review status</th></tr></thead><tbody id="costRows"></tbody></table></div>
-<p><small>All prices and estimated costs are in US dollars. Suggested commissions round DOWN to whole dollars. No proposal is accepted until you review and approve it. Products with missing costs or inadequate margins must be resolved individually.</small></p>
+<p><small>All prices and estimated costs are in US dollars. Suggested commissions round down to whole dollars, except that a near-$1 target may round to $1 when at least $4 profit remains before payout (for example, our agreed leggings case). No proposal is accepted until you review and approve it. Products with missing costs or inadequate margins must be resolved individually.</small></p>
 </section>
 <section class="panel"><h2>Affiliate applications</h2><div class="scroll"><table><thead><tr><th>Applicant</th><th>Email / channel</th><th>Status</th><th>Referral code</th><th>Actions</th></tr></thead><tbody id="applicants"></tbody></table></div></section>
 <section class="panel"><h2>Affiliate commissions and manual payments</h2><p>After the 30-day holding period, review the sale and any refunds before sending payment yourself. Only then mark it paid here.</p><div class="scroll"><table><thead><tr><th>Order / affiliate</th><th>Products</th><th>Commission</th><th>Hold until</th><th>Status</th><th>Actions</th></tr></thead><tbody id="commissions"></tbody></table></div></section>
@@ -26,7 +26,7 @@
  const fresh=Date.now()-14*86400000;let ready=0;
  for(const name of catalog||[]){
   const x=byName[name],r=document.createElement('tr');
-  const vals=x?[name,money(x.retail_cents),money(x.production_high_cents),money(x.gb_shipping_subsidy_cents),money(x.processing_allowance_cents),money(x.estimated_profit_cents),money(x.twenty_percent_cents),money(x.proposed_commission_cents),money(x.estimated_retained_after_commission_cents),x.status==='proposal_ready'?'Proposal — review':x.reason||x.status]:
+  const vals=x?[name,money(x.retail_cents),money(x.production_high_cents),money(x.gb_shipping_subsidy_cents),money(x.processing_allowance_cents),money(x.estimated_profit_cents),money(x.twenty_percent_cents),money(x.proposed_commission_cents),money(x.estimated_retained_after_commission_cents),x.status==='proposal_ready'?(x.rounding_note==='minimum_1_dollar_exception'?'Proposal — $1 minimum exception; review':'Proposal — review'):x.reason||x.status]:
   [name,'—','—','—','—','—','—','—','—','Not synced'];
   vals.forEach(v=>r.append(td(v)));body.append(r);
   if(x?.status==='proposal_ready'&&x.proposed_commission_cents>0&&Date.parse(x.checked_at)>=fresh)ready++;
