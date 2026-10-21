@@ -446,3 +446,23 @@ test('checkout rejects Stripe live/test key mismatch before creating a session',
  assert.match(source,/secretMode!==publishMode/);
  assert.match(source,/Checkout is temporarily unavailable because its Stripe configuration is inconsistent/);
 });
+
+test('replacement crop tees resolve to distinct verified Printify products for every customer size',async()=>{
+ const {resolveFulfillment,resolveCart}=await import('../netlify/functions/lib/fulfillment-resolver.mjs');
+ const black='Gangster Bougie Women’s Signature Crop Tee – Black';
+ const white='Gangster Bougie Women’s Signature Crop Tee – White';
+ const expected={XS:[73371,73377],S:[73372,73378],M:[73373,73379],L:[73374,73380],XL:[73375,73381]};
+ for(const [size,[b,w]] of Object.entries(expected)){
+  const one=resolveFulfillment(black,size),two=resolveFulfillment(white,size);
+  assert.equal(one.ok,true);assert.equal(two.ok,true);
+  assert.equal(one.product_id,'6aced4b5b92b4771540221b6');
+  assert.equal(two.product_id,'6acecc7facbbb7449c0eda70');
+  assert.equal(one.variant_id,b);assert.equal(two.variant_id,w);
+  assert.equal(PRICE_CENTS[black],3999);assert.equal(PRICE_CENTS[white],3999);
+ }
+ assert.equal(resolveCart([{name:black,size:'M',qty:1},{name:white,size:'XL',qty:1}]).ok,true);
+ assert.equal(resolveFulfillment(black,'2XL').ok,false);
+ const storefront=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ for(const name of [black,white])assert.ok(storefront.includes(name));
+ assert.match(storefront,/#babyTeeModal \.sports-size-block \.sizes\{grid-template-columns:repeat\(5,/);
+});

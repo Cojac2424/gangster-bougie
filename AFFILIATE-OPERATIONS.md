@@ -1,6 +1,6 @@
 # Gangster Bougie affiliate program — operator guide (staging only)
 
-**Status:** Implemented in PR #22 / `crop-tee-replacement-staging-20261013`. Do not merge until the full storefront cleanup, crop tees, affiliate setup, and order testing are approved.
+**Status:** Implementation assembled on staging PR #22 / `crop-tee-replacement-staging-20261013`. Owner confirmed all 15 eligible commission groups saved in the deploy preview on 2026-10-21. Replacement crop tee IDs, XS–XL fulfillment variants and storefront images are configured. Final live-service integration checks and explicit owner approval are still required before production merge. No production deployment is authorized.
 
 ## Architecture
 
@@ -53,9 +53,9 @@ No live production deployment, Stripe customer payment or real affiliate payout 
 3. In Stripe, confirm the existing Gangster Bougie webhook forwards `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded` to the existing signed `stripe-webhook` endpoint. Do not confuse it with the BELLCON Stripe account.
 4. Before applications go public, **sync and review all Printify cost proposals** in private affiliate admin. When all eligible individual product checks are ready, approve the resulting 15 payable grouped commissions once in the admin. Excluded products stay at $0. If any needs review, resolve it and rerun; do not invent missing costs. Rates are stored server-side; affiliates see only the approved rate. An item without a rate is flagged `needs_rates` and is not automatically payable.
 5. Verify real end-to-end behavior **on staging** without risking a live customer's payment: application > owner notification > approval > affiliate approval email > sign-in code > affiliate link or typed code > checkout metadata > paid-order webhook > ledger > refund review > 30-day hold > manual payout reference. If using Stripe test keys, verify the deploy context and webhook secret are the test-mode ones before simulating paid orders.
-6. Complete the storefront cleanup; remove temporary `variant-verification.html` and `gb-variant-lookup.mjs` before production merge. Require explicit owner approval for merge/deploy.
+6. Storefront cleanup: retired yoga mats are removed from the staging catalog, cart, checkout, fulfillment and affiliate surfaces; crop tee black/white size maps and images are wired. Temporary `variant-verification.html` and `gb-variant-lookup.mjs` are absent from the staging tree. Require explicit owner approval for merge/deploy.
 
-## Everyday use
+**Preview-to-production note:** The 15 owner-approved rate groups were confirmed in the deploy-preview admin. Before launching, verify that the production admin sees the identical values after merge; preview-stored records must not be assumed to migrate across Netlify deploy contexts. Do not overwrite or invent payouts if those records are missing.\n\n**Stripe preview:** A Stripe `cs_test_` session could not be loaded by the preview browser. Check that `STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY` in the preview refer to the same Stripe account and mode before the final integration test. Do not change working production keys. Checkout rejects mixed live/test key prefixes in the staged guard.\n\n## Everyday use
 
 - Affiliate applies. Owner approves in `/affiliate-admin.html`; generated referral code and link become available in affiliate dashboard.
 - Customer either follows `https://gangsterbougie.com/?ref=CODE` or types `CODE` in cart. The browser remembers the most recent referral for 30 days, and the server checks active code at checkout.
