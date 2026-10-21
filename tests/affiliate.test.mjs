@@ -440,3 +440,9 @@ test('Stripe line item pagination is complete, duplicate-safe and fails closed',
  const insufficient=async()=>({ok:true,json:async()=>({data:[],has_more:true})});
  await assert.rejects(retrieveAllStripeLineItems('cs_test_mock','sk_test_mock',insufficient),/pagination_failed/);
 });
+
+test('checkout rejects Stripe live/test key mismatch before creating a session',()=>{
+ const source=readFileSync(new URL('../netlify/functions/create-checkout-session.mjs',import.meta.url),'utf8');
+ assert.match(source,/secretMode!==publishMode/);
+ assert.match(source,/Checkout is temporarily unavailable because its Stripe configuration is inconsistent/);
+});
