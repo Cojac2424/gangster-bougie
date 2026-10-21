@@ -13,6 +13,22 @@
 - `stripe-webhook.mjs`: creates a commission ledger entry **only from a verified paid Stripe session**, with a unique key per Checkout Session to avoid duplicate affiliate orders. It also flags refunds for manual review. Stripe is *not* used to pay affiliates.
 - `tests/affiliate.test.mjs`: rule and script checks; GitHub Actions runs automatically in staging.
 
+## Temporary non-commissionable products (owner-approved policy)
+
+As agreed on October 21, **five product categories (six commission keys)** are temporarily excluded because Canadian production and shipping costs leave inadequate margins:
+
+- Men's basketball rib shorts: both Onyx/Gold and Cream/Gold designs.
+- Crowned Luxury crew socks.
+- Stainless steel gym bottles: 12 oz and 18 oz.
+- Foam yoga mats: all colours.
+- Mini wrap bandanas.
+
+They **remain for sale** and can appear on referred orders. The server sets their commission to $0, regardless of any outdated saved rate. The ledger marks each excluded line with `excluded: true`. An excluded-only paid order is recorded as `excluded_only`, with a $0 total and no payment action. Mixed orders receive the sum of eligible item commissions only. The rate editor refuses new nonzero rates on excluded products.
+
+The affiliate application and dashboard clearly identify the exclusion list and explain it without revealing confidential production costs or margins. Suggested reply to an affiliate: "Certain products are temporarily excluded because of their production and delivery costs. The list is reviewed periodically, and eligible items in the same order still earn their listed commissions."
+
+Printify sync can still review all 52 physical products. **Only eligible products** need verified positive rate recommendations for bulk approval. The 21 group keys comprise 15 eligible rates and 6 excluded keys. Exclusion stays in force until the owner explicitly approves changing the policy; a cost sync alone never activates an excluded product.
+
 ## Automated Printify cost review — no spreadsheet required
 
 The owner-only `affiliate-admin.html` page now has **Sync all Printify costs** and **Approve all reviewed proposals** controls. They do not operate until `GB_AFFILIATE_ADMIN_SECRET` is configured. The Printify sync also needs the site's pre-existing `PRINTIFY_API_TOKEN`, used by Gangster Bougie shipping and order fulfillment. Do not paste either token into chat or embed one in website JavaScript.
@@ -23,8 +39,8 @@ The owner-only `affiliate-admin.html` page now has **Sync all Printify costs** a
 2. The server fetches the configured Printify product(s) and variant `cost` for every size or colour. It fetches the print provider's standard first-item shipping profiles for both the US and Canada. The Printify API calls are server-only.
 3. The planning formula intentionally uses **the LOWEST retail price across offered options, the HIGHEST Printify production cost, and the HIGHEST first-item shipping cost among US and Canada**, minus the customer contribution from the same rules used by checkout. It reserves an **estimated 4.5% plus USD $0.30 per product** for processing. These are conservative *planning assumptions*, not verified Stripe fees, and omit extra operating costs or returns.
 4. Compute about 20% of the estimated profit. Default is to round **DOWN** to a whole dollar, except a target between $0.75 and $0.99 can be proposed as **$1** if at least $4 estimated profit remains *before* the payout (the agreed slim-margin leggings case). The admin also shows what the owner keeps after the proposed commission. Each proposal remains private in Netlify Blobs (`gb-owner-printify-affiliate-cost-v1`), never exposed to affiliates.
-5. Review the full product report. Missing/unavailable variants, missing Canadian or US shipping profiles, or non-positive suggested commissions receive a **needs review** flag. **Bulk approval is blocked unless every currently listed product has a fresh, positive and owner-reviewed proposal.**
-6. Only after reviewing the proposals, click **Approve all reviewed proposals** and confirm. The private API saves 21 fixed commission rates in small batches. For shared women's bras, leggings, and workout shorts, each family's rate is the **lowest safe proposed amount across every one of its designs**. The verified Stripe webhook automatically totals (fixed group/product rate × purchased quantity) across every item on a referred order; actual line-item names remain visible.
+5. Review the full product report. Missing/unavailable variants, missing Canadian or US shipping profiles, or non-positive suggested commissions receive a **needs review** flag. **Bulk approval requires every eligible product to have a fresh, positive, owner-reviewed proposal; explicitly excluded items are not blockers or payout candidates.**
+6. Only after reviewing the proposals, click **Approve all reviewed proposals** and confirm. The private API saves 15 eligible fixed commission rates in small batches; six explicitly excluded keys remain at $0. For shared women's bras, leggings, and workout shorts, each family's rate is the **lowest safe proposed amount across every one of its designs**. The verified Stripe webhook automatically totals (fixed group/product rate × purchased quantity) across every item on a referred order; actual line-item names remain visible.
 7. In future, new products require verified checkout/fulfillment mappings, cost sync and approval before affiliates can earn commissions on them.
 
 **Do not confuse the estimated per-item fixed commission with actual accounting profit**: order-specific Printify shipping, currency conversion, card processing, taxes, discounts and returns can differ. If margins are unusually narrow, revise the selling price or commission rather than approve an unsafe payout.
@@ -36,7 +52,7 @@ No live production deployment, Stripe customer payment or real affiliate payout 
 1. **Create a long, random admin secret** in a password manager (at least 24 characters). In Netlify site configuration > Environment variables, set `GB_AFFILIATE_ADMIN_SECRET` to that value in the appropriate contexts. **Never put the value in source code, support tickets, screenshots, or chat.** The admin page refuses to open without it.
 2. Confirm **Resend** environment settings `RESEND_API_KEY` and `GB_EMAIL_FROM` are valid for sending to external affiliates. The Resend testing address cannot reliably deliver to arbitrary affiliate emails.
 3. In Stripe, confirm the existing Gangster Bougie webhook forwards `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded` to the existing signed `stripe-webhook` endpoint. Do not confuse it with the BELLCON Stripe account.
-4. Before applications go public, **sync and review all Printify cost proposals** in private affiliate admin. When all 52 individual product checks are ready, approve the resulting 21 grouped commissions once in the admin. If any needs review, resolve it and rerun; do not invent missing costs. Rates are stored server-side; affiliates see only the approved rate. An item without a rate is flagged `needs_rates` and is not automatically payable.
+4. Before applications go public, **sync and review all Printify cost proposals** in private affiliate admin. When all eligible individual product checks are ready, approve the resulting 15 payable grouped commissions once in the admin. Excluded products stay at $0. If any needs review, resolve it and rerun; do not invent missing costs. Rates are stored server-side; affiliates see only the approved rate. An item without a rate is flagged `needs_rates` and is not automatically payable.
 5. Verify real end-to-end behavior **on staging** without risking a live customer's payment: application > owner notification > approval > affiliate approval email > sign-in code > affiliate link or typed code > checkout metadata > paid-order webhook > ledger > refund review > 30-day hold > manual payout reference. If using Stripe test keys, verify the deploy context and webhook secret are the test-mode ones before simulating paid orders.
 6. Complete the storefront cleanup; remove temporary `variant-verification.html` and `gb-variant-lookup.mjs` before production merge. Require explicit owner approval for merge/deploy.
 
@@ -44,7 +60,7 @@ No live production deployment, Stripe customer payment or real affiliate payout 
 
 - Affiliate applies. Owner approves in `/affiliate-admin.html`; generated referral code and link become available in affiliate dashboard.
 - Customer either follows `https://gangsterbougie.com/?ref=CODE` or types `CODE` in cart. The browser remembers the most recent referral for 30 days, and the server checks active code at checkout.
-- A paid order creates one ledger record with item quantities, fixed commission rates, and a 30-day payout hold. A missing rate, self-referral, inactive affiliate, or refund requires manual review.
+- A paid order creates one ledger record with item quantities, fixed commission rates, and a 30-day payout hold. Excluded items earn $0; excluded-only orders are recorded but not payable. Missing eligible rates, self-referrals, inactive affiliates, and refunds require manual review.
 - Owner manually pays after the hold, then marks it paid and enters the **actual payout confirmation/reference**. Never mark an unpaid transfer as paid.
 - New products: create the Printify product; upload imagery to Cloudflare R2; add/storefront-verify the exact name in the shared checkout catalogue and Printify fulfillment mapping; review its cost and shipping with the owner dashboard and update its fixed USD garment-family rate or individual product rate as appropriate; then reference the item in cards/Build Your Fit/carousel. Existing gold-card navigation remains unchanged.
 
