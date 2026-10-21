@@ -42,14 +42,19 @@ export function planProductCommission({
  const processing=Math.ceil((sell+Math.min(shipping,contribution))*feeRateBasisPoints/10000)+feeFixedCents;
  const profit=sell-highCost-subsidy-processing;
  const target=Math.max(0,Math.floor(profit*0.2));
- const proposed=Math.floor(target/100)*100;
+ const wholeDollar=Math.floor(target/100)*100;
+ // A target close to one dollar can round to $1 only when a safe $4+ profit remains
+ // before payout. This covers the previously agreed $1 leggings example (~22%),
+ // while rejecting $1 commissions on thin-margin products such as socks/yoga mats.
+ const minimumOneDollarException=wholeDollar===0&&target>=75&&profit>=400;
+ const proposed=minimumOneDollarException?100:wholeDollar;
  return {name,status:profit>0&&proposed>0?'proposal_ready':'needs_review',
   reason:profit>0&&proposed>0?null:'zero_or_negative_suggested_commission',
   retail_cents:sell,production_high_cents:highCost,production_low_cents:lowCost,
   max_first_item_shipping_cents:shipping,customer_shipping_contribution_cents:contribution,
   gb_shipping_subsidy_cents:subsidy,processing_allowance_cents:processing,
   estimated_profit_cents:profit,twenty_percent_cents:target,proposed_commission_cents:proposed,
-  estimated_retained_after_commission_cents:profit-proposed,
+  estimated_retained_after_commission_cents:profit-proposed,rounding_note:minimumOneDollarException?'minimum_1_dollar_exception':'rounded_down_whole_dollars',
   fee_basis_points:feeRateBasisPoints,fee_fixed_cents:feeFixedCents,
   cost_variant_count:list.length,shipping_profile_count:shippingByVariant.length};
 }
