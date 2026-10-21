@@ -6,6 +6,7 @@ import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES, AFFILIATE_RATE_PR
 import { normalizeReferralCode, referralExpiryMs, referralIsValid, commissionForPaidItems, commissionTotalCents, commissionHoldUntil, REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS } from '../netlify/functions/lib/gb-affiliate-rules.mjs';
 import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS} from '../netlify/functions/lib/gb-affiliate-cost-math.mjs';
 import {customerShippingContribution} from '../netlify/functions/lib/gb-shipping-contribution.mjs';
+import {readPrintifyCost} from '../netlify/functions/lib/gb-affiliate-printify-reader.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
  assert.ok(SELLABLE_PRODUCT_NAMES.length >= 50);
@@ -151,4 +152,65 @@ test('owner admin has private Printify syncing and proposal approval UI',()=>{
  assert.match(admin,/id="approvePrintifyCosts"/);
  assert.match(admin,/approve_all_cost_rates/);
  assert.match(admin,/sync_printify_costs/);
+});
+
+test('mocked Printify API retrieves both bottle sizes and real variant costs before proposing a commission',async()=>{
+ const calls=[],productId='6aa0d82a6279c5ea5c03596f';
+ const mock=async (url,options)=>{
+  calls.push(url);
+  assert.equal(options.headers.Authorization,'Bearer TEST_TOKEN');
+  let value;
+  if(url.endsWith('/products/'+productId+'.json'))value={
+   id:productId,blueprint_id:100,print_provider_id:200,
+   variants:[{id:76801,cost:2000,is_enabled:true,is_available:true},
+             {id:76802,cost:2400,is_enabled:true,is_available:true}]
+  };
+  else if(url.endsWith('/blueprints/100/print_providers/200/shipping.json'))value={
+   profiles:[
+    {variant_ids:[76801,76802],countries:['US'],first_item:{currency:'USD',cost:799}},
+    {variant_ids:[76801,76802],countries:['CA'],first_item:{currency:'USD',cost:1199}}
+   ]
+  };
+  else throw Error('Unexpected Printify API route: '+url);
+  return {ok:true,status:200,json:async()=>value};
+ };
+ const x=await readPrintifyCost('Stainless Steel Gym Bottle','TEST_TOKEN',mock);
+ assert.equal(x.status,'proposal_ready');
+ assert.equal(x.production_high_cents,2400);
+ assert.equal(x.production_low_cents,2000);
+ assert.equal(x.retail_cents,4499);
+ assert.equal(x.gb_shipping_subsidy_cents,700);
+ assert.equal(x.proposed_commission_cents,200);
+ assert.equal(x.cost_variant_count,2);
+ assert.equal(calls.length,2);
+});
+test('mocked two-colour Printify accessory fetch reuses shipping profile across both products',async()=>{
+ const ids=['6aa428e6d86adfcd610e9457','6aa16fcea334f4469202f6d7'];
+ let productCalls=0,shippingCalls=0;
+ const mock=async url=>{
+  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
+  if(id){productCalls++;return {ok:true,json:async()=>({id,blueprint_id:400,print_provider_id:500,variants:[{id:75135,cost:id===ids[0]?300:400,is_enabled:true,is_available:true}]})};}
+  if(url.endsWith('/blueprints/400/print_providers/500/shipping.json')){shippingCalls++;return {ok:true,json:async()=>({profiles:[
+   {variant_ids:[75135],countries:['US'],first_item:{currency:'USD',cost:250}},
+   {variant_ids:[75135],countries:['CA'],first_item:{currency:'USD',cost:350}}
+  ]})};}
+  throw Error('Unexpected API URL '+url);
+ };
+ const x=await readPrintifyCost('Gym Face Towel','TEST_TOKEN',mock);
+ assert.equal(x.status,'proposal_ready');
+ assert.equal(x.production_high_cents,400);
+ assert.equal(x.printify_product_ids.length,2);
+ assert.equal(productCalls,2);
+ assert.equal(shippingCalls,1);
+});
+test('Printify importer blocks suggestions when a required variant lacks its actual cost',async()=>{
+ const id='6aa0d82a6279c5ea5c03596f';
+ const mock=async url=>{
+  if(url.endsWith('/products/'+id+'.json'))return {ok:true,json:async()=>({id,blueprint_id:100,print_provider_id:200,variants:[{id:76801,cost:2100,is_enabled:true}]})};
+  return {ok:true,json:async()=>({profiles:[]})};
+ };
+ const x=await readPrintifyCost('Stainless Steel Gym Bottle','TEST_TOKEN',mock);
+ assert.equal(x.status,'needs_review');
+ assert.equal(x.reason,'printify_variant_cost_missing');
+ assert.equal(x.proposed_commission_cents,undefined);
 });
