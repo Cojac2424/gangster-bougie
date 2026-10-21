@@ -9,6 +9,7 @@ import { submitPrintifyOrder } from './lib/printify-submit.mjs';
 import { sendOrderConfirmation } from './lib/gb-email.mjs';
 import { sendGangsterBougieActivityEmail } from './visitor-email.mjs';
 import { getAffiliateById, recordVerifiedSale, flagRefund } from './lib/gb-affiliates.mjs';
+import { retrieveAllStripeLineItems } from './lib/gb-stripe-line-items.mjs';
 
 const enc=new TextEncoder();
 function hex(bytes){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -43,9 +44,18 @@ export default async(req)=>{
    // Fetch the authoritative paid session + line items from Stripe; never trust browser cart data here.
    const sk=process.env.STRIPE_SECRET_KEY;
    if(!sk)return Response.json({error:'Stripe API key is not configured.'},{status:500});
-   const sr=await fetch('https://api.stripe.com/v1/checkout/sessions/'+encodeURIComponent(s.id)+'?expand[]=line_items.data.price.product',{headers:{Authorization:'Bearer '+sk}});
-   const full=await sr.json();
+   const sr=await fetch('https://api.stripe.com/v1/checkout/sessions/'+encodeURIComponent(s.id),{headers:{Authorization:'Bearer '+sk}});
    if(!sr.ok)return Response.json({error:'Unable to retrieve paid checkout.'},{status:502});
+   const full=await sr.json();
+   if(full.id!==s.id||full.payment_status!=='paid')return Response.json({error:'Paid checkout verification mismatch.'},{status:502});
+   try{
+     const lineItems=await retrieveAllStripeLineItems(s.id,sk);
+     if(!lineItems.length)return Response.json({error:'Paid checkout has no verified line items.'},{status:502});
+     full.line_items={data:lineItems};
+   }catch(err){
+     console.error('STRIPE CHECKOUT LINE ITEMS RETRIEVAL FAILED',String(err?.message||err));
+     return Response.json({error:'Unable to verify all paid checkout items.'},{status:502});
+   }
    const details=full.customer_details||{}, addr=details.address||full.shipping_details?.address||{};
    const fullName=String(details.name||full.shipping_details?.name||'').trim(), parts=fullName.split(/\\s+/), first=parts.shift()||'', last=parts.join(' ')||'-';
    const items=(full.line_items?.data||[]).map(li=>{
