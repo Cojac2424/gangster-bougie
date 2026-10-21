@@ -77,20 +77,21 @@ export default async(req)=>{
    }
    // Affiliate commissions are an internal ledger only: no Stripe affiliate payouts.
    // Reconcile after every successfully persisted verified payment (including webhook retries).
+   let affiliateLedgerFailure=false;
    const refId=String(full.metadata?.gb_affiliate_id||'');
    if(refId){
     try{
      const affiliate=await getAffiliateById(refId);
-     if(affiliate&&affiliate.status==='approved'&&affiliate.code===full.metadata?.gb_affiliate_code){
+     if(affiliate){
       const saleItems=(full.line_items?.data||[]).map(li=>({
        name:li.price?.product?.metadata?.storefront_name||li.price?.product?.name||li.description||'',
        quantity:li.quantity||1
       }));
       const result=await recordVerifiedSale({session:full,affiliate,items:saleItems,
-       customerEmail:full.customer_details?.email||full.customer_email||'',orderNumber:saved.record.order_number});
-      if(!result.ok)console.error('AFFILIATE COMMISSION RECORD FAILED',result.error);
-     }else console.error('AFFILIATE REFERRAL NO LONGER ACTIVE',JSON.stringify({session_id:full.id,affiliate_id:refId}));
-    }catch(err){console.error('AFFILIATE LEDGER PERSISTENCE FAILED',JSON.stringify({session_id:full.id,error:String(err?.message||err)}))}
+       customerEmail:full.customer_details?.email||full.customer_email||'',orderNumber:saved.record.order_number,referralCode:String(full.metadata?.gb_affiliate_code||'')});
+      if(!result.ok){affiliateLedgerFailure=true;console.error('AFFILIATE COMMISSION RECORD FAILED',result.error)}
+     }else{affiliateLedgerFailure=true;console.error('AFFILIATE REFERRAL ACCOUNT MISSING',JSON.stringify({session_id:full.id,affiliate_id:refId}))}
+    }catch(err){affiliateLedgerFailure=true;console.error('AFFILIATE LEDGER PERSISTENCE FAILED',JSON.stringify({session_id:full.id,error:String(err?.message||err)}))}
    }
    // Send the owner a verified-purchase alert only for a newly created paid order.
    // This is non-fatal: an email problem can never block Stripe/Printify/order processing.
@@ -143,6 +144,9 @@ export default async(req)=>{
      else console.error('ORDER CONFIRMATION SENT BUT STATUS MARK FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number}));
     }else console.error('ORDER CONFIRMATION EMAIL FAILED',JSON.stringify({event_id:event.id,session_id:s.id,order_number:saved.record.order_number,error:confirmation.error,status:confirmation.status||null}));
    }
+   // Retrying a successful order write is safe: the order store keys by Stripe Session ID.
+   // A 500 here asks Stripe to retry if affiliate ledger persistence failed.
+   if(affiliateLedgerFailure)return Response.json({error:'Affiliate ledger requires retry',received:true,verified_paid:true,order_saved:true},{status:500});
    console.log('VERIFIED PAID CHECKOUT READY',JSON.stringify({event_id:event.id,session_id:s.id,gb_order_number:saved.record.order_number,payment_status:s.payment_status,amount_total:s.amount_total,currency:s.currency,line_items:built.payload.line_items.length,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_created:saved.created,confirmation_email_sent:!!(saved.record.confirmation_email_sent_at||(!confirmationAlreadySent&&confirmation.ok)),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped}));
    return Response.json({received:true,accepted:true,verified_paid:true,fulfillment_ready:true,order_record_ready:true,order_saved:true,order_number:saved.record.order_number,confirmation_email_sent:!!(saved.record.confirmation_email_sent_at||(!confirmationAlreadySent&&confirmation.ok)),printify_order_created:!!printify.order_id,printify_order_id:printify.order_id||null,printify_submission_skipped:!!printify.skipped});
  }
