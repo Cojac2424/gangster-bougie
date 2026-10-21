@@ -1,9 +1,10 @@
 // Gangster Bougie affiliate records and commission ledger.
 // All values live in Netlify Blobs; never expose raw customer information to affiliates.
 import { getStore } from '@netlify/blobs';
+import { REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS, commissionHoldUntil } from './gb-affiliate-rules.mjs';
 
 const DATA='gb-affiliates-v1', LEDGER='gb-affiliate-ledger-v1';
-export const HOLD_DAYS=30, ATTRIBUTION_DAYS=30;
+export const HOLD_DAYS=COMMISSION_HOLD_DAYS, ATTRIBUTION_DAYS=REFERRAL_WINDOW_DAYS;
 const enc=new TextEncoder();
 export const cleanEmail=v=>String(v||'').trim().toLowerCase();
 export const cleanCode=v=>String(v||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,30);
@@ -94,7 +95,7 @@ export async function recordVerifiedSale({session,affiliate,items,customerEmail,
  const selfReferral=cleanEmail(customerEmail)===cleanEmail(affiliate.email);
  const affiliateInactive=affiliate.status!=='approved'||Boolean(referralCode&&referralCode!==affiliate.code);
  const now=new Date().toISOString();
- const record={stripe_session_id:session.id,payment_intent:typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null,order_number:orderNumber,affiliate_id:affiliate.id,affiliate_code:referralCode||affiliate.code,currency:String(session.currency||'usd').toUpperCase(),items:calculated,commission_total_cents:pending?null:calculated.reduce((sum,x)=>sum+x.commission_cents,0),status:selfReferral?'review_self_referral':affiliateInactive?'review_inactive_affiliate':pending?'needs_rates':'pending_hold',self_referral:selfReferral,affiliate_inactive:affiliateInactive,refund_flag:false,created_at:now,hold_until:new Date(Date.now()+HOLD_DAYS*86400000).toISOString(),paid_at:null,updated_at:now};
+ const record={stripe_session_id:session.id,payment_intent:typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null,order_number:orderNumber,affiliate_id:affiliate.id,affiliate_code:referralCode||affiliate.code,currency:String(session.currency||'usd').toUpperCase(),items:calculated,commission_total_cents:pending?null:calculated.reduce((sum,x)=>sum+x.commission_cents,0),status:selfReferral?'review_self_referral':affiliateInactive?'review_inactive_affiliate':pending?'needs_rates':'pending_hold',self_referral:selfReferral,affiliate_inactive:affiliateInactive,refund_flag:false,created_at:now,hold_until:commissionHoldUntil(Date.now()),paid_at:null,updated_at:now};
  await st.setJSON(key,record);return {ok:true,created:true,record};
 }
 export async function adminUpdateCommission(session,action,updates={}) {
