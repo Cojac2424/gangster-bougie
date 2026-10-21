@@ -1,6 +1,6 @@
 // Public affiliate application, code validation and email-verified affiliate dashboard.
 import {getStore} from '@netlify/blobs';
-import {applyAffiliate,cleanCode,cleanEmail,digest,findAffiliateByEmail,getAffiliateByCode,listCommissions} from './lib/gb-affiliates.mjs';
+import {applyAffiliate,cleanCode,cleanEmail,digest,findAffiliateByEmail,getAffiliateByCode,listCommissions,listCommissionRates} from './lib/gb-affiliates.mjs';
 import {sendAffiliateVerificationCode,sendAffiliateApplicationNotice} from './lib/gb-email.mjs';
 const auth=()=>getStore('gb-affiliate-auth-v1');
 const json=(value,status=200)=>Response.json(value,{status,headers:{'Cache-Control':'no-store'}});
@@ -28,7 +28,8 @@ export default async req=>{
   const affiliate=await findAffiliateByEmail(session.email);
   if(!affiliate||affiliate.status!=='approved')return json({error:'This affiliate account is not active.'},403);
   const records=(await listCommissions()).filter(x=>x.affiliate_id===affiliate.id).map(x=>({order_number:x.order_number,created_at:x.created_at,hold_until:x.hold_until,items:x.items,status:x.status,currency:x.currency,commission_total_cents:x.commission_total_cents,paid_at:x.paid_at}));
-  return json({ok:true,affiliate:{name:affiliate.name,email:affiliate.email,code:affiliate.code,status:affiliate.status},records});
+  const rates=(await listCommissionRates()).filter(x=>Number.isInteger(x.cents)&&x.cents>0).map(x=>({name:x.name,cents:x.cents})).sort((x,y)=>x.name.localeCompare(y.name));
+  return json({ok:true,affiliate:{name:affiliate.name,email:affiliate.email,code:affiliate.code,status:affiliate.status},records,rates});
  }
  if(req.method!=='POST')return json({error:'Method not allowed.'},405);
  let body;try{body=await req.json()}catch{return json({error:'Invalid request.'},400)}
