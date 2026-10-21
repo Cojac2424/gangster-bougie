@@ -7,7 +7,7 @@ export const COMMISSION_CENTS=Object.freeze({});
 
 export function normalizeReferralCode(value){
  const code=String(value??'').trim().toUpperCase();
- return /^[A-Z0-9][A-Z0-9_-]{2,23}$/.test(code)?code:null;
+ return /^[A-Z0-9][A-Z0-9_-]{2,29}$/.test(code)?code:null;
 }
 export function referralExpiryMs(clickedAtMs){
  const t=Number(clickedAtMs);
@@ -17,13 +17,13 @@ export function referralIsValid({code,clickedAtMs,nowMs=Date.now()}){
  const expiry=referralExpiryMs(clickedAtMs);
  return Boolean(normalizeReferralCode(code)&&expiry&&Number(nowMs)>=Number(clickedAtMs)&&Number(nowMs)<expiry);
 }
-export function commissionForPaidItems(items){
+export function commissionForPaidItems(items,rates=COMMISSION_CENTS){
  if(!Array.isArray(items))throw new TypeError('items must be an array');
  return items.map(item=>{
   const name=String(item?.name??'').trim();
   const quantity=Number(item?.quantity??item?.qty??0);
   if(!Number.isSafeInteger(quantity)||quantity<1||quantity>100)throw new RangeError('invalid quantity');
-  const cents=COMMISSION_CENTS[name];
+  const cents=rates[name];
   if(!Number.isSafeInteger(cents)||cents<0) return {name,quantity,commissionCents:0,configured:false};
   return {name,quantity,commissionCents:cents*quantity,configured:true};
  });
