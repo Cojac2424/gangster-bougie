@@ -2,7 +2,7 @@
 // in Netlify before attempting access; this endpoint fails closed without it.
 import {digest,listAffiliates,listCommissions,listCommissionRates,setCommissionRate,updateAffiliate,adminUpdateCommission} from './lib/gb-affiliates.mjs';
 import {sendAffiliateApprovalNotice} from './lib/gb-email.mjs';
-import {AFFILIATE_RATE_PRODUCTS} from './lib/gb-product-catalog.mjs';
+import {AFFILIATE_RATE_PRODUCTS,AFFILIATE_COST_PRODUCTS,AFFILIATE_RATE_MEMBERS,AFFILIATE_RATE_GROUP_LABELS} from './lib/gb-product-catalog.mjs';
 import {listCostSnapshots,syncCostBatch,applyProposedRates} from './lib/gb-affiliate-cost-sync.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 async function authorized(req){
@@ -19,7 +19,7 @@ export default async req=>{
  if(!await authorized(req))return json({error:'Unauthorized.'},401);
  if(req.method==='GET'){
   const [affiliates,commissions,rates,printify_costs]=await Promise.all([listAffiliates(),listCommissions(),listCommissionRates(),listCostSnapshots()]);
-  return json({ok:true,affiliates,commissions,rates,printify_costs,catalog_products:AFFILIATE_RATE_PRODUCTS,hold_days:30});
+  return json({ok:true,affiliates,commissions,rates,printify_costs,catalog_products:AFFILIATE_RATE_PRODUCTS,cost_products:AFFILIATE_COST_PRODUCTS,rate_members:AFFILIATE_RATE_MEMBERS,rate_labels:AFFILIATE_RATE_GROUP_LABELS,hold_days:30});
  }
  if(req.method!=='POST')return json({error:'Method not allowed.'},405);
  let b;try{b=await req.json()}catch{return json({error:'Invalid request.'},400)}
