@@ -4,6 +4,7 @@ import {getStore} from '@netlify/blobs';
 import {AFFILIATE_RATE_PRODUCTS,AFFILIATE_RATE_MEMBERS,AFFILIATE_COST_PRODUCTS} from './gb-product-catalog.mjs';
 import {readPrintifyCost} from './gb-affiliate-printify-reader.mjs';
 import {setCommissionRate} from './gb-affiliates.mjs';
+import {conservativeFamilyCommission} from './gb-affiliate-cost-math.mjs';
 
 const store=()=>getStore('gb-owner-printify-affiliate-cost-v1');
 const key=name=>'cost/'+encodeURIComponent(name);
@@ -45,7 +46,7 @@ export async function applyProposedRates({offset=0,batchSize=4}={}){
  const sharedRates=AFFILIATE_RATE_PRODUCTS.map(name=>({
    name,members:AFFILIATE_RATE_MEMBERS[name],
    // Use the smallest safe payout in a family so even the least profitable design is covered.
-   cents:Math.min(...AFFILIATE_RATE_MEMBERS[name].map(member=>byName.get(member).proposed_commission_cents))
+   cents:conservativeFamilyCommission(AFFILIATE_RATE_MEMBERS[name],byName)
  }));
  const selected=sharedRates.slice(start,start+Math.max(1,Math.min(5,Number(batchSize)||4)));
  const saved=[];
