@@ -3,6 +3,7 @@
 import { getStore } from '@netlify/blobs';
 import { REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS, commissionHoldUntil } from './gb-affiliate-rules.mjs';
 import { AFFILIATE_ELIGIBLE_RATE_PRODUCTS, canonicalCommissionName, isAffiliateExcluded } from './gb-product-catalog.mjs';
+import { commissionLineFromRate, summarizeCommissionLines } from './gb-affiliate-commission-lines.mjs';
 
 const DATA='gb-affiliates-v1', LEDGER='gb-affiliate-ledger-v1';
 export const HOLD_DAYS=COMMISSION_HOLD_DAYS, ATTRIBUTION_DAYS=REFERRAL_WINDOW_DAYS;
@@ -89,15 +90,14 @@ export async function recordVerifiedSale({session,affiliate,items,customerEmail,
  // Commission is calculated ONLY from Stripe-verified line items, NEVER browser-supplied totals.
  const calculated=[];
  for(const item of items||[]){
-  const name=String(item.name||''),qty=Math.min(100,Math.max(1,Math.floor(Number(item.quantity)||1)));
-  const rate=await getCommissionRate(name);
-  calculated.push({name,quantity:qty,excluded:Boolean(rate?.excluded),rate_cents:Number.isInteger(rate?.cents)?rate.cents:null,commission_cents:rate?.cents!=null?rate.cents*qty:null});
+  const rate=await getCommissionRate(item.name);
+  calculated.push(commissionLineFromRate(item,rate));
  }
- const pending=calculated.some(x=>x.commission_cents===null),excludedOnly=calculated.length>0&&calculated.every(x=>x.excluded);
+ const {missing_rate:pending,excluded_only:excludedOnly,commission_total_cents:totalCents}=summarizeCommissionLines(calculated);
  const selfReferral=cleanEmail(customerEmail)===cleanEmail(affiliate.email);
  const affiliateInactive=affiliate.status!=='approved'||Boolean(referralCode&&referralCode!==affiliate.code);
  const now=new Date().toISOString();
- const record={stripe_session_id:session.id,payment_intent:typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null,order_number:orderNumber,affiliate_id:affiliate.id,affiliate_code:referralCode||affiliate.code,currency:String(session.currency||'usd').toUpperCase(),items:calculated,commission_total_cents:pending?null:calculated.reduce((sum,x)=>sum+x.commission_cents,0),status:excludedOnly?'excluded_only':selfReferral?'review_self_referral':affiliateInactive?'review_inactive_affiliate':pending?'needs_rates':'pending_hold',self_referral:selfReferral,affiliate_inactive:affiliateInactive,refund_flag:false,created_at:now,hold_until:commissionHoldUntil(Date.now()),paid_at:null,updated_at:now};
+ const record={stripe_session_id:session.id,payment_intent:typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id||null,order_number:orderNumber,affiliate_id:affiliate.id,affiliate_code:referralCode||affiliate.code,currency:String(session.currency||'usd').toUpperCase(),items:calculated,commission_total_cents:totalCents,status:excludedOnly?'excluded_only':selfReferral?'review_self_referral':affiliateInactive?'review_inactive_affiliate':pending?'needs_rates':'pending_hold',self_referral:selfReferral,affiliate_inactive:affiliateInactive,refund_flag:false,created_at:now,hold_until:commissionHoldUntil(Date.now()),paid_at:null,updated_at:now};
  await st.setJSON(key,record);return {ok:true,created:true,record};
 }
 export async function adminUpdateCommission(session,action,updates={}) {
@@ -106,10 +106,10 @@ export async function adminUpdateCommission(session,action,updates={}) {
  const now=new Date().toISOString();
  if(action==='recalculate'){
   if(row.status==='paid'||row.status==='void'||row.status==='refund_review')return {ok:false,error:'Resolve the paid/void/refund state first.'};
-  for(const item of row.items){const rate=await getCommissionRate(item.name);item.excluded=Boolean(rate?.excluded);item.rate_cents=Number.isInteger(rate?.cents)?rate.cents:null;item.commission_cents=item.rate_cents===null?null:item.rate_cents*item.quantity}
-  const pending=row.items.some(x=>x.commission_cents===null);
-  row.commission_total_cents=pending?null:row.items.reduce((s,x)=>s+x.commission_cents,0);
-  row.status=row.items.length>0&&row.items.every(x=>x.excluded)?'excluded_only':pending?'needs_rates':row.refund_flag?'refund_review':row.self_referral?'review_self_referral':row.affiliate_inactive?'review_inactive_affiliate':'pending_hold';
+  for(const item of row.items){const rate=await getCommissionRate(item.name);Object.assign(item,commissionLineFromRate(item,rate))}
+  const {missing_rate:pending,excluded_only:excludedOnly,commission_total_cents:totalCents}=summarizeCommissionLines(row.items);
+  row.commission_total_cents=totalCents;
+  row.status=excludedOnly?'excluded_only':pending?'needs_rates':row.refund_flag?'refund_review':row.self_referral?'review_self_referral':row.affiliate_inactive?'review_inactive_affiliate':'pending_hold';
  }else if(action==='mark_paid'){
   if(row.status!=='pending_hold'&&row.status!=='approved_for_payout')return {ok:false,error:'Commission needs review before payment.'};
   if(Date.parse(row.hold_until)>Date.now())return {ok:false,error:'30-day holding period has not elapsed.'};
