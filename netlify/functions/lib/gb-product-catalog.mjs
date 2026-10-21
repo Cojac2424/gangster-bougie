@@ -33,7 +33,7 @@ export function canonicalCommissionName(value){
  const raw=String(value||'').trim(),name=COMMISSION_PRODUCT_ALIASES[raw]||raw;
  if(!AFFILIATE_COST_PRODUCTS.includes(name))return name;
  if(name.endsWith('Sports Bra')||name.includes('Sports Bra – '))return 'Onyx Sports Bra';
- if(name.endsWith('Leggings'))return 'Onyx Leggings';
+ if(name.endsWith('Leggings')||name.includes('High-Waisted Leggings – '))return 'Onyx Leggings';
  if(name.endsWith('Workout Shorts')||name==='Shorts – Black'||name==='Shorts – White')return 'Onyx Workout Shorts';
  return name;
 }
