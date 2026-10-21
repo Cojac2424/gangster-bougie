@@ -1,0 +1,29 @@
+name: Gangster Bougie affiliate safety checks
+on:
+  pull_request:
+    paths:
+      - 'affiliate*.html'
+      - 'netlify/functions/**'
+      - 'tests/**'
+      - '.github/workflows/affiliate-safety.yml'
+  push:
+    branches:
+      - crop-tee-replacement-staging-20261013
+    paths:
+      - 'affiliate*.html'
+      - 'netlify/functions/**'
+      - 'tests/**'
+      - '.github/workflows/affiliate-safety.yml'
+jobs:
+  affiliate-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check server function JavaScript syntax
+        run: |
+          for f in netlify/functions/*.mjs netlify/functions/lib/*.mjs; do node --check "$f"; done
+      - name: Test referral rules, commissions, catalog and dashboard JavaScript
+        run: node --test tests/affiliate.test.mjs
