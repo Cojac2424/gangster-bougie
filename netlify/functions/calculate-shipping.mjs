@@ -1,14 +1,6 @@
+import { customerShippingContribution } from './lib/gb-shipping-contribution.mjs';
 import { resolveCart } from './lib/fulfillment-resolver.mjs';
 const SHOP_ID='28816619',ALLOWED_COUNTRIES=new Set(['CA','US']);
-function customerShippingContribution(name){
- const n=String(name||'');
- if(/Full-Zip Hoodie|Faux Leather Travel Bag/.test(n))return 0;
- if(/Gym Face Towel/.test(n))return 249;
- if(/Sports Bra|Baby Bougie Tee|Cotton Tee|Signature Cap|Gym Bag|Structured Cap/.test(n))return 299;
- if(/Leggings|Mini Wrap Bandana/.test(n))return 399;
- if(/Workout Shorts|^Shorts – |Basketball Rib Shorts|Crew Socks|Gym Bottle|Yoga Mat/.test(n))return 499;
- return null;
-}
 function plannedCartShipping(items){
  let total=0;
  for(const x of items){const each=customerShippingContribution(x.name);if(each===null)return null;total+=each*Number(x.quantity||1);}
