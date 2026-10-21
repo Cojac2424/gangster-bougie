@@ -1,11 +1,12 @@
 // Verified activewear fulfillment identities.
 // Exact Printify IDs captured from the branch verification run.
 // Variant IDs are stable Printify blueprint/provider variant IDs for these products.
- // Crop Tee replacements are intentionally NOT mapped until each XS–XL Printify variant ID is verified.
- // Black Printify product: 6aced4b5b92b4771540221b6
- // White Printify product: 6acecc7facbbb7449c0eda70
- // Do not reuse discontinued Baby Tee variant IDs.
+ // Crop Tee XS–XL IDs verified against the two Printify product API responses.
+ // Black and white products both use the Black stitching variant (73371–73375).
+ // Black product also exposes 2XL; storefront deliberately excludes 2XL.
 export const VERIFIED_ACTIVEWEAR_PRODUCTS={
+ 'Gangster Bougie Women’s Signature Crop Tee – Black':{product_id:'6aced4b5b92b4771540221b6',sizes:{XS:73371,S:73372,M:73373,L:73374,XL:73375}},
+ 'Gangster Bougie Women’s Signature Crop Tee – White':{product_id:'6acecc7facbbb7449c0eda70',sizes:{XS:73371,S:73372,M:73373,L:73374,XL:73375}},
  'GB Classic Sports Bra – Cream':{product_id:'6aa9d1ba412309c4e10dfc4a',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
  'GB Classic Sports Bra – Red':{product_id:'6aaa0b7d7baff9369d0043f3',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
  'GB Classic Sports Bra – Blue':{product_id:'6aaa0aa6aab470f4440050fa',sizes:{S:118121,M:118122,L:118123,XL:118124,'2XL':118125}},
