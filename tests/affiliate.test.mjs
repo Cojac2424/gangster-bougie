@@ -243,3 +243,25 @@ test('Printify null production cost cannot be interpreted as zero-cost product',
  assert.equal(row.reason,'printify_variant_cost_missing');
  assert.equal(row.proposed_commission_cents,undefined);
 });
+
+test('one-dollar rounding exception preserves the approved slim-margin leggings example',()=>{
+ const leggings=planProductCommission({
+  name:'Example higher-cost leggings',retailCents:5999,
+  variantCosts:[{costCents:3859}],
+  shippingByVariant:[{firstItemCents:1769}],customerContributionCents:399
+ });
+ assert.equal(leggings.processing_allowance_cents,318);
+ assert.equal(leggings.gb_shipping_subsidy_cents,1370);
+ assert.equal(leggings.estimated_profit_cents,452);
+ assert.equal(leggings.twenty_percent_cents,90);
+ assert.equal(leggings.proposed_commission_cents,100);
+ assert.equal(leggings.estimated_retained_after_commission_cents,352);
+ assert.equal(leggings.rounding_note,'minimum_1_dollar_exception');
+ const lowMargin=planProductCommission({
+  name:'Example low-margin mat',retailCents:10499,variantCosts:[{costCents:5448}],
+  shippingByVariant:[{firstItemCents:4839}],customerContributionCents:499
+ });
+ assert.equal(lowMargin.estimated_profit_cents,186);
+ assert.equal(lowMargin.proposed_commission_cents,0);
+ assert.equal(lowMargin.status,'needs_review');
+});
