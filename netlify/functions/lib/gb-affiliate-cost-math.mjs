@@ -49,6 +49,7 @@ export function planProductCommission({
   max_first_item_shipping_cents:shipping,customer_shipping_contribution_cents:contribution,
   gb_shipping_subsidy_cents:subsidy,processing_allowance_cents:processing,
   estimated_profit_cents:profit,twenty_percent_cents:target,proposed_commission_cents:proposed,
+  estimated_retained_after_commission_cents:profit-proposed,
   fee_basis_points:feeRateBasisPoints,fee_fixed_cents:feeFixedCents,
   cost_variant_count:list.length,shipping_profile_count:shippingByVariant.length};
 }
