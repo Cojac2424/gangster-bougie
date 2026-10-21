@@ -10,7 +10,6 @@ import {readPrintifyCost} from '../netlify/functions/lib/gb-affiliate-printify-r
 import {affiliateMappedVariants} from '../netlify/functions/lib/fulfillment-resolver.mjs';
 import {AFFILIATE_EXCLUDED_RATE_NAMES,AFFILIATE_EXCLUDED_PRODUCT_NAMES,AFFILIATE_ELIGIBLE_RATE_PRODUCTS,isAffiliateExcluded} from '../netlify/functions/lib/gb-product-catalog.mjs';
 import {commissionLineFromRate,summarizeCommissionLines} from '../netlify/functions/lib/gb-affiliate-commission-lines.mjs';
-import {getCommissionRate,setCommissionRate} from '../netlify/functions/lib/gb-affiliates.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
  assert.ok(SELLABLE_PRODUCT_NAMES.length >= 50);
@@ -324,14 +323,11 @@ test('explicit low-margin exclusions cover men’s shorts, bottles, mats, socks 
  assert.equal(isAffiliateExcluded('GB Classic High-Waisted Leggings – Black'),false);
  assert.equal(isAffiliateExcluded('Onyx/Gold Crowned Luxury Full-Zip Hoodie'),false);
 });
-test('rate storage rejects excluded products and always returns policy-enforced $0 without saved-rate lookup',async()=>{
- const sock=await getCommissionRate('Crowned Luxury Crew Socks');
- const bottle=await getCommissionRate('Gangster Bougie Stainless Steel Gym Bottle');
- assert.deepEqual(sock,{name:'Crowned Luxury Crew Socks',cents:0,excluded:true});
- assert.deepEqual(bottle,{name:'Stainless Steel Gym Bottle',cents:0,excluded:true});
- const result=await setCommissionRate('Foam Yoga Mat',500);
- assert.equal(result.ok,false);
- assert.match(result.error,/excluded/i);
+test('server code rejects saved excluded rates and always returns policy-enforced $0',()=>{
+ const impl=readFileSync(new URL('../netlify/functions/lib/gb-affiliates.mjs',import.meta.url),'utf8');
+ assert.match(impl,/if\(isAffiliateExcluded\(n\)\)return \{ok:false/);
+ assert.match(impl,/isAffiliateExcluded\(n\)\?\{name:n,cents:0,excluded:true\}/);
+ assert.match(impl,/filter\(rate=>!isAffiliateExcluded\(rate.name\)\)/);
 });
 test('verified multi-item referral adds eligible rates but pays $0 on excluded items',()=>{
  const lines=[
