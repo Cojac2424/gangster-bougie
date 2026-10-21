@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Script } from 'node:vm';
-import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES, AFFILIATE_RATE_PRODUCTS, AFFILIATE_LEGACY_UNMAPPED_NAMES, COMMISSION_PRODUCT_ALIASES, canonicalCommissionName } from '../netlify/functions/lib/gb-product-catalog.mjs';
+import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES, AFFILIATE_RATE_PRODUCTS, AFFILIATE_COST_PRODUCTS, AFFILIATE_RATE_MEMBERS, AFFILIATE_LEGACY_UNMAPPED_NAMES, COMMISSION_PRODUCT_ALIASES, canonicalCommissionName } from '../netlify/functions/lib/gb-product-catalog.mjs';
 import { normalizeReferralCode, referralExpiryMs, referralIsValid, commissionForPaidItems, commissionTotalCents, commissionHoldUntil, REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS } from '../netlify/functions/lib/gb-affiliate-rules.mjs';
 import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS} from '../netlify/functions/lib/gb-affiliate-cost-math.mjs';
 import {customerShippingContribution} from '../netlify/functions/lib/gb-shipping-contribution.mjs';
@@ -87,8 +87,9 @@ test('Printify fulfillment picks exact sizes and accessory variants', async () =
  assert.equal(resolveFulfillment('Gangster Bougie Foam Yoga Mat','Dark Blue').variant_id,71786);
 });
 
-test('one commission amount per real product, including every accessory alias', () => {
- assert.equal(AFFILIATE_RATE_PRODUCTS.length,52);
+test('all physical products are cost-verified, with only one commission per garment type', () => {
+ assert.equal(AFFILIATE_COST_PRODUCTS.length,52);
+ assert.equal(AFFILIATE_RATE_PRODUCTS.length,21);
  assert.equal(Object.keys(COMMISSION_PRODUCT_ALIASES).length,8);
  assert.equal(AFFILIATE_LEGACY_UNMAPPED_NAMES.length,6);
  for(const name of AFFILIATE_RATE_PRODUCTS) assert.ok(SELLABLE_PRODUCT_NAMES.includes(name));
@@ -105,6 +106,14 @@ test('one commission amount per real product, including every accessory alias', 
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gangster Bougie Women’s Signature Crop Tee – White'));
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gym Face Towel'));
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Foam Yoga Mat'));
+ assert.equal(AFFILIATE_RATE_MEMBERS['Onyx Sports Bra'].length,13);
+ assert.equal(AFFILIATE_RATE_MEMBERS['Onyx Leggings'].length,13);
+ assert.equal(AFFILIATE_RATE_MEMBERS['Onyx Workout Shorts'].length,8);
+ for(const name of AFFILIATE_COST_PRODUCTS) assert.ok(AFFILIATE_RATE_PRODUCTS.includes(canonicalCommissionName(name)),name);
+ for(const name of AFFILIATE_RATE_MEMBERS['Onyx Sports Bra']) assert.equal(canonicalCommissionName(name),'Onyx Sports Bra');
+ for(const name of AFFILIATE_RATE_MEMBERS['Onyx Leggings']) assert.equal(canonicalCommissionName(name),'Onyx Leggings');
+ for(const name of AFFILIATE_RATE_MEMBERS['Onyx Workout Shorts']) assert.equal(canonicalCommissionName(name),'Onyx Workout Shorts');
+ assert.equal(canonicalCommissionName('Gangster Bougie Women’s Signature Crop Tee – Black'),'Gangster Bougie Women’s Signature Crop Tee – Black');
 });
 
 test('shipping subsidy uses the same contribution as live checkout', () => {
@@ -151,7 +160,7 @@ test('verified Printify cost planner rounds DOWN to fixed whole-dollar USD, requ
  }).status,'needs_review');
 });
 test('every affiliate product has exact Printify variants and a customer shipping contribution',()=>{
- for(const name of AFFILIATE_RATE_PRODUCTS){
+ for(const name of AFFILIATE_COST_PRODUCTS){
    const variants=affiliateMappedVariants(name);
    assert.ok(variants.length>0,'Missing Printify mapping: '+name);
    assert.ok(variants.every(v=>v.productId&&Number.isSafeInteger(v.variantId)&&v.variantId>0),'Invalid variant: '+name);
@@ -165,6 +174,8 @@ test('owner admin has private Printify syncing and proposal approval UI',()=>{
  assert.match(admin,/id="syncPrintifyCosts"/);
  assert.match(admin,/id="approvePrintifyCosts"/);
  assert.match(admin,/You keep after commission/);
+ assert.match(admin,/id="sharedRateRows"/);
+ assert.match(admin,/d\.cost_products/);
  assert.match(admin,/approve_all_cost_rates/);
  assert.match(admin,/sync_printify_costs/);
 });
