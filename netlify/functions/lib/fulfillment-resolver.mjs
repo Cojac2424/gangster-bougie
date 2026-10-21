@@ -21,13 +21,25 @@ function findKey(haystack,keys){
  const h=text(haystack).toLowerCase();
  return keys.find(k=>h.includes(String(k).toLowerCase()))||null;
 }
+// Match sizes/capacities as complete tokens; XL and 2XL must never resolve to L.
+function findSizeKey(option,keys){
+ const h=text(option).toLowerCase().replace(/\s+/g,'');
+ for(const key of [...keys].sort((a,b)=>String(b).length-String(a).length)){
+  const k=String(key).toLowerCase().replace(/\s+/g,'');
+  let at=h.indexOf(k);
+  while(at!==-1){
+   const before=at===0?'':h[at-1],after=h[at+k.length]||'';
+   if(!/[a-z0-9]/.test(before)&&!/[a-z0-9]/.test(after))return key;
+   at=h.indexOf(k,at+1);
+  }
+ }
+ return null;
+}
 export function resolveFulfillment(name,option=''){
  const key=canonicalName(name), p=ALL[key];
  if(!p) return {ok:false,error:'unmapped_product',name:key};
  if(p.sizes){
-   let wanted=findKey(option,Object.keys(p.sizes));
-   // Normalize bottle storefront spacing: "12 oz" / "18 oz" -> mapping "12oz" / "18oz".
-   if(!wanted){const compact=text(option).replace(/\s+/g,'');wanted=findKey(compact,Object.keys(p.sizes));}
+   const wanted=findSizeKey(option,Object.keys(p.sizes));
    if(!wanted) return {ok:false,error:'unmapped_size',name:key,option:text(option)};
    return {ok:true,name:key,product_id:p.product_id,variant_id:p.sizes[wanted],selection:wanted};
  }
