@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { Script } from 'node:vm';
 import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES, AFFILIATE_RATE_PRODUCTS, AFFILIATE_COST_PRODUCTS, AFFILIATE_RATE_MEMBERS, AFFILIATE_LEGACY_UNMAPPED_NAMES, COMMISSION_PRODUCT_ALIASES, canonicalCommissionName } from '../netlify/functions/lib/gb-product-catalog.mjs';
 import { normalizeReferralCode, referralExpiryMs, referralIsValid, commissionForPaidItems, commissionTotalCents, commissionHoldUntil, REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS } from '../netlify/functions/lib/gb-affiliate-rules.mjs';
-import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS} from '../netlify/functions/lib/gb-affiliate-cost-math.mjs';
+import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS,conservativeFamilyCommission} from '../netlify/functions/lib/gb-affiliate-cost-math.mjs';
 import {customerShippingContribution} from '../netlify/functions/lib/gb-shipping-contribution.mjs';
 import {readPrintifyCost} from '../netlify/functions/lib/gb-affiliate-printify-reader.mjs';
 import {affiliateMappedVariants} from '../netlify/functions/lib/fulfillment-resolver.mjs';
@@ -275,4 +275,26 @@ test('one-dollar rounding exception preserves the approved slim-margin leggings 
  assert.equal(lowMargin.estimated_profit_cents,186);
  assert.equal(lowMargin.proposed_commission_cents,0);
  assert.equal(lowMargin.status,'needs_review');
+});
+
+test('shared commission uses least profitable garment design and fails closed when one cost is missing',()=>{
+ const names=AFFILIATE_RATE_MEMBERS['Onyx Workout Shorts'];
+ assert.equal(names.length,8);
+ const byName=new Map(names.map((name,i)=>[name,{proposed_commission_cents:i===5?100:200}]));
+ assert.equal(conservativeFamilyCommission(names,byName),100);
+ byName.delete(names[0]);
+ assert.equal(conservativeFamilyCommission(names,byName),null);
+});
+test('multi-item referral totaling uses the same rate for colourways of bras, leggings and shorts',()=>{
+ const sourceRates=new Map([['Onyx Sports Bra',200],['Onyx Leggings',100],['Onyx Workout Shorts',100]]);
+ const order=[
+ {name:'GB Classic Sports Bra – Cream',quantity:1},
+ {name:'Heritage Plaid Sports Bra',quantity:1},
+ {name:'GB Classic High-Waisted Leggings – Grey',quantity:2},
+ {name:'Shorts – White',quantity:1},
+ {name:'Oxblood Workout Shorts',quantity:1}
+ ];
+ const lines=order.map(x=>({name:x.name,quantity:x.quantity,rate_cents:sourceRates.get(canonicalCommissionName(x.name))}));
+ assert.deepEqual(lines.map(x=>x.rate_cents),[200,200,100,100,100]);
+ assert.equal(lines.reduce((total,x)=>total+x.quantity*x.rate_cents,0),800);
 });
