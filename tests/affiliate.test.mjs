@@ -62,3 +62,23 @@ test('storefront connects affiliate login and application with the right pages',
  assert.match(admin, /id="authForm"/);
  assert.match(admin, /id="commissions"/);
 });
+
+test('Printify fulfillment picks exact sizes and accessory variants', async () => {
+ const {resolveFulfillment}=await import('../netlify/functions/lib/fulfillment-resolver.mjs');
+ const blue='GB Classic High-Waisted Leggings – Blue';
+ assert.equal(resolveFulfillment(blue,'XS').variant_id,67982);
+ assert.equal(resolveFulfillment(blue,'S').variant_id,67983);
+ assert.equal(resolveFulfillment(blue,'M').variant_id,67984);
+ assert.equal(resolveFulfillment(blue,'L').variant_id,67985);
+ assert.equal(resolveFulfillment(blue,'XL').variant_id,67986);
+ assert.equal(resolveFulfillment(blue,'2XL').variant_id,67987);
+ assert.equal(resolveFulfillment(blue,'Black / XL').variant_id,67986);
+ assert.equal(resolveFulfillment(blue,'3XL').ok,false);
+ assert.equal(resolveFulfillment('Onyx/Gold Crowned Luxury Full-Zip Hoodie','2XL').variant_id,75723);
+ assert.equal(resolveFulfillment('Stainless Steel Gym Bottle','18 oz').variant_id,76802);
+ assert.equal(resolveFulfillment('Stainless Steel Gym Bottle','Black / 12 oz').variant_id,76801);
+ assert.equal(resolveFulfillment('Embroidered Structured Cap','S/M').variant_id,118702);
+ assert.equal(resolveFulfillment('Embroidered Structured Cap','L/XL').variant_id,118703);
+ assert.equal(resolveFulfillment('Gangster Bougie Gym Face Towel','Black').variant_id,75135);
+ assert.equal(resolveFulfillment('Gangster Bougie Foam Yoga Mat','Dark Blue').variant_id,71786);
+});
