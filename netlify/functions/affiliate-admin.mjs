@@ -2,7 +2,7 @@
 // in Netlify before attempting access; this endpoint fails closed without it.
 import {digest,listAffiliates,listCommissions,listCommissionRates,setCommissionRate,updateAffiliate,adminUpdateCommission} from './lib/gb-affiliates.mjs';
 import {sendAffiliateApprovalNotice} from './lib/gb-email.mjs';
-import {SELLABLE_PRODUCT_NAMES} from './lib/gb-product-catalog.mjs';
+import {AFFILIATE_RATE_PRODUCTS} from './lib/gb-product-catalog.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 async function authorized(req){
  const expected=String(process.env.GB_AFFILIATE_ADMIN_SECRET||'');
@@ -18,7 +18,7 @@ export default async req=>{
  if(!await authorized(req))return json({error:'Unauthorized.'},401);
  if(req.method==='GET'){
   const [affiliates,commissions,rates]=await Promise.all([listAffiliates(),listCommissions(),listCommissionRates()]);
-  return json({ok:true,affiliates,commissions,rates,catalog_products:SELLABLE_PRODUCT_NAMES,hold_days:30});
+  return json({ok:true,affiliates,commissions,rates,catalog_products:AFFILIATE_RATE_PRODUCTS,hold_days:30});
  }
  if(req.method!=='POST')return json({error:'Method not allowed.'},405);
  let b;try{b=await req.json()}catch{return json({error:'Invalid request.'},400)}
