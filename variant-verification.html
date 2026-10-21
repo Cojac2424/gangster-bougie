@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gangster Bougie — Printify Variant Verification</title>
+<style>body{font:16px system-ui;background:#111;color:#eee;max-width:750px;margin:40px auto;padding:16px}input,button{font:inherit;padding:12px;border-radius:6px}input{width:100%;box-sizing:border-box;background:#222;color:#fff;border:1px solid #777}button{margin-top:12px;background:#c5a45d;color:#111;border:0;font-weight:700}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#222;padding:14px}small{color:#bbb}</style></head><body>
+<h1>Printify Crop Tee Variant Verification</h1>
+<p>This temporary tool reads the two Crop Tee products using the existing Netlify Printify connection. It does not create orders or publish anything.</p>
+<label for="secret">Temporary lookup secret (configured privately in Netlify)</label><input id="secret" type="password" autocomplete="off" minlength="32" placeholder="Paste the temporary secret here">
+<button id="lookup" type="button">Retrieve variant IDs</button>
+<p id="status" role="status"></p><pre id="output" hidden></pre>
+<small>Do not enter your Printify API token here. This page requires a separate temporary secret. The secret is never stored by this page. Remove the temporary lookup function and secret after verification.</small>
+<script>
+document.getElementById('lookup').addEventListener('click',async()=>{
+ const secret=document.getElementById('secret').value;
+ const status=document.getElementById('status'),out=document.getElementById('output');
+ out.hidden=true;out.textContent='';if(secret.length<32){status.textContent='Enter your temporary secret (32 characters minimum).';return}
+ status.textContent='Retrieving products…';
+ try{const r=await fetch('/.netlify/functions/gb-variant-lookup',{method:'POST',headers:{'x-gb-variant-lookup-secret':secret}});
+ const data=await r.json();if(!r.ok)throw Error(data.error||'Lookup failed');
+ out.textContent=JSON.stringify(data,null,2);out.hidden=false;status.textContent='Lookup completed. Copy only the variant IDs and size labels, not your secret.';
+ }catch(e){status.textContent='Lookup failed: '+e.message}
+ document.getElementById('secret').value='';
+});
+</script></body></html>
