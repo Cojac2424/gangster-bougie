@@ -44,3 +44,29 @@ export const AFFILIATE_RATE_MEMBERS=Object.freeze(Object.fromEntries(AFFILIATE_R
  key,Object.freeze(AFFILIATE_COST_PRODUCTS.filter(name=>canonicalCommissionName(name)===key))
 ])));
 
+
+// Temporary exclusions from affiliate earnings. These items remain on sale; their
+// commission is always $0 until the owner explicitly changes the policy in code.
+// Physical product names resolve through aliases and garment-family group keys.
+export const AFFILIATE_EXCLUDED_RATE_NAMES=Object.freeze([
+ 'Onyx/Gold Gangster Bougie Basketball Rib Shorts',
+ 'Cream/Gold Gangster Bougie Basketball Rib Shorts',
+ 'Crowned Luxury Crew Socks',
+ 'Stainless Steel Gym Bottle',
+ 'Foam Yoga Mat',
+ 'Mini Wrap Bandana'
+]);
+export const isAffiliateExcluded=name=>AFFILIATE_EXCLUDED_RATE_NAMES.includes(canonicalCommissionName(name));
+export const AFFILIATE_ELIGIBLE_RATE_PRODUCTS=Object.freeze(
+ AFFILIATE_RATE_PRODUCTS.filter(name=>!isAffiliateExcluded(name))
+);
+export const AFFILIATE_EXCLUDED_PRODUCT_NAMES=Object.freeze(
+ AFFILIATE_COST_PRODUCTS.filter(name=>isAffiliateExcluded(name))
+);
+export const AFFILIATE_PUBLIC_EXCLUSION_LABELS=Object.freeze([
+ 'Men’s basketball rib shorts (both designs)',
+ 'Crowned Luxury crew socks',
+ 'Stainless steel gym bottles (12 oz and 18 oz)',
+ 'Foam yoga mats (all colours)',
+ 'Mini wrap bandanas'
+]);
