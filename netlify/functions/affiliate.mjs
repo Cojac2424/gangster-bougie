@@ -1,7 +1,7 @@
 // Public affiliate application, code validation and email-verified affiliate dashboard.
 import {getStore} from '@netlify/blobs';
 import {applyAffiliate,cleanCode,cleanEmail,digest,findAffiliateByEmail,getAffiliateByCode,listCommissions} from './lib/gb-affiliates.mjs';
-import {sendAffiliateVerificationCode} from './lib/gb-email.mjs';
+import {sendAffiliateVerificationCode,sendAffiliateApplicationNotice} from './lib/gb-email.mjs';
 const auth=()=>getStore('gb-affiliate-auth-v1');
 const json=(value,status=200)=>Response.json(value,{status,headers:{'Cache-Control':'no-store'}});
 const token=()=>[...crypto.getRandomValues(new Uint8Array(32))].map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -36,6 +36,7 @@ export default async req=>{
  if(action==='apply'){
   if(await limited(req,'apply',5,60*60*1000))return json({error:'Please try again later.'},429);
   const result=await applyAffiliate(body);
+  if(result.ok&&!result.existing){try{const mail=await sendAffiliateApplicationNotice(body);if(!mail.ok)console.error('AFFILIATE APPLICATION ALERT FAILED',mail.error)}catch(e){console.error('AFFILIATE APPLICATION ALERT FAILED',String(e?.message||e))}}
   return result.ok?json({ok:true,message:'Application received. We will review it before issuing a referral code.'}):json({error:result.error},400);
  }
  if(action==='request_code'){
