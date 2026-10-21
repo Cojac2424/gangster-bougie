@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { Script } from 'node:vm';
 import { PRICE_CENTS, VARIABLE_PRICES, SELLABLE_PRODUCT_NAMES, AFFILIATE_RATE_PRODUCTS, AFFILIATE_LEGACY_UNMAPPED_NAMES, COMMISSION_PRODUCT_ALIASES, canonicalCommissionName } from '../netlify/functions/lib/gb-product-catalog.mjs';
 import { normalizeReferralCode, referralExpiryMs, referralIsValid, commissionForPaidItems, commissionTotalCents, commissionHoldUntil, REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS } from '../netlify/functions/lib/gb-affiliate-rules.mjs';
+import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS} from '../netlify/functions/lib/gb-affiliate-cost-math.mjs';
+import {customerShippingContribution} from '../netlify/functions/lib/gb-shipping-contribution.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
  assert.ok(SELLABLE_PRODUCT_NAMES.length >= 50);
@@ -101,4 +103,52 @@ test('one commission amount per real product, including every accessory alias', 
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gangster Bougie Women’s Signature Crop Tee – White'));
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gym Face Towel'));
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Foam Yoga Mat'));
+});
+
+test('shipping subsidy uses the same contribution as live checkout', () => {
+ assert.equal(customerShippingContribution('Gym Face Towel'),249);
+ assert.equal(customerShippingContribution('Foam Yoga Mat'),499);
+ assert.equal(customerShippingContribution('Onyx/Gold Crowned Luxury Full-Zip Hoodie'),0);
+ assert.equal(customerShippingContribution('Stainless Steel Gym Bottle'),499);
+});
+test('Printify US and Canada shipping quotes choose highest first-item cost for all offered variants',()=>{
+ const profiles=[
+  {variant_ids:[10,20],countries:['US'],first_item:{currency:'USD',cost:799}},
+  {variant_ids:[10,20],countries:['CA'],first_item:{currency:'USD',cost:1199}}
+ ];
+ const result=getWorstShippingCents(profiles,[10,20]);
+ assert.equal(result.ok,true);
+ assert.equal(result.maxFirstItemCents,1199);
+ assert.equal(result.perDestination.length,4);
+ assert.equal(getWorstShippingCents(profiles.slice(0,1),[10]).ok,false);
+});
+test('verified Printify cost planner rounds DOWN to fixed whole-dollar USD, requiring owner approval',()=>{
+ const row=planProductCommission({
+  name:'Example accessory',retailCents:4999,
+  variantCosts:[{costCents:1200},{costCents:1600}],
+  shippingByVariant:[{firstItemCents:799},{firstItemCents:1199}],
+  customerContributionCents:299
+ });
+ assert.equal(FEE_ESTIMATE_BASIS_POINTS,450);
+ assert.equal(row.status,'proposal_ready');
+ assert.equal(row.production_high_cents,1600);
+ assert.equal(row.gb_shipping_subsidy_cents,900);
+ assert.equal(row.processing_allowance_cents,269);
+ assert.equal(row.estimated_profit_cents,2230);
+ assert.equal(row.twenty_percent_cents,446);
+ assert.equal(row.proposed_commission_cents,400);
+ assert.equal(planProductCommission({
+  name:'Unsafe',retailCents:1999,variantCosts:[],shippingByVariant:[],customerContributionCents:299
+ }).status,'needs_review');
+ assert.equal(planProductCommission({
+  name:'Loss-making',retailCents:2000,variantCosts:[{costCents:3000}],
+  shippingByVariant:[{firstItemCents:1000}],customerContributionCents:0
+ }).status,'needs_review');
+});
+test('owner admin has private Printify syncing and proposal approval UI',()=>{
+ const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
+ assert.match(admin,/id="syncPrintifyCosts"/);
+ assert.match(admin,/id="approvePrintifyCosts"/);
+ assert.match(admin,/approve_all_cost_rates/);
+ assert.match(admin,/sync_printify_costs/);
 });
