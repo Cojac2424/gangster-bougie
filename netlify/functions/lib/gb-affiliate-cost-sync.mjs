@@ -1,7 +1,7 @@
 // Private Printify cost synchronizer. Called only from affiliate-admin after owner auth.
 // Never expose this module through an unauthenticated function or the affiliate dashboard.
 import {getStore} from '@netlify/blobs';
-import {AFFILIATE_RATE_PRODUCTS} from './gb-product-catalog.mjs';
+import {AFFILIATE_RATE_PRODUCTS,AFFILIATE_RATE_MEMBERS,AFFILIATE_COST_PRODUCTS} from './gb-product-catalog.mjs';
 import {readPrintifyCost} from './gb-affiliate-printify-reader.mjs';
 import {setCommissionRate} from './gb-affiliates.mjs';
 
@@ -20,31 +20,37 @@ export async function listCostSnapshots(){
 export async function syncCostBatch({offset=0,batchSize=3,fetcher=fetch}={}){
  const token=process.env.PRINTIFY_API_TOKEN;
  if(!token)return {ok:false,error:'PRINTIFY_API_TOKEN is not configured in Netlify.'};
- const start=Number(offset);if(!Number.isSafeInteger(start)||start<0||start>AFFILIATE_RATE_PRODUCTS.length)return {ok:false,error:'Invalid sync offset.'};
+ const start=Number(offset);if(!Number.isSafeInteger(start)||start<0||start>AFFILIATE_COST_PRODUCTS.length)return {ok:false,error:'Invalid sync offset.'};
  const n=Math.max(1,Math.min(4,Number(batchSize)||3));
- const selected=AFFILIATE_RATE_PRODUCTS.slice(start,start+n);
+ const selected=AFFILIATE_COST_PRODUCTS.slice(start,start+n);
  const rows=await Promise.all(selected.map(async name=>{
   let value;try{value=await readPrintifyCost(name,token,fetcher)}
   catch(error){value={name,status:'error',reason:safeError(error),checked_at:new Date().toISOString()}}
   await store().setJSON(key(name),value);
   return {name,status:value.status,reason:value.reason||null};
  }));
- return {ok:true,processed:rows.length,total:AFFILIATE_RATE_PRODUCTS.length,next_offset:start+rows.length,done:start+rows.length>=AFFILIATE_RATE_PRODUCTS.length,rows};
+ return {ok:true,processed:rows.length,total:AFFILIATE_COST_PRODUCTS.length,next_offset:start+rows.length,done:start+rows.length>=AFFILIATE_COST_PRODUCTS.length,rows};
 }
 export async function applyProposedRates({offset=0,batchSize=4}={}){
  const start=Number(offset);
  if(!Number.isSafeInteger(start)||start<0||start>AFFILIATE_RATE_PRODUCTS.length)return {ok:false,error:'Invalid batch offset.'};
- // Fail closed for ALL products before the first rate can be activated.
- const s=store(),rows=await Promise.all(AFFILIATE_RATE_PRODUCTS.map(name=>s.get(key(name),{type:'json'})));
+ // Block approval until every single physical garment has verified current costs.
+ const s=store(),snapshots=await Promise.all(AFFILIATE_COST_PRODUCTS.map(name=>s.get(key(name),{type:'json'})));
  const now=Date.now();
- const unready=rows.filter((r,i)=>r?.name!==AFFILIATE_RATE_PRODUCTS[i]||r.status!=='proposal_ready'||
+ const unready=snapshots.filter((r,i)=>r?.name!==AFFILIATE_COST_PRODUCTS[i]||r.status!=='proposal_ready'||
   !Number.isSafeInteger(r.proposed_commission_cents)||r.proposed_commission_cents<=0||
   !Number.isFinite(Date.parse(r.checked_at))||now-Date.parse(r.checked_at)>14*86400000);
  if(unready.length)return {ok:false,error:'Every current product needs fresh verified costs and a positive proposed rate before bulk approval.',remaining:unready.length};
- const selected=rows.slice(start,start+Math.max(1,Math.min(5,Number(batchSize)||4)));
+ const byName=new Map(snapshots.map(s=>[s.name,s]));
+ const sharedRates=AFFILIATE_RATE_PRODUCTS.map(name=>({
+   name,members:AFFILIATE_RATE_MEMBERS[name],
+   // Use the smallest safe payout in a family so even the least profitable design is covered.
+   cents:Math.min(...AFFILIATE_RATE_MEMBERS[name].map(member=>byName.get(member).proposed_commission_cents))
+ }));
+ const selected=sharedRates.slice(start,start+Math.max(1,Math.min(5,Number(batchSize)||4)));
  const saved=[];
- for(const r of selected){const v=await setCommissionRate(r.name,r.proposed_commission_cents);
+ for(const r of selected){const v=await setCommissionRate(r.name,r.cents);
   if(!v.ok)return {ok:false,error:'Unable to save rate for '+r.name,saved};
-  saved.push({name:r.name,cents:r.proposed_commission_cents});}
- return {ok:true,saved,processed:saved.length,next_offset:start+saved.length,done:start+saved.length>=rows.length,total:rows.length};
+  saved.push({name:r.name,cents:r.cents,members:r.members.length});}
+ return {ok:true,saved,processed:saved.length,next_offset:start+saved.length,done:start+saved.length>=sharedRates.length,total:sharedRates.length};
 }
