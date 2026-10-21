@@ -175,6 +175,8 @@ test('every affiliate product has exact Printify variants and a customer shippin
 test('owner admin has private Printify syncing and proposal approval UI',()=>{
  const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
  assert.match(admin,/id="syncPrintifyCosts"/);
+ assert.match(admin,/id="syncMatCost"/);
+ assert.match(admin,/id="matCostStatus"/);
  assert.match(admin,/id="approvePrintifyCosts"/);
  assert.match(admin,/You keep after commission/);
  assert.match(admin,/id="sharedRateRows"/);
@@ -231,6 +233,56 @@ test('mocked two-colour Printify accessory fetch reuses shipping profile across 
  assert.equal(x.printify_product_ids.length,2);
  assert.equal(productCalls,2);
  assert.equal(shippingCalls,1);
+});
+test('foam yoga mat retries missing V1 Canada rate against real-format Printify V2 standard shipping',async()=>{
+ const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
+ '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
+ '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
+ let v2Calls=0;
+ const mock=async url=>{
+  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
+  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
+    variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
+  if(url.endsWith('/v1/catalog/blueprints/900/print_providers/901/shipping.json'))
+   return {ok:true,json:async()=>({profiles:[{variant_ids:[71786],countries:['US'],
+    first_item:{currency:'USD',cost:3900}}]})};
+  if(url.endsWith('/v2/catalog/blueprints/900/print_providers/901/shipping/standard.json')){
+   v2Calls++;
+   return {ok:true,json:async()=>({data:['US','CA'].map(country=>({attributes:{
+    shippingType:'standard',variantId:71786,country:{code:country},
+    shippingCost:{firstItem:{amount:country==='CA'?4839:3900,currency:'USD'}}
+   }}))})};
+  }
+  throw Error('Unexpected mock route '+url);
+ };
+ const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
+ assert.equal(mat.retail_cents,10499);
+ assert.equal(mat.production_high_cents,5448);
+ assert.equal(mat.gb_shipping_subsidy_cents,4340);
+ assert.equal(mat.estimated_profit_cents,186);
+ assert.equal(mat.proposed_commission_cents,0);
+ assert.equal(mat.status,'needs_review'); // Excluded: zero proposed payout is intentional.
+ assert.match(mat.shipping_source,/V2 standard/);
+ assert.equal(v2Calls,1);
+});
+test('mat with no verified Canada shipping must remain unpriced rather than assume a shipping cost',async()=>{
+ const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
+ '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
+ '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
+ const mock=async url=>{
+  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
+  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
+   variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
+  if(url.includes('/shipping/standard.json'))return {ok:true,json:async()=>({data:[]})};
+  if(url.includes('/shipping.json'))return {ok:true,json:async()=>({profiles:[]})};
+  throw Error('Unexpected mock route '+url);
+ };
+ const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
+ assert.equal(mat.status,'needs_review');
+ assert.equal(mat.reason,'shipping_profile_missing');
+ assert.equal(mat.retail_cents,10499);
+ assert.equal(mat.proposed_commission_cents,undefined);
+ assert.equal(mat.estimated_profit_cents,undefined);
 });
 test('Printify importer blocks suggestions when a required variant lacks its actual cost',async()=>{
  const id='6aa0d82a6279c5ea5c03596f';

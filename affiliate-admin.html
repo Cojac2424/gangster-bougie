@@ -6,8 +6,8 @@
 <section class="panel"><h2>Eligible affiliate commission rates by product type</h2><p>Women's sports bras, leggings, and workout shorts each share one fixed rate across colours and designs. Other eligible products have their own rates. Thin-margin items are explicitly excluded and always earn $0. Enter a fixed amount in USD. These amounts are private; no commission is payable for an unconfigured product. Only set rates after checking Printify costs and your margins.</p><form id="rateForm" class="grid"><label>Product or shared garment type<input id="rateName" list="products" required><datalist id="products"></datalist></label><label>Commission per item (USD)<input id="rateDollars" type="number" min="0" max="1000" step=".01" required placeholder="4.00"></label><div style="align-self:end"><button type="submit">Save Commission Amount</button></div></form><p id="unconfigured" class="small" role="status"></p><div id="rates"></div></section>
 <section class="panel" id="costReview"><h2>Printify costs & commission recommendations</h2>
 <p>Pull production costs for all 52 products directly from your Printify account, including each enabled size/colour. The estimate uses the highest product cost, conservative US/Canada first-item shipping, customer shipping contributions, and an <strong>estimated 4.5% + US$0.30 per item processing allowance</strong>. This is a cautious planning assumption, NOT the actual Stripe fee. Nothing is automatically approved or paid.</p>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
-<p id="costState" role="status">No verified cost report has been loaded yet.</p><p class="small"><strong>Temporarily excluded:</strong> Basketball rib shorts (both designs), crew socks, gym bottles (both sizes), yoga mats, mini wrap bandanas. These remain sellable and show $0 on referred orders. Production and shipping costs make them unsuitable for commissions at present.</p><h3 style="color:var(--gold)">Shared garment commissions</h3><p class="small">For each women's garment type, the proposed rate uses the lowest safe commission among all its patterns and colours. No separate payouts by design.</p><div class="scroll"><table><thead><tr><th>Garment type</th><th>Designs covered</th><th>Safe shared commission</th><th>Minimum estimated profit kept</th><th>Status</th></tr></thead><tbody id="sharedRateRows"></tbody></table></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="syncMatCost" class="secondary">Recheck yoga mat only</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
+<p id="costState" role="status">No verified cost report has been loaded yet.</p><p id="matCostStatus" role="status">Foam yoga mat: no cost report loaded.</p><p class="small"><strong>Temporarily excluded:</strong> Basketball rib shorts (both designs), crew socks, gym bottles (both sizes), yoga mats, mini wrap bandanas. These remain sellable and show $0 on referred orders. Production and shipping costs make them unsuitable for commissions at present.</p><h3 style="color:var(--gold)">Shared garment commissions</h3><p class="small">For each women's garment type, the proposed rate uses the lowest safe commission among all its patterns and colours. No separate payouts by design.</p><div class="scroll"><table><thead><tr><th>Garment type</th><th>Designs covered</th><th>Safe shared commission</th><th>Minimum estimated profit kept</th><th>Status</th></tr></thead><tbody id="sharedRateRows"></tbody></table></div>
 <div class="scroll"><table><thead><tr><th>Product</th><th>Retail</th><th>Highest Printify cost</th><th>Highest shipping subsidy</th><th>Estimated payment fee</th><th>Estimated net profit</th><th>20% target</th><th>Suggested fixed commission</th><th>You keep after commission</th><th>Review status</th></tr></thead><tbody id="costRows"></tbody></table></div>
 <p><small>All prices and estimated costs are in US dollars. Suggested commissions round down to whole dollars, except that a near-$1 target may round to $1 when at least $4 profit remains before payout (for example, our agreed leggings case). No proposal is accepted until you review and approve it. Products with missing costs or inadequate margins must be resolved individually.</small></p>
 </section>
@@ -17,20 +17,37 @@
 (function(){
  const $=id=>document.getElementById(id);let secret='';
  const money=n=>n==null?'RATE NEEDED':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
+ const verifiedMoney=n=>n==null?'NOT VERIFIED':money(n);
  function td(text){let cell=document.createElement('td');cell.textContent=String(text==null?'':text);return cell}
  function button(label,action,payload,klass=''){let b=document.createElement('button');b.type='button';b.textContent=label;b.className=klass;b.addEventListener('click',async()=>{if(['mark_paid','void','approve_for_payout','suspend','reject'].includes(action)&&!confirm('Confirm '+label+'?'))return;let note='';if(action==='mark_paid'){const value=prompt('Enter your actual manual payout confirmation/reference (for example, e-transfer confirmation number). Do not mark paid until you have sent payment.');if(value===null)return;note=value.trim();if(note.length<4){$('state').textContent='Enter a payment reference at least four characters long.';return}}b.disabled=true;try{await call('POST',{action,...payload,...(action==='mark_paid'?{note}:{})});await refresh()}catch(err){$('state').textContent=err.message}finally{b.disabled=false}});return b}
  async function call(method='GET',body){let r=await fetch('/.netlify/functions/affiliate-admin',{method,headers:{Authorization:'Bearer '+secret,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})}),j=await r.json();if(!r.ok)throw Error(j.error||'Request failed');return j}
  function showRates(rows,labels){let box=$('rates');box.replaceChildren();let sorted=rows.slice().sort((a,b)=>a.name.localeCompare(b.name));let p=document.createElement('p');p.textContent='Configured product types: '+sorted.length;box.append(p);for(let r of sorted){let line=document.createElement('div');line.style.padding='4px 0';line.textContent=(labels?.[r.name]||r.name)+' — '+money(r.cents);box.append(line)}}
- function showCosts(rows,catalog,excludedNames=[]){
+ function showCosts(rows,catalog,excludedNames=[],retailPrices={}){
  const byName=Object.fromEntries((rows||[]).map(x=>[x.name,x]));const body=$('costRows');body.replaceChildren();
  const fresh=Date.now()-14*86400000;let ready=0;const excluded=new Set(excludedNames||[]);
  for(const name of catalog||[]){
   const x=byName[name],r=document.createElement('tr'),nonpayable=excluded.has(name);
-  const vals=x?[name,money(x.retail_cents),money(x.production_high_cents),money(x.gb_shipping_subsidy_cents),money(x.processing_allowance_cents),money(x.estimated_profit_cents),money(x.twenty_percent_cents),nonpayable?'$0.00 — EXCLUDED':money(x.proposed_commission_cents),nonpayable?money(x.estimated_profit_cents):money(x.estimated_retained_after_commission_cents),nonpayable?'Excluded — no payout':x.status==='proposal_ready'?(x.rounding_note==='minimum_1_dollar_exception'?'Proposal — $1 minimum exception; review':'Proposal — review'):x.reason||x.status]:
-  [name,'—','—','—','—','—','—',nonpayable?'$0.00 — EXCLUDED':'—','—',nonpayable?'Excluded — no payout':'Not synced'];
+  const retail=x?.retail_cents??retailPrices[name];
+  const excludedStatus= !x?'Excluded — not synced':
+   x.estimated_profit_cents==null?'Excluded — costs NOT VERIFIED: '+(x.reason||x.status):
+   x.estimated_profit_cents<=0?'Excluded — LOSS RISK; review selling price':
+   x.estimated_profit_cents<500?'Excluded — THIN MARGIN; review selling price':'Excluded — verified costs; no payout';
+  const vals=[name,verifiedMoney(retail),verifiedMoney(x?.production_high_cents),
+   verifiedMoney(x?.gb_shipping_subsidy_cents),verifiedMoney(x?.processing_allowance_cents),
+   verifiedMoney(x?.estimated_profit_cents),verifiedMoney(x?.twenty_percent_cents),
+   nonpayable?'$0.00 — EXCLUDED':money(x?.proposed_commission_cents),
+   nonpayable?verifiedMoney(x?.estimated_profit_cents):verifiedMoney(x?.estimated_retained_after_commission_cents),
+   nonpayable?excludedStatus:!x?'Not synced':x.status==='proposal_ready'?
+    (x.rounding_note==='minimum_1_dollar_exception'?'Proposal — $1 minimum exception; review':'Proposal — review'):(x.reason||x.status)];
   vals.forEach(v=>r.append(td(v)));body.append(r);
   if(!nonpayable&&x?.status==='proposal_ready'&&x.proposed_commission_cents>0&&Date.parse(x.checked_at)>=fresh)ready++;
  }
+ const mat=byName['Foam Yoga Mat'];
+ $('matCostStatus').textContent=mat?.estimated_profit_cents!=null?
+  'Foam yoga mat (affiliate payout $0): '+money(mat.estimated_profit_cents)+' estimated profit before affiliate. '+
+  (mat.estimated_profit_cents<=0?'LOSS RISK — review selling price.':mat.estimated_profit_cents<500?'THIN MARGIN — review selling price.':'Costs verified.'):
+  'Foam yoga mat (affiliate payout $0): cost or shipping NOT VERIFIED — '+(mat?.reason||mat?.status||'not yet synced')+
+  (mat?.printify_product_id?' (Printify product '+mat.printify_product_id+')':'')+'.';
  const eligibleTotal=(catalog||[]).filter(name=>!excluded.has(name)).length;
  $('costState').textContent=ready+'/'+eligibleTotal+' eligible products have recent positive proposals; '+excluded.size+' products are excluded from commissions. '+
   (ready===eligibleTotal?'Review the suggested payouts before approving.':'Missing or unverified costs for eligible products must be resolved before approval.');
@@ -52,7 +69,7 @@
  }
  function showApplicants(rows){let body=$('applicants');body.replaceChildren();for(let a of rows){let tr=document.createElement('tr');[a.name,a.email+(a.channel?' | '+a.channel:''),a.status,a.code||'Not assigned'].forEach(v=>tr.appendChild(td(v)));let actions=td('');if(a.status!=='approved')actions.append(button('Approve','approve',{affiliate_id:a.id}));if(a.status==='approved')actions.append(button('Suspend','suspend',{affiliate_id:a.id},'secondary'));if(a.status==='pending')actions.append(button('Reject','reject',{affiliate_id:a.id},'danger'));if(a.status==='suspended')actions.append(button('Reactivate','reactivate',{affiliate_id:a.id}));tr.append(actions);body.append(tr)}}
  function showCommissions(rows,affiliates){let body=$('commissions');body.replaceChildren();let names=Object.fromEntries(affiliates.map(a=>[a.id,a.name+' ('+a.code+')']));for(let r of rows){let tr=document.createElement('tr');[r.order_number+' | '+(names[r.affiliate_id]||r.affiliate_code),r.items.map(x=>x.name+' × '+x.quantity+(x.excluded?' [EXCLUDED — $0]':x.rate_cents==null?' [RATE NEEDED]':'')).join('; '),money(r.commission_total_cents),new Date(r.hold_until).toLocaleDateString('en-CA'),(r.status==='excluded_only'?'excluded items only — no payout':r.status.replace(/_/g,' '))+(r.refund_after_payout?' — refunded after payout':'')].forEach(v=>tr.append(td(v)));let actions=td('');let base={stripe_session_id:r.stripe_session_id};if(['needs_rates','pending_hold','review_self_referral','review_inactive_affiliate','refund_review'].includes(r.status))actions.append(button('Recalculate','recalculate',base));if(['review_self_referral','review_inactive_affiliate','refund_review','pending_hold','needs_rates'].includes(r.status))actions.append(button('Approve Review','approve_for_payout',base,'secondary'));if(['pending_hold','approved_for_payout'].includes(r.status)&&Date.parse(r.hold_until)<=Date.now()&&r.commission_total_cents>0)actions.append(button('Mark Manually Paid','mark_paid',base));if(r.status!=='paid'&&r.status!=='void')actions.append(button('Void','void',base,'danger'));tr.append(actions);body.append(tr)}}
- async function refresh(){let d=await call(),a=d.affiliates||[],c=d.commissions||[];showApplicants(a);showCommissions(c,a);showRates(d.rates||[],d.rate_labels||{});showCosts(d.printify_costs||[],d.cost_products||[],d.excluded_cost_products||[]);showGroupedRates(d.printify_costs||[],d.rate_members||{},d.rate_labels||{});let names=new Set([...(d.catalog_products||[]),...(d.rates||[]).map(x=>x.name)]);$('products').replaceChildren();for(let name of [...names].sort()){let o=document.createElement('option');o.value=name;$('products').append(o)}const configured=new Set((d.rates||[]).map(r=>r.name));const missing=(d.catalog_products||[]).filter(n=>!configured.has(n));$('unconfigured').textContent=missing.length+' product types still need a fixed commission rate: '+(missing.length?missing.join(' • '):'none');$('state').textContent=a.length+' affiliates • '+c.length+' commission records • '+(d.rates||[]).length+' product rates. No automated payouts.';return d}
+ async function refresh(){let d=await call(),a=d.affiliates||[],c=d.commissions||[];showApplicants(a);showCommissions(c,a);showRates(d.rates||[],d.rate_labels||{});showCosts(d.printify_costs||[],d.cost_products||[],d.excluded_cost_products||[],d.retail_prices||{});showGroupedRates(d.printify_costs||[],d.rate_members||{},d.rate_labels||{});let names=new Set([...(d.catalog_products||[]),...(d.rates||[]).map(x=>x.name)]);$('products').replaceChildren();for(let name of [...names].sort()){let o=document.createElement('option');o.value=name;$('products').append(o)}const configured=new Set((d.rates||[]).map(r=>r.name));const missing=(d.catalog_products||[]).filter(n=>!configured.has(n));$('unconfigured').textContent=missing.length+' product types still need a fixed commission rate: '+(missing.length?missing.join(' • '):'none');$('state').textContent=a.length+' affiliates • '+c.length+' commission records • '+(d.rates||[]).length+' product rates. No automated payouts.';return d}
  $('authForm').addEventListener('submit',async e=>{e.preventDefault();secret=$('adminSecret').value;$('adminSecret').value='';try{await refresh();$('login').hidden=true;$('workspace').hidden=false}catch(err){$('authMsg').textContent=err.message;secret=''}});
  $('refresh').addEventListener('click',()=>refresh().catch(e=>$('state').textContent=e.message));
  $('syncPrintifyCosts').addEventListener('click',async()=>{
@@ -64,6 +81,15 @@
    offset=res.next_offset;remaining=res.total;
   }await refresh();
   }catch(error){$('costState').textContent='Printify sync stopped: '+error.message+' — review Netlify configuration or retry.'}
+  finally{btn.disabled=false}
+ });
+ $('syncMatCost').addEventListener('click',async()=>{
+  const btn=$('syncMatCost');btn.disabled=true;
+  $('matCostStatus').textContent='Checking foam yoga mat directly with Printify…';
+  try{const res=await call('POST',{action:'sync_mat_cost'});
+   if(!res.ok)throw Error(res.error||'Mat cost check failed.');
+   await refresh();
+  }catch(error){$('matCostStatus').textContent='Mat cost recheck failed: '+error.message}
   finally{btn.disabled=false}
  });
  $('approvePrintifyCosts').addEventListener('click',async()=>{
