@@ -95,7 +95,7 @@ export async function applyProposedRates({offset=0,batchSize=4}={}){
  const unready=rows.filter((r,i)=>r?.name!==AFFILIATE_RATE_PRODUCTS[i]||r.status!=='proposal_ready'||
   !Number.isSafeInteger(r.proposed_commission_cents)||r.proposed_commission_cents<=0||
   !Number.isFinite(Date.parse(r.checked_at))||now-Date.parse(r.checked_at)>14*86400000);
- if(unready.length)return {ok:false,error:'All 52 products need fresh verified costs and positive proposed rates before bulk approval.',remaining:unready.length};
+ if(unready.length)return {ok:false,error:'Every current product needs fresh verified costs and a positive proposed rate before bulk approval.',remaining:unready.length};
  const selected=rows.slice(start,start+Math.max(1,Math.min(5,Number(batchSize)||4)));
  const saved=[];
  for(const r of selected){const v=await setCommissionRate(r.name,r.proposed_commission_cents);
