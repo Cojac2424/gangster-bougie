@@ -26,9 +26,14 @@ async function requestMatShippingQuote(productId,variantId,country,token,fetcher
   });
   if(!response.ok)return {ok:false,reason:'printify_quote_http_'+response.status};
   const methods=await response.json();
-  if(!Number.isSafeInteger(methods?.standard)||methods.standard<0)
-   return {ok:false,reason:'standard_shipping_unavailable'};
-  return {ok:true,cents:methods.standard};
+  // Exactly match calculate-shipping.mjs: prefer standard, otherwise select the
+  // first available shipping option. Some providers offer economy/priority only.
+  const methodsAvailable=Object.entries(methods||{}).filter(([,value])=>
+   Number.isSafeInteger(Number(value))&&Number(value)>=0);
+  const selected=methodsAvailable.find(([key])=>key==='standard')||
+   methodsAvailable.find(([key])=>/standard/i.test(key))||methodsAvailable[0];
+  if(!selected)return {ok:false,reason:'no_shipping_method_available'};
+  return {ok:true,cents:Number(selected[1]),method:selected[0]};
  }catch(_e){return {ok:false,reason:'printify_quote_request_failed'};}
 }
 async function requestPrintify(path,token,fetcher){

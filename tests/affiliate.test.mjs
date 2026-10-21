@@ -389,7 +389,7 @@ test('mat with no verified Canada shipping must remain unpriced rather than assu
  };
  const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
  assert.equal(mat.status,'needs_review');
- assert.equal(mat.reason,'printify_reference_standard_shipping_unavailable');
+ assert.equal(mat.reason,'printify_reference_no_shipping_method_available');
  assert.equal(mat.shipping_country,'CA');
  assert.equal(mat.retail_cents,10499);
  assert.equal(mat.proposed_commission_cents,undefined);
@@ -445,7 +445,7 @@ test('mat failing its real Printify shipping quote stays unverified, never uses 
    return {ok:true,json:async()=>({data:[]})};
   if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
    const {country}=JSON.parse(options.body).address_to;
-   return {ok:true,json:async()=>country==='CA'?{priority:8500}:{standard:3999}};
+   return {ok:true,json:async()=>country==='CA'?{}:{standard:3999}};
   }
   throw Error('unexpected route '+url);
  };
