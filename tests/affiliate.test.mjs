@@ -375,18 +375,22 @@ test('mat with no verified Canada shipping must remain unpriced rather than assu
  const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
  '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
  '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
- const mock=async url=>{
+ const mock=async (url,options={})=>{
   const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
   if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
    variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
+  if(url.endsWith('/orders/shipping.json')){
+   const body=JSON.parse(options.body);
+   return {ok:true,json:async()=>body.address_to.country==='US'?{standard:3900}:{}};
+  }
   if(url.includes('/shipping/standard.json'))return {ok:true,json:async()=>({data:[]})};
   if(url.includes('/shipping.json'))return {ok:true,json:async()=>({profiles:[]})};
   throw Error('Unexpected mock route '+url);
  };
  const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
  assert.equal(mat.status,'needs_review');
- assert.equal(mat.reason,'printify_reference_printify_quote_request_failed');
- assert.equal(mat.shipping_country,'US');
+ assert.equal(mat.reason,'printify_reference_standard_shipping_unavailable');
+ assert.equal(mat.shipping_country,'CA');
  assert.equal(mat.retail_cents,10499);
  assert.equal(mat.proposed_commission_cents,undefined);
  assert.equal(mat.estimated_profit_cents,undefined);
