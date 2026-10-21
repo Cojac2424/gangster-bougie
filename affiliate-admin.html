@@ -45,8 +45,11 @@
  const mat=byName['Foam Yoga Mat'];
  $('matCostStatus').textContent=mat?.estimated_profit_cents!=null?
   'Foam yoga mat (affiliate payout $0): '+money(mat.estimated_profit_cents)+' estimated profit before affiliate. '+
-  (mat.estimated_profit_cents<=0?'LOSS RISK — review selling price.':mat.estimated_profit_cents<500?'THIN MARGIN — review selling price.':'Costs verified.'):
+  (mat.estimated_profit_cents<=0?'LOSS RISK — review selling price.':mat.estimated_profit_cents<500?'THIN MARGIN — review selling price.':'Cost calculation complete.')+
+  (mat.shipping_reference_only?' Shipping is based on reference-city quotes, NOT all addresses; do not approve a mat commission.':''):
   'Foam yoga mat (affiliate payout $0): cost or shipping NOT VERIFIED — '+(mat?.reason||mat?.status||'not yet synced')+
+  (mat?.product_colour?' for '+mat.product_colour:'')+
+  (mat?.shipping_country?' to '+(mat.shipping_country==='CA'?'Canada':mat.shipping_country==='US'?'the United States':mat.shipping_country):'')+
   (mat?.printify_product_id?' (Printify product '+mat.printify_product_id+')':'')+'.';
  const eligibleTotal=(catalog||[]).filter(name=>!excluded.has(name)).length;
  $('costState').textContent=ready+'/'+eligibleTotal+' eligible products have recent positive proposals; '+excluded.size+' products are excluded from commissions. '+

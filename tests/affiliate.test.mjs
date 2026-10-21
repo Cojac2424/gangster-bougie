@@ -385,10 +385,73 @@ test('mat with no verified Canada shipping must remain unpriced rather than assu
  };
  const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
  assert.equal(mat.status,'needs_review');
- assert.equal(mat.reason,'shipping_profile_missing');
+ assert.equal(mat.reason,'printify_reference_printify_quote_request_failed');
+ assert.equal(mat.shipping_country,'US');
  assert.equal(mat.retail_cents,10499);
  assert.equal(mat.proposed_commission_cents,undefined);
  assert.equal(mat.estimated_profit_cents,undefined);
+});
+test('mat without catalog rates uses real-form Printify checkout QUOTES for six colour IDs in US and CA',async()=>{
+ const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
+ '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
+ '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
+ const quotes=[];
+ const mock=async (url,options={})=>{
+  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
+  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
+   variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
+  if(url.endsWith('/v1/catalog/blueprints/900/print_providers/901/shipping.json'))
+   return {ok:true,json:async()=>({profiles:[]})};
+  if(url.endsWith('/v2/catalog/blueprints/900/print_providers/901/shipping/standard.json'))
+   return {ok:true,json:async()=>({data:[]})};
+  if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
+   assert.equal(options.method,'POST');
+   const body=JSON.parse(options.body),country=body.address_to.country;
+   assert.ok(['US','CA'].includes(country));
+   assert.equal(body.line_items.length,1);
+   assert.equal(body.line_items[0].variant_id,71786);
+   assert.ok(ids.includes(body.line_items[0].product_id));
+   quotes.push({country,id:body.line_items[0].product_id});
+   return {ok:true,json:async()=>({standard:country==='CA'?4839:3999})};
+  }
+  throw Error('unexpected Printify API route: '+url);
+ };
+ const result=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
+ assert.equal(result.production_high_cents,5448);
+ assert.equal(result.gb_shipping_subsidy_cents,4340);
+ assert.equal(result.estimated_profit_cents,186);
+ assert.equal(result.proposed_commission_cents,0);
+ assert.equal(result.shipping_reference_only,true);
+ assert.equal(result.cost_variant_count,6);
+ assert.equal(quotes.length,12);
+ assert.deepEqual(new Set(quotes.map(q=>q.country)),new Set(['US','CA']));
+ assert.deepEqual(new Set(quotes.map(q=>q.id)),new Set(ids));
+});
+test('mat failing its real Printify shipping quote stays unverified, never uses guessed rate',async()=>{
+ const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
+ '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
+ '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
+ const mock=async (url,options={})=>{
+  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
+  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
+   variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
+  if(url.endsWith('/v1/catalog/blueprints/900/print_providers/901/shipping.json'))
+   return {ok:true,json:async()=>({profiles:[]})};
+  if(url.endsWith('/v2/catalog/blueprints/900/print_providers/901/shipping/standard.json'))
+   return {ok:true,json:async()=>({data:[]})};
+  if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
+   const {country}=JSON.parse(options.body).address_to;
+   return {ok:true,json:async()=>country==='CA'?{priority:8500}:{standard:3999}};
+  }
+  throw Error('unexpected route '+url);
+ };
+ const row=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
+ assert.equal(row.status,'needs_review');
+ assert.equal(row.reason,'printify_reference_standard_shipping_unavailable');
+ assert.equal(row.shipping_country,'CA');
+ assert.equal(row.product_colour,'Dark Green');
+ assert.equal(row.proposed_commission_cents,undefined);
+ assert.equal(row.estimated_profit_cents,undefined);
 });
 test('Printify importer blocks suggestions when a required variant lacks its actual cost',async()=>{
  const id='6aa0d82a6279c5ea5c03596f';
