@@ -2,6 +2,7 @@
 // All values live in Netlify Blobs; never expose raw customer information to affiliates.
 import { getStore } from '@netlify/blobs';
 import { REFERRAL_WINDOW_DAYS, COMMISSION_HOLD_DAYS, commissionHoldUntil } from './gb-affiliate-rules.mjs';
+import { AFFILIATE_RATE_PRODUCTS, canonicalCommissionName } from './gb-product-catalog.mjs';
 
 const DATA='gb-affiliates-v1', LEDGER='gb-affiliate-ledger-v1';
 export const HOLD_DAYS=COMMISSION_HOLD_DAYS, ATTRIBUTION_DAYS=REFERRAL_WINDOW_DAYS;
@@ -70,13 +71,13 @@ export async function updateAffiliate(affiliateId,action,requestedCode=''){
  row.updated_at=now;await st.setJSON(affKey(row.id),row);return {ok:true,affiliate:row};
 }
 export async function setCommissionRate(name,cents) {
- const n=String(name||'').trim().slice(0,180),amount=Number(cents);
- if(n.length<2||!Number.isInteger(amount)||amount<0||amount>100000)return {ok:false,error:'Enter an exact product name and a nonnegative commission in cents.'};
+ const n=canonicalCommissionName(String(name||'').trim()).slice(0,180),amount=Number(cents);
+ if(!AFFILIATE_RATE_PRODUCTS.includes(n)||!Number.isInteger(amount)||amount<0||amount>100000)return {ok:false,error:'Enter an exact product name and a nonnegative commission in cents.'};
  const st=data(),key=await rateKey(n);
  const record={name:n,cents:amount,updated_at:new Date().toISOString()};
  await st.setJSON(key,record);return {ok:true,rate:record};
 }
-export async function getCommissionRate(name){return data().get(await rateKey(name),{type:'json'})}
+export async function getCommissionRate(name){return data().get(await rateKey(canonicalCommissionName(name)),{type:'json'})}
 export async function listCommissionRates(){return listRecords(data(),'rate/')}
 export async function listCommissions(){return (await listRecords(ledger(),'commission/')).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))}
 export async function getCommissionBySession(session){return ledger().get(ledgerKey(session),{type:'json'})}
