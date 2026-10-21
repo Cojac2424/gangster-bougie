@@ -72,7 +72,10 @@ test('storefront connects affiliate login and application with the right pages',
 
 test('mobile checkout confirms shipping address and recalculates before enabling payment',()=>{
  const home=readFileSync(new URL('../index.html',import.meta.url),'utf8');
- assert.match(home,/id="gbCheckoutCalculateShipping"/);
+ assert.doesNotMatch(home,/id="gbCheckoutCalculateShipping"/);
+ assert.doesNotMatch(home,/Calculate shipping<\/button>/);
+ assert.match(home,/gbShippingEl\.on\('blur'/);
+ assert.match(home,/gbQuoteTimer=setTimeout\(\(\)=>refreshShippingQuote\(version\),350\)/);
  assert.match(home,/gbShippingEl\.getValue\(\)/);
  assert.match(home,/gbActions\.updateShippingAddress\(\{name,address:/);
  assert.match(home,/await gbActions\.runServerUpdate\(/);
@@ -80,6 +83,52 @@ test('mobile checkout confirms shipping address and recalculates before enabling
  assert.match(home,/gbCheckout\.on\('change',session=>updateSummary\(session\)\)/);
  assert.match(home,/gbQuoteBusy\?'Calculating shipping/);
  assert.match(home,/gbQuoteVersion/);
+});
+test('yoga mat checkout server quotes actual Printify shipping and charges the approved $4.99',async()=>{
+ const {default:calculateShipping}=await import('../netlify/functions/calculate-shipping.mjs');
+ const originalFetch=globalThis.fetch,originalPrintify=process.env.PRINTIFY_API_TOKEN,originalStripe=process.env.STRIPE_SECRET_KEY;
+ process.env.PRINTIFY_API_TOKEN='mock-printify-token';process.env.STRIPE_SECRET_KEY='sk_test_mock';
+ const calls=[];
+ const goodResponse=(obj)=>new Response(JSON.stringify(obj),{status:200,headers:{'Content-Type':'application/json'}});
+ try{
+  globalThis.fetch=async(url,opts={})=>{
+   calls.push({url,opts});
+   if(url.endsWith('/checkout/sessions/cs_test_yogamat')){
+    if(opts.method==='POST')return goodResponse({id:'cs_test_yogamat'});
+    return goodResponse({id:'cs_test_yogamat',status:'open',payment_status:'unpaid'});
+   }
+   if(url.includes('/checkout/sessions/cs_test_yogamat/line_items?'))
+    return goodResponse({has_more:false,data:[{id:'li_mat',quantity:1,
+      price:{product:{metadata:{printify_product_id:'6aa17cf10e017119c60fca91',
+      printify_variant_id:'71786'}}}}]});
+   if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
+    const body=JSON.parse(opts.body);
+    assert.deepEqual(body.line_items,[{product_id:'6aa17cf10e017119c60fca91',variant_id:71786,quantity:1}]);
+    assert.equal(body.address_to.country,'CA');
+    assert.equal(body.address_to.region,'ON');
+    assert.equal(body.address_to.zip,'N2A 0B1');
+    return goodResponse({standard:4839});
+   }
+   throw Error('Unexpected shipping API mock call: '+url);
+  };
+  const request=new Request('https://preview.example/.netlify/functions/calculate-shipping',{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({session_id:'cs_test_yogamat',items:[{name:'Gangster Bougie Foam Yoga Mat',size:'Turquoise • 24" × 72"',qty:1}],
+    address:{name:'Customer Example',country:'CA',region:'ON',address1:'100 Example Street',city:'Test City',zip:'N2A 0B1'}})
+  });
+  const response=await calculateShipping(request);const body=await response.json();
+  assert.equal(response.status,200,JSON.stringify(body));
+  assert.equal(body.amount,499);
+  assert.equal(body.actual_amount,4839);
+  assert.equal(body.subsidy,4340);
+  assert.equal(calls.filter(x=>x.url.endsWith('/orders/shipping.json')).length,1);
+  const posted=calls.find(x=>x.url.endsWith('/checkout/sessions/cs_test_yogamat')&&x.opts.method==='POST');
+  assert.ok(posted,'Stripe session shipping was updated');
+  const form=new URLSearchParams(posted.opts.body);
+  assert.equal(form.get('shipping_options[0][shipping_rate_data][fixed_amount][amount]'),'499');
+ }finally{globalThis.fetch=originalFetch;
+  if(originalPrintify===undefined)delete process.env.PRINTIFY_API_TOKEN;else process.env.PRINTIFY_API_TOKEN=originalPrintify;
+  if(originalStripe===undefined)delete process.env.STRIPE_SECRET_KEY;else process.env.STRIPE_SECRET_KEY=originalStripe;}
 });
 test('Printify fulfillment picks exact sizes and accessory variants', async () => {
  const {resolveFulfillment}=await import('../netlify/functions/lib/fulfillment-resolver.mjs');
