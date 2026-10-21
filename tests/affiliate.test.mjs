@@ -451,7 +451,7 @@ test('mat failing its real Printify shipping quote stays unverified, never uses 
  };
  const row=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
  assert.equal(row.status,'needs_review');
- assert.equal(row.reason,'printify_reference_standard_shipping_unavailable');
+ assert.equal(row.reason,'printify_reference_no_shipping_method_available');
  assert.equal(row.shipping_country,'CA');
  assert.equal(row.product_colour,'Dark Green');
  assert.equal(row.proposed_commission_cents,undefined);
