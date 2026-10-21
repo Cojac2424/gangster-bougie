@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'affiliate*.html'
+      - 'index.html'
       - 'netlify/functions/**'
       - 'tests/**'
       - '.github/workflows/affiliate-safety.yml'
@@ -11,6 +12,7 @@ on:
       - crop-tee-replacement-staging-20261013
     paths:
       - 'affiliate*.html'
+      - 'index.html'
       - 'netlify/functions/**'
       - 'tests/**'
       - '.github/workflows/affiliate-safety.yml'
