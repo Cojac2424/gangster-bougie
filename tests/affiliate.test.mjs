@@ -8,6 +8,9 @@ import {getWorstShippingCents,planProductCommission,FEE_ESTIMATE_BASIS_POINTS,co
 import {customerShippingContribution} from '../netlify/functions/lib/gb-shipping-contribution.mjs';
 import {readPrintifyCost} from '../netlify/functions/lib/gb-affiliate-printify-reader.mjs';
 import {affiliateMappedVariants} from '../netlify/functions/lib/fulfillment-resolver.mjs';
+import {AFFILIATE_EXCLUDED_RATE_NAMES,AFFILIATE_EXCLUDED_PRODUCT_NAMES,AFFILIATE_ELIGIBLE_RATE_PRODUCTS,isAffiliateExcluded} from '../netlify/functions/lib/gb-product-catalog.mjs';
+import {commissionLineFromRate,summarizeCommissionLines} from '../netlify/functions/lib/gb-affiliate-commission-lines.mjs';
+import {getCommissionRate,setCommissionRate} from '../netlify/functions/lib/gb-affiliates.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
  assert.ok(SELLABLE_PRODUCT_NAMES.length >= 50);
@@ -297,4 +300,72 @@ test('multi-item referral totaling uses the same rate for colourways of bras, le
  const lines=order.map(x=>({name:x.name,quantity:x.quantity,rate_cents:sourceRates.get(canonicalCommissionName(x.name))}));
  assert.deepEqual(lines.map(x=>x.rate_cents),[200,200,100,100,100]);
  assert.equal(lines.reduce((total,x)=>total+x.quantity*x.rate_cents,0),800);
+});
+
+
+test('explicit low-margin exclusions cover men’s shorts, bottles, mats, socks and bandanas',()=>{
+ assert.equal(AFFILIATE_RATE_PRODUCTS.length,21);
+ assert.equal(AFFILIATE_ELIGIBLE_RATE_PRODUCTS.length,15);
+ assert.equal(AFFILIATE_EXCLUDED_RATE_NAMES.length,6);
+ assert.equal(AFFILIATE_EXCLUDED_PRODUCT_NAMES.length,6);
+ for(const name of AFFILIATE_EXCLUDED_RATE_NAMES){
+  assert.equal(isAffiliateExcluded(name),true);
+  assert.equal(AFFILIATE_ELIGIBLE_RATE_PRODUCTS.includes(name),false);
+ }
+ for(const name of AFFILIATE_ELIGIBLE_RATE_PRODUCTS)assert.equal(isAffiliateExcluded(name),false,name);
+ for(const name of [
+   'Gangster Bougie Stainless Steel Gym Bottle','Stainless Steel Gym Bottle',
+   'Gangster Bougie Foam Yoga Mat','Foam Yoga Mat',
+   'Gangster Bougie Mini Wrap Bandana','Mini Wrap Bandana',
+   'Crowned Luxury Crew Socks',
+   'Onyx/Gold Gangster Bougie Basketball Rib Shorts',
+   'Cream/Gold Gangster Bougie Basketball Rib Shorts'
+ ])assert.equal(isAffiliateExcluded(name),true,name);
+ assert.equal(isAffiliateExcluded('GB Classic High-Waisted Leggings – Black'),false);
+ assert.equal(isAffiliateExcluded('Onyx/Gold Crowned Luxury Full-Zip Hoodie'),false);
+});
+test('rate storage rejects excluded products and always returns policy-enforced $0 without saved-rate lookup',async()=>{
+ const sock=await getCommissionRate('Crowned Luxury Crew Socks');
+ const bottle=await getCommissionRate('Gangster Bougie Stainless Steel Gym Bottle');
+ assert.deepEqual(sock,{name:'Crowned Luxury Crew Socks',cents:0,excluded:true});
+ assert.deepEqual(bottle,{name:'Stainless Steel Gym Bottle',cents:0,excluded:true});
+ const result=await setCommissionRate('Foam Yoga Mat',500);
+ assert.equal(result.ok,false);
+ assert.match(result.error,/excluded/i);
+});
+test('verified multi-item referral adds eligible rates but pays $0 on excluded items',()=>{
+ const lines=[
+  commissionLineFromRate({name:'Onyx/Gold Crowned Luxury Full-Zip Hoodie',quantity:1},{cents:300}),
+  commissionLineFromRate({name:'GB Classic High-Waisted Leggings – Grey',quantity:2},{cents:100}),
+  commissionLineFromRate({name:'Gangster Bougie Stainless Steel Gym Bottle',quantity:1},{cents:0,excluded:true}),
+  commissionLineFromRate({name:'Gangster Bougie Foam Yoga Mat',quantity:1},{cents:0,excluded:true}),
+ ];
+ assert.deepEqual(lines.map(x=>x.commission_cents),[300,200,0,0]);
+ assert.deepEqual(lines.map(x=>x.excluded),[false,false,true,true]);
+ const summary=summarizeCommissionLines(lines);
+ assert.equal(summary.missing_rate,false);
+ assert.equal(summary.excluded_only,false);
+ assert.equal(summary.commission_total_cents,500);
+});
+test('excluded-only orders record zero payout; missing eligible rates still need review',()=>{
+ const bottle=commissionLineFromRate({name:'Stainless Steel Gym Bottle',quantity:3},{cents:0,excluded:true});
+ const socks=commissionLineFromRate({name:'Crowned Luxury Crew Socks',quantity:2},{cents:0,excluded:true});
+ assert.deepEqual(summarizeCommissionLines([bottle,socks]),{
+  missing_rate:false,excluded_only:true,commission_total_cents:0
+ });
+ assert.equal(summarizeCommissionLines([bottle,commissionLineFromRate({name:'Unconfigured crop tee',quantity:1},null)]).missing_rate,true);
+ assert.equal(summarizeCommissionLines([bottle,commissionLineFromRate({name:'Unconfigured crop tee',quantity:1},null)]).commission_total_cents,null);
+});
+test('affiliate terms disclose excluded product categories before sign-up and item lines show $0',()=>{
+ const affiliate=readFileSync(new URL('../affiliate.html',import.meta.url),'utf8');
+ const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
+ const ledger=readFileSync(new URL('../netlify/functions/lib/gb-affiliates.mjs',import.meta.url),'utf8');
+ const sync=readFileSync(new URL('../netlify/functions/lib/gb-affiliate-cost-sync.mjs',import.meta.url),'utf8');
+ assert.match(affiliate,/id="affiliateExclusions"/);
+ assert.match(affiliate,/Stainless steel gym bottles \(12 oz and 18 oz\)/);
+ assert.match(affiliate,/Foam yoga mats \(all colours\)/);
+ assert.match(affiliate,/excluded — \$0/);
+ assert.match(admin,/EXCLUDED — \$0/);
+ assert.match(ledger,/excluded_only/);
+ assert.match(sync,/AFFILIATE_ELIGIBLE_RATE_PRODUCTS/);
 });
