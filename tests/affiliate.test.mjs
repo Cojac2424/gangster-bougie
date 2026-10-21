@@ -70,6 +70,17 @@ test('storefront connects affiliate login and application with the right pages',
  assert.match(admin, /id="commissions"/);
 });
 
+test('mobile checkout confirms shipping address and recalculates before enabling payment',()=>{
+ const home=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ assert.match(home,/id="gbCheckoutCalculateShipping"/);
+ assert.match(home,/gbShippingEl\.getValue\(\)/);
+ assert.match(home,/gbActions\.updateShippingAddress\(\{name,address:/);
+ assert.match(home,/await gbActions\.runServerUpdate\(/);
+ assert.ok(home.indexOf('await gbActions.updateShippingAddress')<home.indexOf('await gbActions.runServerUpdate'));
+ assert.match(home,/gbCheckout\.on\('change',session=>updateSummary\(session\)\)/);
+ assert.match(home,/gbQuoteBusy\?'Calculating shipping/);
+ assert.match(home,/gbQuoteVersion/);
+});
 test('Printify fulfillment picks exact sizes and accessory variants', async () => {
  const {resolveFulfillment}=await import('../netlify/functions/lib/fulfillment-resolver.mjs');
  const blue='GB Classic High-Waisted Leggings – Blue';
