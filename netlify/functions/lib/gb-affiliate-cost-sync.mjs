@@ -13,7 +13,7 @@ export async function listCostSnapshots(){
  const output=[],s=store();let cursor;
  do{
   const p=await s.list({prefix:'cost/',...(cursor?{cursor}:{})});
-  for(const file of p.blobs||[]){const row=await s.get(file.key,{type:'json'});if(row)output.push(row)}
+  for(const file of p.blobs||[]){const row=await s.get(file.key,{type:'json'});if(row&&AFFILIATE_COST_PRODUCTS.includes(row.name))output.push(row)}
   cursor=p.cursor||null;
  }while(cursor);
  return output.sort((a,b)=>a.name.localeCompare(b.name));

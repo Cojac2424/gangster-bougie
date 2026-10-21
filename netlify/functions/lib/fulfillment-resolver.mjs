@@ -9,7 +9,6 @@ const ALIASES={
  'Gangster Bougie Stainless Steel Gym Bottle':'Stainless Steel Gym Bottle',
  'Gangster Bougie Gym Face Towel':'Gym Face Towel',
  'Gangster Bougie Gym Bag':'Gym Bag',
- 'Gangster Bougie Foam Yoga Mat':'Foam Yoga Mat',
  'Gangster Bougie GB Faux Leather Travel Bag':'GB Faux Leather Travel Bag',
  'Gangster Bougie “Baddie” Faux Leather Travel Bag':'“Baddie” Faux Leather Travel Bag',
  'Gangster Bougie Mini Wrap Bandana':'Mini Wrap Bandana',

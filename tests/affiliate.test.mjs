@@ -23,6 +23,30 @@ test('checkout catalog contains distinct authoritative products and positive pri
    for (const p of Object.values(sizes)) assert.ok(Number.isInteger(p) && p > 0);
  }
 });
+test('retired yoga mats are absent from the catalog, storefront, fulfillment, and affiliate list',async()=>{
+ const home=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ const affiliate=readFileSync(new URL('../affiliate.html',import.meta.url),'utf8');
+ const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
+ const {resolveFulfillment,resolveCart}=await import('../netlify/functions/lib/fulfillment-resolver.mjs');
+ for(const name of ['Foam Yoga Mat','Gangster Bougie Foam Yoga Mat']){
+  assert.equal(PRICE_CENTS[name],undefined);
+  assert.ok(!SELLABLE_PRODUCT_NAMES.includes(name));
+  assert.ok(!AFFILIATE_COST_PRODUCTS.includes(name));
+  assert.ok(!AFFILIATE_RATE_PRODUCTS.includes(name));
+  assert.equal(resolveFulfillment(name,'Black').ok,false);
+  assert.equal(resolveCart([{name,size:'Black',qty:1}]).ok,false);
+  assert.deepEqual(affiliateMappedVariants(name),[]);
+ }
+ assert.doesNotMatch(home,/openYogaMat|yogaMatModal|yoga-mat-thumb|IMG_0204\.jpeg/);
+ assert.doesNotMatch(affiliate,/Foam yoga mats \(all colours\)/);
+ assert.doesNotMatch(admin,/Recheck yoga mat only|matCostStatus|syncMatCost/);
+ assert.match(home,/retiredCartItems/);
+ assert.equal(PRICE_CENTS['Gym Bag'],5999);
+ assert.equal(PRICE_CENTS['Gangster Bougie Gym Bag'],5999);
+ assert.equal(resolveFulfillment('Gangster Bougie Gym Bag','Black').ok,true);
+ assert.equal(AFFILIATE_ELIGIBLE_RATE_PRODUCTS.length,15);
+});
+
 test('referral validation and 30-day attribution expiry', () => {
  const start = Date.UTC(2026, 9, 21);
  assert.equal(normalizeReferralCode('Jenn10'), 'JENN10');
@@ -84,98 +108,6 @@ test('mobile checkout confirms shipping address and recalculates before enabling
  assert.match(home,/gbQuoteBusy\?'Calculating shipping/);
  assert.match(home,/gbQuoteVersion/);
 });
-test('yoga mat checkout server quotes actual Printify shipping and charges the approved $4.99',async()=>{
- const {default:calculateShipping}=await import('../netlify/functions/calculate-shipping.mjs');
- const originalFetch=globalThis.fetch,originalPrintify=process.env.PRINTIFY_API_TOKEN,originalStripe=process.env.STRIPE_SECRET_KEY;
- process.env.PRINTIFY_API_TOKEN='mock-printify-token';process.env.STRIPE_SECRET_KEY='sk_test_mock';
- const calls=[];
- const goodResponse=(obj)=>new Response(JSON.stringify(obj),{status:200,headers:{'Content-Type':'application/json'}});
- try{
-  globalThis.fetch=async(url,opts={})=>{
-   calls.push({url,opts});
-   if(url.endsWith('/checkout/sessions/cs_test_yogamat')){
-    if(opts.method==='POST')return goodResponse({id:'cs_test_yogamat'});
-    return goodResponse({id:'cs_test_yogamat',status:'open',payment_status:'unpaid'});
-   }
-   if(url.includes('/checkout/sessions/cs_test_yogamat/line_items?'))
-    return goodResponse({has_more:false,data:[{id:'li_mat',quantity:1,
-      price:{product:{metadata:{printify_product_id:'6aa17cf10e017119c60fca91',
-      printify_variant_id:'71786'}}}}]});
-   if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
-    const body=JSON.parse(opts.body);
-    assert.deepEqual(body.line_items,[{product_id:'6aa17cf10e017119c60fca91',variant_id:71786,quantity:1}]);
-    assert.equal(body.address_to.country,'CA');
-    assert.equal(body.address_to.region,'ON');
-    assert.equal(body.address_to.zip,'N2A 0B1');
-    return goodResponse({standard:4839});
-   }
-   throw Error('Unexpected shipping API mock call: '+url);
-  };
-  const request=new Request('https://preview.example/.netlify/functions/calculate-shipping',{
-   method:'POST',headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({session_id:'cs_test_yogamat',items:[{name:'Gangster Bougie Foam Yoga Mat',size:'Turquoise • 24" × 72"',qty:1}],
-    address:{name:'Customer Example',country:'CA',region:'ON',address1:'100 Example Street',city:'Test City',zip:'N2A 0B1'}})
-  });
-  const response=await calculateShipping(request);const body=await response.json();
-  assert.equal(response.status,200,JSON.stringify(body));
-  assert.equal(body.amount,499);
-  assert.equal(body.actual_amount,4839);
-  assert.equal(body.subsidy,4340);
-  assert.equal(calls.filter(x=>x.url.endsWith('/orders/shipping.json')).length,1);
-  const posted=calls.find(x=>x.url.endsWith('/checkout/sessions/cs_test_yogamat')&&x.opts.method==='POST');
-  assert.ok(posted,'Stripe session shipping was updated');
-  const form=new URLSearchParams(posted.opts.body);
-  assert.equal(form.get('shipping_options[0][shipping_rate_data][fixed_amount][amount]'),'499');
- }finally{globalThis.fetch=originalFetch;
-  if(originalPrintify===undefined)delete process.env.PRINTIFY_API_TOKEN;else process.env.PRINTIFY_API_TOKEN=originalPrintify;
-  if(originalStripe===undefined)delete process.env.STRIPE_SECRET_KEY;else process.env.STRIPE_SECRET_KEY=originalStripe;}
-});
-test('American yoga mat checkout uses the same US$4.99 charge after a US Printify quote',async()=>{
- const {default:calculateShipping}=await import('../netlify/functions/calculate-shipping.mjs');
- const originalFetch=globalThis.fetch,originalPrintify=process.env.PRINTIFY_API_TOKEN,originalStripe=process.env.STRIPE_SECRET_KEY;
- process.env.PRINTIFY_API_TOKEN='mock-printify-token';process.env.STRIPE_SECRET_KEY='sk_test_mock';
- const calls=[];
- const goodResponse=(obj)=>new Response(JSON.stringify(obj),{status:200,headers:{'Content-Type':'application/json'}});
- try{
-  globalThis.fetch=async(url,opts={})=>{
-   calls.push({url,opts});
-   if(url.endsWith('/checkout/sessions/cs_test_yogamat')){
-    if(opts.method==='POST')return goodResponse({id:'cs_test_yogamat'});
-    return goodResponse({id:'cs_test_yogamat',status:'open',payment_status:'unpaid'});
-   }
-   if(url.includes('/checkout/sessions/cs_test_yogamat/line_items?'))
-    return goodResponse({has_more:false,data:[{id:'li_mat',quantity:1,
-      price:{product:{metadata:{printify_product_id:'6aa17cf10e017119c60fca91',
-      printify_variant_id:'71786'}}}}]});
-   if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
-    const body=JSON.parse(opts.body);
-    assert.deepEqual(body.line_items,[{product_id:'6aa17cf10e017119c60fca91',variant_id:71786,quantity:1}]);
-    assert.equal(body.address_to.country,'US');
-    assert.equal(body.address_to.region,'MI');
-    assert.equal(body.address_to.zip,'48201');
-    return goodResponse({standard:2200});
-   }
-   throw Error('Unexpected shipping API mock call: '+url);
-  };
-  const request=new Request('https://preview.example/.netlify/functions/calculate-shipping',{
-   method:'POST',headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({session_id:'cs_test_yogamat',items:[{name:'Gangster Bougie Foam Yoga Mat',size:'Turquoise • 24" × 72"',qty:1}],
-    address:{name:'Customer Example',country:'US',region:'MI',address1:'100 Example Street',city:'Test City',zip:'48201'}})
-  });
-  const response=await calculateShipping(request);const body=await response.json();
-  assert.equal(response.status,200,JSON.stringify(body));
-  assert.equal(body.amount,499);
-  assert.equal(body.actual_amount,2200);
-  assert.equal(body.subsidy,1701);
-  assert.equal(calls.filter(x=>x.url.endsWith('/orders/shipping.json')).length,1);
-  const posted=calls.find(x=>x.url.endsWith('/checkout/sessions/cs_test_yogamat')&&x.opts.method==='POST');
-  assert.ok(posted,'Stripe session shipping was updated');
-  const form=new URLSearchParams(posted.opts.body);
-  assert.equal(form.get('shipping_options[0][shipping_rate_data][fixed_amount][amount]'),'499');
- }finally{globalThis.fetch=originalFetch;
-  if(originalPrintify===undefined)delete process.env.PRINTIFY_API_TOKEN;else process.env.PRINTIFY_API_TOKEN=originalPrintify;
-  if(originalStripe===undefined)delete process.env.STRIPE_SECRET_KEY;else process.env.STRIPE_SECRET_KEY=originalStripe;}
-});
 test('Printify fulfillment picks exact sizes and accessory variants', async () => {
  const {resolveFulfillment}=await import('../netlify/functions/lib/fulfillment-resolver.mjs');
  const blue='GB Classic High-Waisted Leggings – Blue';
@@ -193,13 +125,12 @@ test('Printify fulfillment picks exact sizes and accessory variants', async () =
  assert.equal(resolveFulfillment('Embroidered Structured Cap','S/M').variant_id,118702);
  assert.equal(resolveFulfillment('Embroidered Structured Cap','L/XL').variant_id,118703);
  assert.equal(resolveFulfillment('Gangster Bougie Gym Face Towel','Black').variant_id,75135);
- assert.equal(resolveFulfillment('Gangster Bougie Foam Yoga Mat','Dark Blue').variant_id,71786);
 });
 
 test('all physical products are cost-verified, with only one commission per garment type', () => {
- assert.equal(AFFILIATE_COST_PRODUCTS.length,52);
- assert.equal(AFFILIATE_RATE_PRODUCTS.length,21);
- assert.equal(Object.keys(COMMISSION_PRODUCT_ALIASES).length,8);
+ assert.equal(AFFILIATE_COST_PRODUCTS.length,51);
+ assert.equal(AFFILIATE_RATE_PRODUCTS.length,20);
+ assert.equal(Object.keys(COMMISSION_PRODUCT_ALIASES).length,7);
  assert.equal(AFFILIATE_LEGACY_UNMAPPED_NAMES.length,6);
  for(const name of AFFILIATE_RATE_PRODUCTS) assert.ok(SELLABLE_PRODUCT_NAMES.includes(name));
  for(const [alias,canonical] of Object.entries(COMMISSION_PRODUCT_ALIASES)){
@@ -214,7 +145,6 @@ test('all physical products are cost-verified, with only one commission per garm
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gangster Bougie Women’s Signature Crop Tee – Black'));
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gangster Bougie Women’s Signature Crop Tee – White'));
  assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Gym Face Towel'));
- assert.ok(AFFILIATE_RATE_PRODUCTS.includes('Foam Yoga Mat'));
  assert.equal(AFFILIATE_RATE_MEMBERS['Onyx Sports Bra'].length,13);
  assert.equal(AFFILIATE_RATE_MEMBERS['Onyx Leggings'].length,13);
  assert.equal(AFFILIATE_RATE_MEMBERS['Onyx Workout Shorts'].length,8);
@@ -227,7 +157,7 @@ test('all physical products are cost-verified, with only one commission per garm
 
 test('shipping subsidy uses the same contribution as live checkout', () => {
  assert.equal(customerShippingContribution('Gym Face Towel'),249);
- assert.equal(customerShippingContribution('Foam Yoga Mat'),499);
+ assert.equal(customerShippingContribution('Foam Yoga Mat'),null);
  assert.equal(customerShippingContribution('Onyx/Gold Crowned Luxury Full-Zip Hoodie'),0);
  assert.equal(customerShippingContribution('Stainless Steel Gym Bottle'),499);
 });
@@ -281,8 +211,8 @@ test('every affiliate product has exact Printify variants and a customer shippin
 test('owner admin has private Printify syncing and proposal approval UI',()=>{
  const admin=readFileSync(new URL('../affiliate-admin.html',import.meta.url),'utf8');
  assert.match(admin,/id="syncPrintifyCosts"/);
- assert.match(admin,/id="syncMatCost"/);
- assert.match(admin,/id="matCostStatus"/);
+ assert.doesNotMatch(admin,/id="syncMatCost"/);
+ assert.doesNotMatch(admin,/id="matCostStatus"/);
  assert.match(admin,/id="approvePrintifyCosts"/);
  assert.match(admin,/You keep after commission/);
  assert.match(admin,/id="sharedRateRows"/);
@@ -340,123 +270,6 @@ test('mocked two-colour Printify accessory fetch reuses shipping profile across 
  assert.equal(productCalls,2);
  assert.equal(shippingCalls,1);
 });
-test('foam yoga mat retries missing V1 Canada rate against real-format Printify V2 standard shipping',async()=>{
- const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
- '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
- '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
- let v2Calls=0;
- const mock=async url=>{
-  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
-  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
-    variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
-  if(url.endsWith('/v1/catalog/blueprints/900/print_providers/901/shipping.json'))
-   return {ok:true,json:async()=>({profiles:[{variant_ids:[71786],countries:['US'],
-    first_item:{currency:'USD',cost:3900}}]})};
-  if(url.endsWith('/v2/catalog/blueprints/900/print_providers/901/shipping/standard.json')){
-   v2Calls++;
-   return {ok:true,json:async()=>({data:['US','CA'].map(country=>({attributes:{
-    shippingType:'standard',variantId:71786,country:{code:country},
-    shippingCost:{firstItem:{amount:country==='CA'?4839:3900,currency:'USD'}}
-   }}))})};
-  }
-  throw Error('Unexpected mock route '+url);
- };
- const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
- assert.equal(mat.retail_cents,10499);
- assert.equal(mat.production_high_cents,5448);
- assert.equal(mat.gb_shipping_subsidy_cents,4340);
- assert.equal(mat.estimated_profit_cents,186);
- assert.equal(mat.proposed_commission_cents,0);
- assert.equal(mat.status,'needs_review'); // Excluded: zero proposed payout is intentional.
- assert.match(mat.shipping_source,/V2 standard/);
- assert.equal(v2Calls,1);
-});
-test('mat with no verified Canada shipping must remain unpriced rather than assume a shipping cost',async()=>{
- const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
- '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
- '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
- const mock=async (url,options={})=>{
-  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
-  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
-   variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
-  if(url.endsWith('/orders/shipping.json')){
-   const body=JSON.parse(options.body);
-   return {ok:true,json:async()=>body.address_to.country==='US'?{standard:3900}:{}};
-  }
-  if(url.includes('/shipping/standard.json'))return {ok:true,json:async()=>({data:[]})};
-  if(url.includes('/shipping.json'))return {ok:true,json:async()=>({profiles:[]})};
-  throw Error('Unexpected mock route '+url);
- };
- const mat=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
- assert.equal(mat.status,'needs_review');
- assert.equal(mat.reason,'printify_reference_no_shipping_method_available');
- assert.equal(mat.shipping_country,'CA');
- assert.equal(mat.retail_cents,10499);
- assert.equal(mat.proposed_commission_cents,undefined);
- assert.equal(mat.estimated_profit_cents,undefined);
-});
-test('mat without catalog rates uses real-form Printify checkout QUOTES for six colour IDs in US and CA',async()=>{
- const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
- '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
- '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
- const quotes=[];
- const mock=async (url,options={})=>{
-  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
-  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
-   variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
-  if(url.endsWith('/v1/catalog/blueprints/900/print_providers/901/shipping.json'))
-   return {ok:true,json:async()=>({profiles:[]})};
-  if(url.endsWith('/v2/catalog/blueprints/900/print_providers/901/shipping/standard.json'))
-   return {ok:true,json:async()=>({data:[]})};
-  if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
-   assert.equal(options.method,'POST');
-   const body=JSON.parse(options.body),country=body.address_to.country;
-   assert.ok(['US','CA'].includes(country));
-   assert.equal(body.line_items.length,1);
-   assert.equal(body.line_items[0].variant_id,71786);
-   assert.ok(ids.includes(body.line_items[0].product_id));
-   quotes.push({country,id:body.line_items[0].product_id});
-   return {ok:true,json:async()=>({standard:country==='CA'?4839:3999})};
-  }
-  throw Error('unexpected Printify API route: '+url);
- };
- const result=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
- assert.equal(result.production_high_cents,5448);
- assert.equal(result.gb_shipping_subsidy_cents,4340);
- assert.equal(result.estimated_profit_cents,186);
- assert.equal(result.proposed_commission_cents,0);
- assert.equal(result.shipping_reference_only,true);
- assert.equal(result.cost_variant_count,6);
- assert.equal(quotes.length,12);
- assert.deepEqual(new Set(quotes.map(q=>q.country)),new Set(['US','CA']));
- assert.deepEqual(new Set(quotes.map(q=>q.id)),new Set(ids));
-});
-test('mat failing its real Printify shipping quote stays unverified, never uses guessed rate',async()=>{
- const ids=['6aa17d76ecf402b473069b65','6aa17cf10e017119c60fca91',
- '6aa17ca22e2c82890e0b1c06','6aa17c5cef297c9cb30b13e7',
- '6aa17bf44e6cc4ad44002904','6aa1778761c176742d02f065'];
- const mock=async (url,options={})=>{
-  const id=ids.find(v=>url.endsWith('/products/'+v+'.json'));
-  if(id)return {ok:true,json:async()=>({id,blueprint_id:900,print_provider_id:901,
-   variants:[{id:71786,cost:5448,is_enabled:true,is_available:true}]})};
-  if(url.endsWith('/v1/catalog/blueprints/900/print_providers/901/shipping.json'))
-   return {ok:true,json:async()=>({profiles:[]})};
-  if(url.endsWith('/v2/catalog/blueprints/900/print_providers/901/shipping/standard.json'))
-   return {ok:true,json:async()=>({data:[]})};
-  if(url.endsWith('/v1/shops/28816619/orders/shipping.json')){
-   const {country}=JSON.parse(options.body).address_to;
-   return {ok:true,json:async()=>country==='CA'?{}:{standard:3999}};
-  }
-  throw Error('unexpected route '+url);
- };
- const row=await readPrintifyCost('Foam Yoga Mat','TEST_TOKEN',mock);
- assert.equal(row.status,'needs_review');
- assert.equal(row.reason,'printify_reference_no_shipping_method_available');
- assert.equal(row.shipping_country,'CA');
- assert.equal(row.product_colour,'Dark Green');
- assert.equal(row.proposed_commission_cents,undefined);
- assert.equal(row.estimated_profit_cents,undefined);
-});
 test('Printify importer blocks suggestions when a required variant lacks its actual cost',async()=>{
  const id='6aa0d82a6279c5ea5c03596f';
  const mock=async url=>{
@@ -497,10 +310,10 @@ test('one-dollar rounding exception preserves the approved slim-margin leggings 
  assert.equal(leggings.estimated_retained_after_commission_cents,352);
  assert.equal(leggings.rounding_note,'minimum_1_dollar_exception');
  const lowMargin=planProductCommission({
-  name:'Example low-margin mat',retailCents:10499,variantCosts:[{costCents:5448}],
+  name:'Example low-margin product',retailCents:10599,variantCosts:[{costCents:5448}],
   shippingByVariant:[{firstItemCents:4839}],customerContributionCents:499
  });
- assert.equal(lowMargin.estimated_profit_cents,186);
+ assert.equal(lowMargin.estimated_profit_cents,281);
  assert.equal(lowMargin.proposed_commission_cents,0);
  assert.equal(lowMargin.status,'needs_review');
 });
@@ -528,11 +341,11 @@ test('multi-item referral totaling uses the same rate for colourways of bras, le
 });
 
 
-test('explicit low-margin exclusions cover men’s shorts, bottles, mats, socks and bandanas',()=>{
- assert.equal(AFFILIATE_RATE_PRODUCTS.length,21);
+test('explicit low-margin exclusions cover men’s shorts, bottles, socks and bandanas',()=>{
+ assert.equal(AFFILIATE_RATE_PRODUCTS.length,20);
  assert.equal(AFFILIATE_ELIGIBLE_RATE_PRODUCTS.length,15);
- assert.equal(AFFILIATE_EXCLUDED_RATE_NAMES.length,6);
- assert.equal(AFFILIATE_EXCLUDED_PRODUCT_NAMES.length,6);
+ assert.equal(AFFILIATE_EXCLUDED_RATE_NAMES.length,5);
+ assert.equal(AFFILIATE_EXCLUDED_PRODUCT_NAMES.length,5);
  for(const name of AFFILIATE_EXCLUDED_RATE_NAMES){
   assert.equal(isAffiliateExcluded(name),true);
   assert.equal(AFFILIATE_ELIGIBLE_RATE_PRODUCTS.includes(name),false);
@@ -540,7 +353,6 @@ test('explicit low-margin exclusions cover men’s shorts, bottles, mats, socks 
  for(const name of AFFILIATE_ELIGIBLE_RATE_PRODUCTS)assert.equal(isAffiliateExcluded(name),false,name);
  for(const name of [
    'Gangster Bougie Stainless Steel Gym Bottle','Stainless Steel Gym Bottle',
-   'Gangster Bougie Foam Yoga Mat','Foam Yoga Mat',
    'Gangster Bougie Mini Wrap Bandana','Mini Wrap Bandana',
    'Crowned Luxury Crew Socks',
    'Onyx/Gold Gangster Bougie Basketball Rib Shorts',
@@ -553,14 +365,14 @@ test('server code rejects saved excluded rates and always returns policy-enforce
  const impl=readFileSync(new URL('../netlify/functions/lib/gb-affiliates.mjs',import.meta.url),'utf8');
  assert.match(impl,/if\(isAffiliateExcluded\(n\)\)return \{ok:false/);
  assert.match(impl,/isAffiliateExcluded\(n\)\?\{name:n,cents:0,excluded:true\}/);
- assert.match(impl,/filter\(rate=>!isAffiliateExcluded\(rate.name\)\)/);
+ assert.match(impl,/filter\(rate=>AFFILIATE_ELIGIBLE_RATE_PRODUCTS.includes\(rate.name\)\)/);
 });
 test('verified multi-item referral adds eligible rates but pays $0 on excluded items',()=>{
  const lines=[
   commissionLineFromRate({name:'Onyx/Gold Crowned Luxury Full-Zip Hoodie',quantity:1},{cents:300}),
   commissionLineFromRate({name:'GB Classic High-Waisted Leggings – Grey',quantity:2},{cents:100}),
   commissionLineFromRate({name:'Gangster Bougie Stainless Steel Gym Bottle',quantity:1},{cents:0,excluded:true}),
-  commissionLineFromRate({name:'Gangster Bougie Foam Yoga Mat',quantity:1},{cents:0,excluded:true}),
+  commissionLineFromRate({name:'Gangster Bougie Mini Wrap Bandana',quantity:1},{cents:0,excluded:true}),
  ];
  assert.deepEqual(lines.map(x=>x.commission_cents),[300,200,0,0]);
  assert.deepEqual(lines.map(x=>x.excluded),[false,false,true,true]);
@@ -585,7 +397,7 @@ test('affiliate terms disclose excluded product categories before sign-up and it
  const sync=readFileSync(new URL('../netlify/functions/lib/gb-affiliate-cost-sync.mjs',import.meta.url),'utf8');
  assert.match(affiliate,/id="affiliateExclusions"/);
  assert.match(affiliate,/Stainless steel gym bottles \(12 oz and 18 oz\)/);
- assert.match(affiliate,/Foam yoga mats \(all colours\)/);
+ assert.doesNotMatch(affiliate,/Foam yoga mats \(all colours\)/);
  assert.match(affiliate,/excluded — \$0/);
  assert.match(admin,/EXCLUDED — \$0/);
  assert.match(ledger,/excluded_only/);

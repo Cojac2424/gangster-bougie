@@ -25,7 +25,6 @@ export default async req=>{
  let b;try{b=await req.json()}catch{return json({error:'Invalid request.'},400)}
  let result;
  if(b.action==='sync_printify_costs')result=await syncCostBatch({offset:b.offset,batchSize:3});
- else if(b.action==='sync_mat_cost')result=await syncCostBatch({offset:AFFILIATE_COST_PRODUCTS.indexOf('Foam Yoga Mat'),batchSize:1});
  else if(b.action==='approve_all_cost_rates')result=await applyProposedRates({offset:b.offset,batchSize:4});
  else if(b.action==='set_rate')result=await setCommissionRate(b.name,b.cents);
  else if(['approve','reject','suspend','reactivate'].includes(b.action))result=await updateAffiliate(String(b.affiliate_id||''),b.action,b.code||'');

@@ -631,11 +631,6 @@ gtag('config','G-MRHDQKCTCX');
 .gb-men-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.gb-men-card{background:#0d0d0d;border:1px solid #1e1e1e;overflow:hidden;display:flex;flex-direction:column}.gb-men-img{aspect-ratio:1;background:#f6f6f4;overflow:hidden}.gb-men-img img{width:100%;height:100%;object-fit:contain}.gb-men-info{padding:18px;display:flex;flex-direction:column;flex:1}.gb-men-tag{color:var(--gold-light);font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;font-weight:900;margin-bottom:9px}.gb-men-name{font-family:'Bodoni Moda',serif;text-transform:uppercase;font-weight:900;line-height:1.15;margin-bottom:8px}.gb-men-price{font-weight:900;margin-bottom:14px}.gb-men-view{margin-top:auto;width:100%;padding:11px;border:1px solid var(--gold);background:transparent;color:var(--gold-light);font-weight:900;text-transform:uppercase;cursor:pointer}
 #gbMenQuick{position:fixed;inset:0;z-index:125;background:rgba(0,0,0,.88);display:none;padding:22px;overflow:auto}#gbMenQuick.open{display:grid;place-items:center}.gb-mq-box{width:min(850px,100%);background:#0b0b0b;border:1px solid var(--border);padding:22px;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:26px}.gb-mq-close{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);background:#080808;color:var(--gold-light);font-size:1.25rem;cursor:pointer}.gb-mq-pics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gb-mq-pics.single{display:block}.gb-mq-pics.single img{width:100%;aspect-ratio:auto;max-height:620px;object-fit:contain}.gb-mq-pics img{width:100%;aspect-ratio:1;object-fit:contain;background:#f4f3ef}.gb-mq-copy h3{font-family:'Bodoni Moda',serif;font-size:clamp(1.5rem,4vw,2.25rem);line-height:1.05;margin:12px 40px 8px 0}.gb-mq-price{font-size:1.2rem;font-weight:900;color:var(--gold-light);margin-bottom:14px}.gb-mq-label{display:block;margin:16px 0 8px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em}.gb-mq-sizes{display:flex;gap:8px;flex-wrap:wrap}.gb-mq-size{min-width:42px;height:42px;padding:0 9px;border:1px solid #555;background:#111;color:#fff;cursor:pointer}.gb-mq-size.active{border-color:var(--gold);color:var(--gold-light)}.gb-mq-details{margin-top:18px;border-top:1px solid #333;border-bottom:1px solid #333;padding:12px 0}.gb-mq-details summary{cursor:pointer;color:var(--gold-light);font-weight:900;text-transform:uppercase}.gb-mq-details-body{color:#ccc;line-height:1.55;padding-top:10px}.gb-mq-add{margin-top:20px;width:100%;padding:14px;border:0;background:linear-gradient(135deg,#f6d56c,#d8a928);color:#111;font-weight:1000;cursor:pointer}.gb-mq-note{font-size:.75rem;color:#999;margin-top:9px}
 @media(max-width:900px){.gb-men-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:680px){.gb-men-head{display:block}.gb-men-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.gb-men-info{padding:11px}.gb-men-name{font-size:.8rem}.gb-men-tag{font-size:.65rem}.gb-men-view{padding:10px;font-size:.7rem}.gb-mq-box{grid-template-columns:1fr}.gb-mq-pics{grid-template-columns:1fr 1fr}}
-/* Yoga Mat only: keep navigation controls clear of the mat images */
-#yogaMatModal #yogaMatPrev,
-#yogaMatModal #yogaMatNext{top:auto;bottom:14px;transform:none}
-#yogaMatModal #yogaMatPrev{left:14px}
-#yogaMatModal #yogaMatNext{right:14px}
 </style>
 <section id="gbMenCatalog"><div class="container"><div class="gb-men-head"><h2>Shop Men</h2><p>Crowned Luxury. Signature Gangster Bougie pieces built in black, cream, espresso and gold.</p></div><div class="gb-men-grid" id="gbMenGrid"></div></div></section>
 <div id="gbMenQuick" aria-hidden="true"><div class="gb-mq-box"><button class="gb-mq-close" aria-label="Close">×</button><div class="gb-mq-pics"><img id="gbMqFront"><img id="gbMqBack"></div><div class="gb-mq-copy"><div class="gb-men-tag">Crowned Luxury</div><h3 id="gbMqName"></h3><div class="gb-mq-price" id="gbMqPrice"></div><span class="gb-mq-label">Choose size</span><div class="gb-mq-sizes" id="gbMqSizes"></div><button class="gb-size-guide-btn" id="gbMenSizeGuideBtn" type="button">📏 Size Guide</button><details class="gb-mq-details"><summary>Product Details</summary><div class="gb-mq-details-body" id="gbMqDetails"></div></details><button class="gb-mq-add" id="gbMqAdd">🛒 ADD TO CART</button><div class="gb-mq-note">Made to order. Select your size before adding to cart.</div></div></div></div>
@@ -665,7 +660,6 @@ gtag('config','G-MRHDQKCTCX');
 <article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0412.jpeg" alt="Gangster Bougie Stainless Steel Gym Bottle" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Gym</div><div class="gb-access-name">Stainless Steel Gym Bottle</div><div class="gb-access-price">US$44.99–49.99</div><button class="gb-access-view" data-open="openGymBottle">View Item</button></div></article>
 <article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0098.jpeg" alt="Gangster Bougie Gym Face Towel" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Gym</div><div class="gb-access-name">Gym Face Towel</div><div class="gb-access-price">US$19.99</div><button class="gb-access-view" data-open="openGymTowel">View Item</button></div></article>
 <article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0093.jpeg" alt="Gangster Bougie Gym Bag" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Gym</div><div class="gb-access-name">Gym Bag</div><div class="gb-access-price">US$59.99</div><button class="gb-access-view" data-open="openGymBag">View Item</button></div></article>
-<article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0204.jpeg" alt="Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Activewear</div><div class="gb-access-name">Foam Yoga Mat</div><div class="gb-access-price">US$104.99</div><button class="gb-access-view" data-open="openYogaMat">View Item</button></div></article>
 <article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0416.jpeg" alt="Gangster Bougie GB Faux Leather Travel Bag" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Travel</div><div class="gb-access-name">GB Faux Leather Travel Bag</div><div class="gb-access-price">US$84.99</div><button class="gb-access-view" data-open="openGBTravelBag">View Item</button></div></article>
 <article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0414.jpeg" alt="Gangster Bougie Baddie Faux Leather Travel Bag" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Travel</div><div class="gb-access-name">“Baddie” Faux Leather Travel Bag</div><div class="gb-access-price">US$84.99</div><button class="gb-access-view" data-open="openTravelBag">View Item</button></div></article>
 <article class="gb-access-card"><div class="gb-access-img"><img src="https://assets.gangster-bougie.com/IMG_0321.jpeg" alt="Gangster Bougie Mini Wrap Bandana" loading="lazy" decoding="async"></div><div class="gb-access-info"><div class="gb-access-tag">Style</div><div class="gb-access-name">Mini Wrap Bandana</div><div class="gb-access-price">US$27.99</div><button class="gb-access-view" data-open="openBandana">View Item</button></div></article>
@@ -712,16 +706,6 @@ gtag('config','G-MRHDQKCTCX');
     <div class="product-name">Gangster Bougie GB Faux Leather Travel Bag</div>
     <div class="product-status">Black &amp; White • 9.5&quot; × 20.8&quot; • US$84.99</div>
     <button class="view-item" id="openGBTravelBag" type="button">View Item</button>
-  </div>
-</article>
-<article class="product-card" data-category="accessories">
-  <div class="product-image"><img data-src="https://assets.gangster-bougie.com/IMG_0204.jpeg" alt="Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"></div>
-  <div class="product-accent"></div>
-  <div class="product-info">
-    <div class="product-tag">ACCESSORIES • ACTIVEWEAR</div>
-    <div class="product-name">Gangster Bougie Foam Yoga Mat</div>
-    <div class="product-status">6 colourways • US$104.99</div>
-    <button class="view-item" id="openYogaMat" type="button">View Item</button>
   </div>
 </article>
 <article class="product-card" data-category="accessories">
@@ -909,54 +893,6 @@ gtag('config','G-MRHDQKCTCX');
     </div>
   </div>
 </div>
-<div class="modal" id="yogaMatModal" aria-hidden="true">
-  <div class="modal-box sports-modal-box">
-    <button class="modal-close" id="closeYogaMat" type="button">Close</button>
-    <div class="sports-layout">
-      <div class="sports-main-wrap">
-        <div class="main-product-photo sports-stage"><img id="yogaMatMain" src="https://assets.gangster-bougie.com/IMG_0204.jpeg" alt="Gangster Bougie Foam Yoga Mat Black" loading="lazy" decoding="async"></div>
-        <button class="sports-arrow prev" id="yogaMatPrev" type="button" aria-label="Previous image">‹</button>
-        <button class="sports-arrow next" id="yogaMatNext" type="button" aria-label="Next image">›</button>
-      </div>
-      <div class="sports-info">
-        <h2>Gangster Bougie Foam Yoga Mat</h2>
-        <div class="sports-price">US$104.99</div>
-        <p class="sports-description">Bring Gangster Bougie style into every stretch, workout, and recovery session. This branded foam yoga mat combines a cushioned workout surface with bold signature detailing for a clean, luxury activewear look.</p>
-        <ul class="sports-benefits">
-          <li>Cushioned 100% foam construction</li>
-          <li>Full-length 24&quot; × 72&quot; workout and yoga mat</li>
-          <li>0.25&quot; thick and lightweight</li>
-          <li>Edge-to-edge print with signature GB and brand artwork</li>
-          <li>Suitable for yoga, stretching, floor workouts, mobility work, and home training</li>
-          <li>Easy addition to the Gangster Bougie activewear collection</li>
-        </ul>
-        <hr class="sports-divider">
-        <div class="sports-colour-line">Colour: <strong id="yogaMatColourName">Black</strong></div>
-        <div class="sports-colors" aria-label="Choose colour">
-          <button class="sports-color yoga-mat-color active" type="button" data-index="0" aria-label="Black" title="Black" style="background:#17191b"></button>
-          <button class="sports-color yoga-mat-color" type="button" data-index="1" aria-label="Dark Grey" title="Dark Grey" style="background:#626a68"></button>
-          <button class="sports-color yoga-mat-color" type="button" data-index="2" aria-label="Dark Red" title="Dark Red" style="background:#c92332"></button>
-          <button class="sports-color yoga-mat-color" type="button" data-index="3" aria-label="Dark Blue" title="Dark Blue" style="background:#2752a8"></button>
-          <button class="sports-color yoga-mat-color" type="button" data-index="4" aria-label="Turquoise" title="Turquoise" style="background:#20a7bd"></button>
-          <button class="sports-color yoga-mat-color" type="button" data-index="5" aria-label="Dark Green" title="Dark Green" style="background:#269754"></button>
-        </div>
-        <div class="sports-buy-row">
-          <div class="sports-size-block"><span class="option-label">Size</span><div class="sizes"><button class="size active" type="button">24&quot; × 72&quot;</button></div></div>
-          <button class="sports-add" type="button" aria-label="Add to cart coming soon"><span>🛒</span>ADD TO CART</button>
-        </div>
-        <div class="sports-preview-note">Cart connection coming soon.</div>
-      </div>
-      <div class="sports-gallery">
-        <button class="sports-thumb active yoga-mat-thumb" type="button" data-index="0"><img src="https://assets.gangster-bougie.com/IMG_0204.jpeg" alt="Black Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"><span class="sports-thumb-label">Black</span></button>
-        <button class="sports-thumb yoga-mat-thumb" type="button" data-index="1"><img src="https://assets.gangster-bougie.com/IMG_0203.jpeg" alt="Dark Grey Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"><span class="sports-thumb-label">Dark Grey</span></button>
-        <button class="sports-thumb yoga-mat-thumb" type="button" data-index="2"><img src="https://assets.gangster-bougie.com/IMG_0201.jpeg" alt="Dark Red Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"><span class="sports-thumb-label">Dark Red</span></button>
-        <button class="sports-thumb yoga-mat-thumb" type="button" data-index="3"><img src="https://assets.gangster-bougie.com/IMG_0200.jpeg" alt="Dark Blue Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"><span class="sports-thumb-label">Dark Blue</span></button>
-        <button class="sports-thumb yoga-mat-thumb" type="button" data-index="4"><img src="https://assets.gangster-bougie.com/IMG_0199.jpeg" alt="Turquoise Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"><span class="sports-thumb-label">Turquoise</span></button>
-        <button class="sports-thumb yoga-mat-thumb" type="button" data-index="5"><img src="https://assets.gangster-bougie.com/IMG_0198.jpeg" alt="Dark Green Gangster Bougie Foam Yoga Mat" loading="lazy" decoding="async"><span class="sports-thumb-label">Dark Green</span></button>
-      </div>
-    </div>
-  </div>
-</div>
 <div class="modal" id="gbTravelBagModal" aria-hidden="true">
   <div class="modal-box sports-modal-box">
     <button class="modal-close" id="closeGBTravelBag" type="button">Close</button>
@@ -1138,25 +1074,6 @@ gtag('config','G-MRHDQKCTCX');
  document.getElementById('gbTravelBagNext').onclick=()=>show(idx+1);
  thumbs.forEach((b,n)=>b.onclick=()=>show(n));
  modal.addEventListener('click',e=>{if(e.target===modal)document.getElementById('closeGBTravelBag').click();});
-})();
-
-(function(){
- const modal=document.getElementById('yogaMatModal');
- const main=document.getElementById('yogaMatMain');
- const name=document.getElementById('yogaMatColourName');
- const files=['https://assets.gangster-bougie.com/IMG_0204.jpeg','https://assets.gangster-bougie.com/IMG_0203.jpeg','https://assets.gangster-bougie.com/IMG_0201.jpeg','https://assets.gangster-bougie.com/IMG_0200.jpeg','https://assets.gangster-bougie.com/IMG_0199.jpeg','https://assets.gangster-bougie.com/IMG_0198.jpeg'];
- const labels=['Black','Dark Grey','Dark Red','Dark Blue','Turquoise','Dark Green'];
- const thumbs=[...document.querySelectorAll('.yoga-mat-thumb')];
- const colors=[...document.querySelectorAll('.yoga-mat-color')];
- let idx=0;
- function show(i){idx=(i+files.length)%files.length;main.src=files[idx];main.alt=labels[idx]+' Gangster Bougie Foam Yoga Mat';name.textContent=labels[idx];thumbs.forEach((b,n)=>b.classList.toggle('active',n===idx));colors.forEach((b,n)=>b.classList.toggle('active',n===idx));}
- document.getElementById('openYogaMat').onclick=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');show(0);document.body.style.overflow='hidden';};
- document.getElementById('closeYogaMat').onclick=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
- document.getElementById('yogaMatPrev').onclick=()=>show(idx-1);
- document.getElementById('yogaMatNext').onclick=()=>show(idx+1);
- thumbs.forEach((b,n)=>b.onclick=()=>show(n));
- colors.forEach((b,n)=>b.onclick=()=>show(n));
- modal.addEventListener('click',e=>{if(e.target===modal)document.getElementById('closeYogaMat').click();});
 })();
 
 (function(){
@@ -1446,7 +1363,14 @@ gtag('config','G-MRHDQKCTCX');
  const link=document.getElementById('gbCartLink')||document.querySelector('.cart-link');
  const drawer=document.getElementById('gbCartDrawer'),overlay=document.getElementById('gbCartOverlay'),close=document.getElementById('gbCartClose');
  const lines=document.getElementById('gbCartLines'),empty=document.getElementById('gbCartEmpty'),footer=document.getElementById('gbCartFooter'),subtotal=document.getElementById('gbCartSubtotal'),checkout=document.getElementById('gbCartCheckout');
- function read(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+ // Discard retired products in carts saved before this catalog update.
+ const retiredCartItems=new Set(['Foam Yoga Mat','Gangster Bougie Foam Yoga Mat']);
+ function read(){try{
+  const value=JSON.parse(localStorage.getItem(KEY)||'[]'),items=Array.isArray(value)?value:[];
+  const active=items.filter(item=>!retiredCartItems.has(String(item?.name||'').trim()));
+  if(active.length!==items.length)localStorage.setItem(KEY,JSON.stringify(active));
+  return active;
+ }catch(e){return []}}
  function write(c){localStorage.setItem(KEY,JSON.stringify(c));render()}
  function price(x){if(typeof x.price==='number')return x.price;var m=String(x.price||'').match(/[0-9]+(?:\.[0-9]+)?/);return m?Number(m[0]):0}
  function count(c){return c.reduce((n,x)=>n+(Number(x.qty)||1),0)}
@@ -2555,7 +2479,6 @@ gtag('config','G-MRHDQKCTCX');
  wire('gymBottleModal',function(m){var s=activeText(m,'.gym-bottle-size.active','12 oz'),is18=s.indexOf('18')===0;return{name:'Gangster Bougie Stainless Steel Gym Bottle',size:s,price:is18?49.99:44.99,image:is18?'https://assets.gangster-bougie.com/IMG_0413.jpeg':'https://assets.gangster-bougie.com/IMG_0412.jpeg'}});
  wire('gymTowelModal',function(){var colour=(document.getElementById('gymTowelColourName')||{}).textContent||'White';return{name:'Gangster Bougie Gym Face Towel',size:colour+' • 13&quot; × 13&quot;',price:19.99,image:colour==='Black'?'https://assets.gangster-bougie.com/IMG_0099.jpeg':'https://assets.gangster-bougie.com/IMG_0098.jpeg'}});
  wire('gymBagModal',function(m){var colour=(document.getElementById('gymBagColourName')||{}).textContent||'Black';var files={Black:'https://assets.gangster-bougie.com/IMG_0093.jpeg',Gold:'https://assets.gangster-bougie.com/IMG_0096.jpeg',Hunter:'https://assets.gangster-bougie.com/IMG_0097.jpeg',Maroon:'https://assets.gangster-bougie.com/IMG_0095.jpeg','Tropical Pink':'https://assets.gangster-bougie.com/IMG_0092.jpeg',Royal:'https://assets.gangster-bougie.com/IMG_0094.jpeg'};return{name:'Gangster Bougie Gym Bag',size:colour+' • One Size',price:59.99,image:files[colour]||'https://assets.gangster-bougie.com/IMG_0093.jpeg'}});
- wire('yogaMatModal',function(m){var colour=(document.getElementById('yogaMatColourName')||{}).textContent||'Black';var files={Black:'https://assets.gangster-bougie.com/IMG_0204.jpeg','Dark Grey':'https://assets.gangster-bougie.com/IMG_0203.jpeg','Dark Red':'https://assets.gangster-bougie.com/IMG_0201.jpeg','Dark Blue':'https://assets.gangster-bougie.com/IMG_0200.jpeg',Turquoise:'https://assets.gangster-bougie.com/IMG_0199.jpeg','Dark Green':'https://assets.gangster-bougie.com/IMG_0198.jpeg'};return{name:'Gangster Bougie Foam Yoga Mat',size:colour+' • 24&quot; × 72&quot;',price:104.99,image:files[colour]||'https://assets.gangster-bougie.com/IMG_0204.jpeg'}});
  wire('gbTravelBagModal',function(){return{name:'Gangster Bougie GB Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:84.99,image:'https://assets.gangster-bougie.com/IMG_0416.jpeg'}});
  wire('travelBagModal',function(){return{name:'Gangster Bougie “Baddie” Faux Leather Travel Bag',size:'9.5&quot; × 20.8&quot;',price:84.99,image:'https://assets.gangster-bougie.com/IMG_0414.jpeg'}});
  wire('bandanaModal',function(){return{name:'Gangster Bougie Mini Wrap Bandana',size:'27&quot; × 13&quot;',price:27.99,image:'https://assets.gangster-bougie.com/IMG_0321.jpeg'}});

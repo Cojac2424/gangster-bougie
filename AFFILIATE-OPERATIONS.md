@@ -8,26 +8,25 @@
 - `/affiliate-admin.html`: private owner approval, rate setting, refund/review, payout reconciliation.
 - `netlify/functions/affiliate.mjs` and `affiliate-admin.mjs`: protected API endpoints.
 - `netlify/functions/lib/gb-affiliates.mjs`: persistent Netlify Blobs application records and commission ledger.
-- `netlify/functions/lib/gb-product-catalog.mjs`: authoritative checkout prices, 52 individually cost-checked physical products, and 21 commission rate groups. Thirteen women's sports bras share one rate, thirteen leggings share one, and eight workout shorts (including black/white) share one. Other product types retain separate rates.
+- `netlify/functions/lib/gb-product-catalog.mjs`: authoritative checkout prices, 51 individually cost-checked physical products, and 20 commission rate groups. Thirteen women's sports bras share one rate, thirteen leggings share one, and eight workout shorts (including black/white) share one. Other product types retain separate rates.
 - `create-checkout-session.mjs`: validates affiliate code on the server and stores approved affiliate ID/code on the Stripe Checkout Session metadata, **without applying a customer discount**.
 - `stripe-webhook.mjs`: creates a commission ledger entry **only from a verified paid Stripe session**, with a unique key per Checkout Session to avoid duplicate affiliate orders. It also flags refunds for manual review. Stripe is *not* used to pay affiliates.
 - `tests/affiliate.test.mjs`: rule and script checks; GitHub Actions runs automatically in staging.
 
 ## Temporary non-commissionable products (owner-approved policy)
 
-As agreed on October 21, **five product categories (six commission keys)** are temporarily excluded because Canadian production and shipping costs leave inadequate margins:
+As agreed on October 21, **four product categories (five commission keys)** are temporarily excluded because Canadian production and shipping costs leave inadequate margins:
 
 - Men's basketball rib shorts: both Onyx/Gold and Cream/Gold designs.
 - Crowned Luxury crew socks.
 - Stainless steel gym bottles: 12 oz and 18 oz.
-- Foam yoga mats: all colours.
 - Mini wrap bandanas.
 
 They **remain for sale** and can appear on referred orders. The server sets their commission to $0, regardless of any outdated saved rate. The ledger marks each excluded line with `excluded: true`. An excluded-only paid order is recorded as `excluded_only`, with a $0 total and no payment action. Mixed orders receive the sum of eligible item commissions only. The rate editor refuses new nonzero rates on excluded products.
 
 The affiliate application and dashboard clearly identify the exclusion list and explain it without revealing confidential production costs or margins. Suggested reply to an affiliate: "Certain products are temporarily excluded because of their production and delivery costs. The list is reviewed periodically, and eligible items in the same order still earn their listed commissions."
 
-Printify sync can still review all 52 physical products. **Only eligible products** need verified positive rate recommendations for bulk approval. The 21 group keys comprise 15 eligible rates and 6 excluded keys. Exclusion stays in force until the owner explicitly approves changing the policy; a cost sync alone never activates an excluded product.
+Printify sync can still review all 51 physical products. **Only eligible products** need verified positive rate recommendations for bulk approval. The 20 group keys comprise 15 eligible rates and 5 excluded keys. Exclusion stays in force until the owner explicitly approves changing the policy; a cost sync alone never activates an excluded product.
 
 ## Automated Printify cost review — no spreadsheet required
 
@@ -35,12 +34,12 @@ The owner-only `affiliate-admin.html` page now has **Sync all Printify costs** a
 
 **How the workflow works:**
 
-1. Unlock the private admin page with the admin secret. Click **Sync all Printify costs** once; it processes up to three physical products per request, and automatically continues until all 52 have been checked. Even shared-rate garments are verified individually for safe sizing and shipping allowances.
+1. Unlock the private admin page with the admin secret. Click **Sync all Printify costs** once; it processes up to three physical products per request, and automatically continues until all 51 have been checked. Even shared-rate garments are verified individually for safe sizing and shipping allowances.
 2. The server fetches the configured Printify product(s) and variant `cost` for every size or colour. It fetches the print provider's standard first-item shipping profiles for both the US and Canada. The Printify API calls are server-only.
 3. The planning formula intentionally uses **the LOWEST retail price across offered options, the HIGHEST Printify production cost, and the HIGHEST first-item shipping cost among US and Canada**, minus the customer contribution from the same rules used by checkout. It reserves an **estimated 4.5% plus USD $0.30 per product** for processing. These are conservative *planning assumptions*, not verified Stripe fees, and omit extra operating costs or returns.
 4. Compute about 20% of the estimated profit. Default is to round **DOWN** to a whole dollar, except a target between $0.75 and $0.99 can be proposed as **$1** if at least $4 estimated profit remains *before* the payout (the agreed slim-margin leggings case). The admin also shows what the owner keeps after the proposed commission. Each proposal remains private in Netlify Blobs (`gb-owner-printify-affiliate-cost-v1`), never exposed to affiliates.
 5. Review the full product report. Missing/unavailable variants, missing Canadian or US shipping profiles, or non-positive suggested commissions receive a **needs review** flag. **Bulk approval requires every eligible product to have a fresh, positive, owner-reviewed proposal; explicitly excluded items are not blockers or payout candidates.**
-6. Only after reviewing the proposals, click **Approve all reviewed proposals** and confirm. The private API saves 15 eligible fixed commission rates in small batches; six explicitly excluded keys remain at $0. For shared women's bras, leggings, and workout shorts, each family's rate is the **lowest safe proposed amount across every one of its designs**. The verified Stripe webhook automatically totals (fixed group/product rate × purchased quantity) across every item on a referred order; actual line-item names remain visible.
+6. Only after reviewing the proposals, click **Approve all reviewed proposals** and confirm. The private API saves 15 eligible fixed commission rates in small batches; five explicitly excluded keys remain at $0. For shared women's bras, leggings, and workout shorts, each family's rate is the **lowest safe proposed amount across every one of its designs**. The verified Stripe webhook automatically totals (fixed group/product rate × purchased quantity) across every item on a referred order; actual line-item names remain visible.
 7. In future, new products require verified checkout/fulfillment mappings, cost sync and approval before affiliates can earn commissions on them.
 
 **Do not confuse the estimated per-item fixed commission with actual accounting profit**: order-specific Printify shipping, currency conversion, card processing, taxes, discounts and returns can differ. If margins are unusually narrow, revise the selling price or commission rather than approve an unsafe payout.

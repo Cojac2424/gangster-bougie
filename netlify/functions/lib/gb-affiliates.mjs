@@ -80,7 +80,7 @@ export async function setCommissionRate(name,cents) {
  await st.setJSON(key,record);return {ok:true,rate:record};
 }
 export async function getCommissionRate(name){const n=canonicalCommissionName(name);return isAffiliateExcluded(n)?{name:n,cents:0,excluded:true}:data().get(await rateKey(n),{type:'json'})}
-export async function listCommissionRates(){return (await listRecords(data(),'rate/')).filter(rate=>!isAffiliateExcluded(rate.name))}
+export async function listCommissionRates(){return (await listRecords(data(),'rate/')).filter(rate=>AFFILIATE_ELIGIBLE_RATE_PRODUCTS.includes(rate.name))}
 export async function listCommissions(){return (await listRecords(ledger(),'commission/')).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))}
 export async function getCommissionBySession(session){return ledger().get(ledgerKey(session),{type:'json'})}
 export async function recordVerifiedSale({session,affiliate,items,customerEmail,orderNumber,referralCode=''}) {

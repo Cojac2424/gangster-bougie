@@ -5,9 +5,9 @@
 <div id="workspace" hidden><button type="button" id="refresh">Refresh Records</button><button type="button" id="lock" class="secondary">Lock Admin</button><p id="state" role="status"></p>
 <section class="panel"><h2>Eligible affiliate commission rates by product type</h2><p>Women's sports bras, leggings, and workout shorts each share one fixed rate across colours and designs. Other eligible products have their own rates. Thin-margin items are explicitly excluded and always earn $0. Enter a fixed amount in USD. These amounts are private; no commission is payable for an unconfigured product. Only set rates after checking Printify costs and your margins.</p><form id="rateForm" class="grid"><label>Product or shared garment type<input id="rateName" list="products" required><datalist id="products"></datalist></label><label>Commission per item (USD)<input id="rateDollars" type="number" min="0" max="1000" step=".01" required placeholder="4.00"></label><div style="align-self:end"><button type="submit">Save Commission Amount</button></div></form><p id="unconfigured" class="small" role="status"></p><div id="rates"></div></section>
 <section class="panel" id="costReview"><h2>Printify costs & commission recommendations</h2>
-<p>Pull production costs for all 52 products directly from your Printify account, including each enabled size/colour. The estimate uses the highest product cost, conservative US/Canada first-item shipping, customer shipping contributions, and an <strong>estimated 4.5% + US$0.30 per item processing allowance</strong>. This is a cautious planning assumption, NOT the actual Stripe fee. Nothing is automatically approved or paid.</p>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="syncMatCost" class="secondary">Recheck yoga mat only</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
-<p id="costState" role="status">No verified cost report has been loaded yet.</p><p id="matCostStatus" role="status">Foam yoga mat: no cost report loaded.</p><p class="small"><strong>Temporarily excluded:</strong> Basketball rib shorts (both designs), crew socks, gym bottles (both sizes), yoga mats, mini wrap bandanas. These remain sellable and show $0 on referred orders. Production and shipping costs make them unsuitable for commissions at present.</p><h3 style="color:var(--gold)">Shared garment commissions</h3><p class="small">For each women's garment type, the proposed rate uses the lowest safe commission among all its patterns and colours. No separate payouts by design.</p><div class="scroll"><table><thead><tr><th>Garment type</th><th>Designs covered</th><th>Safe shared commission</th><th>Minimum estimated profit kept</th><th>Status</th></tr></thead><tbody id="sharedRateRows"></tbody></table></div>
+<p>Pull production costs for all 51 products directly from your Printify account, including each enabled size/colour. The estimate uses the highest product cost, conservative US/Canada first-item shipping, customer shipping contributions, and an <strong>estimated 4.5% + US$0.30 per item processing allowance</strong>. This is a cautious planning assumption, NOT the actual Stripe fee. Nothing is automatically approved or paid.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
+<p id="costState" role="status">No verified cost report has been loaded yet.</p><p class="small"><strong>Temporarily excluded:</strong> Basketball rib shorts (both designs), crew socks, gym bottles (both sizes), mini wrap bandanas. These remain sellable and show $0 on referred orders. Production and shipping costs make them unsuitable for commissions at present.</p><h3 style="color:var(--gold)">Shared garment commissions</h3><p class="small">For each women's garment type, the proposed rate uses the lowest safe commission among all its patterns and colours. No separate payouts by design.</p><div class="scroll"><table><thead><tr><th>Garment type</th><th>Designs covered</th><th>Safe shared commission</th><th>Minimum estimated profit kept</th><th>Status</th></tr></thead><tbody id="sharedRateRows"></tbody></table></div>
 <div class="scroll"><table><thead><tr><th>Product</th><th>Retail</th><th>Highest Printify cost</th><th>Highest shipping subsidy</th><th>Estimated payment fee</th><th>Estimated net profit</th><th>20% target</th><th>Suggested fixed commission</th><th>You keep after commission</th><th>Review status</th></tr></thead><tbody id="costRows"></tbody></table></div>
 <p><small>All prices and estimated costs are in US dollars. Suggested commissions round down to whole dollars, except that a near-$1 target may round to $1 when at least $4 profit remains before payout (for example, our agreed leggings case). No proposal is accepted until you review and approve it. Products with missing costs or inadequate margins must be resolved individually.</small></p>
 </section>
@@ -42,15 +42,6 @@
   vals.forEach(v=>r.append(td(v)));body.append(r);
   if(!nonpayable&&x?.status==='proposal_ready'&&x.proposed_commission_cents>0&&Date.parse(x.checked_at)>=fresh)ready++;
  }
- const mat=byName['Foam Yoga Mat'];
- $('matCostStatus').textContent=mat?.estimated_profit_cents!=null?
-  'Foam yoga mat (affiliate payout $0): '+money(mat.estimated_profit_cents)+' estimated profit before affiliate. '+
-  (mat.estimated_profit_cents<=0?'LOSS RISK — review selling price.':mat.estimated_profit_cents<500?'THIN MARGIN — review selling price.':'Cost calculation complete.')+
-  (mat.shipping_reference_only?' Shipping is based on reference-city quotes, NOT all addresses; do not approve a mat commission.':''):
-  'Foam yoga mat (affiliate payout $0): cost or shipping NOT VERIFIED — '+(mat?.reason||mat?.status||'not yet synced')+
-  (mat?.product_colour?' for '+mat.product_colour:'')+
-  (mat?.shipping_country?' to '+(mat.shipping_country==='CA'?'Canada':mat.shipping_country==='US'?'the United States':mat.shipping_country):'')+
-  (mat?.printify_product_id?' (Printify product '+mat.printify_product_id+')':'')+'.';
  const eligibleTotal=(catalog||[]).filter(name=>!excluded.has(name)).length;
  $('costState').textContent=ready+'/'+eligibleTotal+' eligible products have recent positive proposals; '+excluded.size+' products are excluded from commissions. '+
   (ready===eligibleTotal?'Review the suggested payouts before approving.':'Missing or unverified costs for eligible products must be resolved before approval.');
@@ -84,15 +75,6 @@
    offset=res.next_offset;remaining=res.total;
   }await refresh();
   }catch(error){$('costState').textContent='Printify sync stopped: '+error.message+' — review Netlify configuration or retry.'}
-  finally{btn.disabled=false}
- });
- $('syncMatCost').addEventListener('click',async()=>{
-  const btn=$('syncMatCost');btn.disabled=true;
-  $('matCostStatus').textContent='Checking foam yoga mat directly with Printify…';
-  try{const res=await call('POST',{action:'sync_mat_cost'});
-   if(!res.ok)throw Error(res.error||'Mat cost check failed.');
-   await refresh();
-  }catch(error){$('matCostStatus').textContent='Mat cost recheck failed: '+error.message}
   finally{btn.disabled=false}
  });
  $('approvePrintifyCosts').addEventListener('click',async()=>{
