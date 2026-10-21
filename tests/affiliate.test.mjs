@@ -10,6 +10,7 @@ import {readPrintifyCost} from '../netlify/functions/lib/gb-affiliate-printify-r
 import {affiliateMappedVariants} from '../netlify/functions/lib/fulfillment-resolver.mjs';
 import {AFFILIATE_EXCLUDED_RATE_NAMES,AFFILIATE_EXCLUDED_PRODUCT_NAMES,AFFILIATE_ELIGIBLE_RATE_PRODUCTS,isAffiliateExcluded} from '../netlify/functions/lib/gb-product-catalog.mjs';
 import {commissionLineFromRate,summarizeCommissionLines} from '../netlify/functions/lib/gb-affiliate-commission-lines.mjs';
+import {retrieveAllStripeLineItems} from '../netlify/functions/lib/gb-stripe-line-items.mjs';
 
 test('checkout catalog contains distinct authoritative products and positive prices', () => {
  assert.ok(SELLABLE_PRODUCT_NAMES.length >= 50);
@@ -364,4 +365,41 @@ test('affiliate terms disclose excluded product categories before sign-up and it
  assert.match(admin,/EXCLUDED — \$0/);
  assert.match(ledger,/excluded_only/);
  assert.match(sync,/AFFILIATE_ELIGIBLE_RATE_PRODUCTS/);
+});
+
+test('complete paid Stripe session line items include every product, not the first handful',async()=>{
+ const observed=[];
+ const items=Array.from({length:12},(_,i)=>({
+  id:'li_'+i,quantity:i%3+1,
+  price:{product:{id:'prod_'+i,metadata:{storefront_name:'Product '+i}}}
+ }));
+ const fetcher=async (url,opts)=>{
+  observed.push(url);
+  assert.match(opts.headers.Authorization,/^Bearer sk_test_mock$/);
+  assert.match(url,/\/line_items\?/);
+  return {ok:true,json:async()=>({data:items,has_more:false})};
+ };
+ const got=await retrieveAllStripeLineItems('cs_test_mock','sk_test_mock',fetcher);
+ assert.equal(got.length,12);
+ assert.equal(got[11].price.product.metadata.storefront_name,'Product 11');
+ assert.equal(observed.length,1);
+});
+test('Stripe line item pagination is complete, duplicate-safe and fails closed',async()=>{
+ let n=0;
+ const fetcher=async (url)=>{
+  const query=new URL(url).searchParams;
+  n++;
+  if(n===1){
+   assert.equal(query.get('starting_after'),null);
+   return {ok:true,json:async()=>({has_more:true,data:[{id:'li_1',quantity:1,price:{product:{id:'p_1'}}}]})};
+  }
+  assert.equal(query.get('starting_after'),'li_1');
+  return {ok:true,json:async()=>({has_more:false,data:[{id:'li_2',quantity:2,price:{product:{id:'p_2'}}}]})};
+ };
+ const rows=await retrieveAllStripeLineItems('cs_test_mock','sk_test_mock',fetcher);
+ assert.deepEqual(rows.map(x=>x.id),['li_1','li_2']);
+ const bad=async()=>({ok:true,json:async()=>({data:[{id:'li_1',quantity:1,price:{product:'prod_not_expanded'}}],has_more:false})});
+ await assert.rejects(retrieveAllStripeLineItems('cs_test_mock','sk_test_mock',bad),/stripe_line_items_missing_product_metadata/);
+ const insufficient=async()=>({ok:true,json:async()=>({data:[],has_more:true})});
+ await assert.rejects(retrieveAllStripeLineItems('cs_test_mock','sk_test_mock',insufficient),/pagination_failed/);
 });
