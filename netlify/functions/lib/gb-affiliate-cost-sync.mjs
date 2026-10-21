@@ -10,7 +10,7 @@ import {setCommissionRate} from './gb-affiliates.mjs';
 const SHOP_ID='28816619',ROOT='https://api.printify.com/v1';
 const store=()=>getStore('gb-owner-printify-affiliate-cost-v1');
 const key=name=>'cost/'+encodeURIComponent(name);
-const safeError=error=>String(error?.message||error||'request_failed').replace(/[^a-zA-Z0-9_\-]/g,'_').slice(0,90);
+const safeError=error=>{const value=String(error?.message||'');return /^(printify_http_\d{3}|printify_product_id_mismatch|printify_provider_missing|invalid_printify_response)$/.test(value)?value:'printify_request_failed'};
 const unitsFromPrice=name=>Math.min(PRICE_CENTS[name],...Object.values(VARIABLE_PRICES[name]||{}));
 async function requestPrintify(path,token,fetcher){
  const response=await fetcher(ROOT+path,{method:'GET',headers:{Authorization:'Bearer '+token,Accept:'application/json'}});
@@ -23,19 +23,25 @@ async function readCost(name,token,fetcher){
  const mapped=affiliateMappedVariants(name);
  if(!mapped.length)return {name,status:'needs_review',reason:'product_has_no_verified_mapping'};
  const products=new Map(),shipping=new Map(),variantCosts=[],shippingCosts=[];
- // Unique Printify product IDs may back different sizes and colours.
- for(const id of [...new Set(mapped.map(x=>x.productId))]){
+ // Fetch each underlying Printify product concurrently; colour variants may use separate product IDs.
+ const productIds=[...new Set(mapped.map(x=>x.productId))];
+ const fetched=await Promise.all(productIds.map(async id=>{
   const product=await requestPrintify('/shops/'+SHOP_ID+'/products/'+encodeURIComponent(id)+'.json',token,fetcher);
   if(String(product.id)!==String(id))throw Error('printify_product_id_mismatch');
-  if(!Number.isSafeInteger(Number(product.blueprint_id))||!Number.isSafeInteger(Number(product.print_provider_id)))throw Error('printify_provider_missing');
-  products.set(id,product);
- }
+  if(!Number.isSafeInteger(Number(product.blueprint_id))||!Number.isSafeInteger(Number(product.print_provider_id)))
+   throw Error('printify_provider_missing');
+  return [id,product];
+ }));
+ for(const [id,product] of fetched)products.set(id,product);
+ const shippingIds=[...new Set(fetched.map(([,p])=>p.blueprint_id+'/'+p.print_provider_id))];
+ const downloadedShipping=await Promise.all(shippingIds.map(async id=>{
+  const [bp,provider]=id.split('/');
+  const sh=await requestPrintify('/catalog/blueprints/'+bp+'/print_providers/'+provider+'/shipping.json',token,fetcher);
+  return [id,sh];
+ }));
+ for(const [id,sh] of downloadedShipping)shipping.set(id,sh);
  for(const [id,product] of products){
   const shipKey=product.blueprint_id+'/'+product.print_provider_id;
-  if(!shipping.has(shipKey)){
-   const sh=await requestPrintify('/catalog/blueprints/'+product.blueprint_id+'/print_providers/'+product.print_provider_id+'/shipping.json',token,fetcher);
-   shipping.set(shipKey,sh);
-  }
   const required=mapped.filter(x=>x.productId===id);
   for(const row of required){
    const variant=(product.variants||[]).find(v=>Number(v.id)===row.variantId);
