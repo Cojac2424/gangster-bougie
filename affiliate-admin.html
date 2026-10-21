@@ -8,7 +8,7 @@
 <p>Pull production costs for all 52 products directly from your Printify account, including each enabled size/colour. The estimate uses the highest product cost, conservative US/Canada first-item shipping, customer shipping contributions, and an <strong>estimated 4.5% + US$0.30 per item processing allowance</strong>. This is a cautious planning assumption, NOT the actual Stripe fee. Nothing is automatically approved or paid.</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
 <p id="costState" role="status">No verified cost report has been loaded yet.</p>
-<div class="scroll"><table><thead><tr><th>Product</th><th>Retail</th><th>Highest Printify cost</th><th>Highest shipping subsidy</th><th>Estimated payment fee</th><th>Estimated net profit</th><th>20% target</th><th>Suggested fixed commission</th><th>Review status</th></tr></thead><tbody id="costRows"></tbody></table></div>
+<div class="scroll"><table><thead><tr><th>Product</th><th>Retail</th><th>Highest Printify cost</th><th>Highest shipping subsidy</th><th>Estimated payment fee</th><th>Estimated net profit</th><th>20% target</th><th>Suggested fixed commission</th><th>You keep after commission</th><th>Review status</th></tr></thead><tbody id="costRows"></tbody></table></div>
 <p><small>All prices and estimated costs are in US dollars. Suggested commissions round DOWN to whole dollars. No proposal is accepted until you review and approve it. Products with missing costs or inadequate margins must be resolved individually.</small></p>
 </section>
 <section class="panel"><h2>Affiliate applications</h2><div class="scroll"><table><thead><tr><th>Applicant</th><th>Email / channel</th><th>Status</th><th>Referral code</th><th>Actions</th></tr></thead><tbody id="applicants"></tbody></table></div></section>
@@ -26,8 +26,8 @@
  const fresh=Date.now()-14*86400000;let ready=0;
  for(const name of catalog||[]){
   const x=byName[name],r=document.createElement('tr');
-  const vals=x?[name,money(x.retail_cents),money(x.production_high_cents),money(x.gb_shipping_subsidy_cents),money(x.processing_allowance_cents),money(x.estimated_profit_cents),money(x.twenty_percent_cents),money(x.proposed_commission_cents),x.status==='proposal_ready'?'Proposal — review':x.reason||x.status]:
-  [name,'—','—','—','—','—','—','—','Not synced'];
+  const vals=x?[name,money(x.retail_cents),money(x.production_high_cents),money(x.gb_shipping_subsidy_cents),money(x.processing_allowance_cents),money(x.estimated_profit_cents),money(x.twenty_percent_cents),money(x.proposed_commission_cents),money(x.estimated_retained_after_commission_cents),x.status==='proposal_ready'?'Proposal — review':x.reason||x.status]:
+  [name,'—','—','—','—','—','—','—','—','Not synced'];
   vals.forEach(v=>r.append(td(v)));body.append(r);
   if(x?.status==='proposal_ready'&&x.proposed_commission_cents>0&&Date.parse(x.checked_at)>=fresh)ready++;
  }
