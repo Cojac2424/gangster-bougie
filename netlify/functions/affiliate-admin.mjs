@@ -1,6 +1,7 @@
 // Owner-only affiliate administration. Set GB_AFFILIATE_ADMIN_SECRET (>=24 characters)
 // in Netlify before attempting access; this endpoint fails closed without it.
 import {digest,listAffiliates,listCommissions,listCommissionRates,setCommissionRate,updateAffiliate,adminUpdateCommission} from './lib/gb-affiliates.mjs';
+import {sendAffiliateApprovalNotice} from './lib/gb-email.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 async function authorized(req){
  const expected=String(process.env.GB_AFFILIATE_ADMIN_SECRET||'');
@@ -25,5 +26,6 @@ export default async req=>{
  else if(['approve','reject','suspend','reactivate'].includes(b.action))result=await updateAffiliate(String(b.affiliate_id||''),b.action,b.code||'');
  else if(['recalculate','mark_paid','void','approve_for_payout'].includes(b.action))result=await adminUpdateCommission(String(b.stripe_session_id||''),b.action,{note:b.note||''});
  else return json({error:'Unsupported action.'},400);
+ if(result.ok&&b.action==='approve'&&result.affiliate){try{const mail=await sendAffiliateApprovalNotice({to:result.affiliate.email,name:result.affiliate.name,code:result.affiliate.code});if(!mail.ok)console.error('AFFILIATE APPROVAL EMAIL FAILED',mail.error)}catch(e){console.error('AFFILIATE APPROVAL EMAIL FAILED',String(e?.message||e))}}
  return result.ok?json(result):json({error:result.error||'Update failed.'},400);
 };
