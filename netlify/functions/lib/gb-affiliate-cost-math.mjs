@@ -58,3 +58,11 @@ export function planProductCommission({
   fee_basis_points:feeRateBasisPoints,fee_fixed_cents:feeFixedCents,
   cost_variant_count:list.length,shipping_profile_count:shippingByVariant.length};
 }
+
+/** The entire garment family shares its most conservative verified member's fixed payout. */
+export function conservativeFamilyCommission(memberNames,verifiedProposals) {
+ if(!Array.isArray(memberNames)||!memberNames.length||!(verifiedProposals instanceof Map))return null;
+ const amounts=memberNames.map(name=>verifiedProposals.get(name)?.proposed_commission_cents);
+ if(amounts.some(n=>!Number.isSafeInteger(n)||n<=0))return null;
+ return Math.min(...amounts);
+}
