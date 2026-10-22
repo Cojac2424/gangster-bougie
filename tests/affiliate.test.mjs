@@ -468,3 +468,9 @@ test('replacement crop tees resolve to distinct verified Printify products for e
  for(const name of [black,white])assert.ok(storefront.includes(name));
  assert.match(storefront,/#babyTeeModal \.sports-size-block \.sizes\{grid-template-columns:repeat\(5,/);
 });
+
+test('refund safeguards preserve voided commissions and prohibit refund payout approval', () => {
+ const source=readFileSync(new URL('../netlify/functions/lib/gb-affiliates.mjs',import.meta.url),'utf8');
+ assert.match(source,/row\.refund_flag=true;if\(row\.status==='paid'\)\{row\.refund_after_payout=true\}else if\(row\.status!=='void'\)\{row\.status='refund_review'\}/);
+ assert.match(source,/if\(!\['review_self_referral','review_inactive_affiliate','pending_hold','needs_rates'\]\.includes\(row\.status\)\|\|row\.refund_flag/);
+});
