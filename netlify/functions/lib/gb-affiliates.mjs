@@ -63,6 +63,20 @@ export async function updateAffiliate(affiliateId,action,requestedCode=''){
   if(row.code&&row.code!==code)await st.delete(codeKey(row.code));
   await st.set(codeKey(code),row.id);
   row.code=code;row.status='approved';row.approved_at=row.approved_at||now;
+ }else if(action==='change_code'){
+  if(row.status!=='approved'&&row.status!=='suspended')return {ok:false,error:'Approve this affiliate before changing the code.'};
+  const code=cleanCode(requestedCode);
+  if(code.length<3||code.length>30)return {ok:false,error:'Referral code must contain 3–30 letters, numbers, underscores, or hyphens.'};
+  if(code===row.code)return {ok:true,affiliate:row};
+  const existing=await st.get(codeKey(code),{type:'text'});
+  if(existing&&existing!==row.id)return {ok:false,error:'Referral code already taken.'};
+  await st.set(codeKey(code),row.id);
+  const oldCode=row.code;
+  row.code=code;
+  row.updated_at=now;
+  try{await st.setJSON(affKey(row.id),row)}catch(e){await st.delete(codeKey(code));throw e}
+  if(oldCode)await st.delete(codeKey(oldCode));
+  return {ok:true,affiliate:row};
  }else if(action==='reject'||action==='suspend'){
   row.status=action==='reject'?'rejected':'suspended';
  }else if(action==='reactivate'){
