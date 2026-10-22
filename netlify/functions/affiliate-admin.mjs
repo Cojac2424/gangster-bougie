@@ -27,7 +27,7 @@ export default async req=>{
  if(b.action==='sync_printify_costs')result=await syncCostBatch({offset:b.offset,batchSize:3});
  else if(b.action==='approve_all_cost_rates')result=await applyProposedRates({offset:b.offset,batchSize:4});
  else if(b.action==='set_rate')result=await setCommissionRate(b.name,b.cents);
- else if(['approve','reject','suspend','reactivate'].includes(b.action))result=await updateAffiliate(String(b.affiliate_id||''),b.action,b.code||'');
+ else if(['approve','reject','suspend','reactivate','change_code'].includes(b.action))result=await updateAffiliate(String(b.affiliate_id||''),b.action,b.code||'');
  else if(['recalculate','mark_paid','void','approve_for_payout'].includes(b.action))result=await adminUpdateCommission(String(b.stripe_session_id||''),b.action,{note:b.note||''});
  else return json({error:'Unsupported action.'},400);
  if(result.ok&&b.action==='approve'&&result.affiliate){try{const mail=await sendAffiliateApprovalNotice({to:result.affiliate.email,name:result.affiliate.name,code:result.affiliate.code});if(!mail.ok)console.error('AFFILIATE APPROVAL EMAIL FAILED',mail.error)}catch(e){console.error('AFFILIATE APPROVAL EMAIL FAILED',String(e?.message||e))}}
