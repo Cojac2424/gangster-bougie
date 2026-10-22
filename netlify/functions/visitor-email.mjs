@@ -56,13 +56,7 @@ function labels(event){
 export async function sendGangsterBougieActivityEmail({
  event='visit',path='/',referrer='',source='',ua='',device='',items=[],value=null,currency='USD',orderNumber='',customerEmail=''
 }={}){
- // Browsing-activity alerts are paused by default to protect the Resend quota.
- // Owner may explicitly re-enable later using GB_BROWSING_EMAIL_ALERTS=true in Netlify.
- // Verified purchase alerts continue unaffected; customer orders, verification codes,
- // and affiliate emails use separate transactional mail functions.
- if(event!=='purchase'&&process.env.GB_BROWSING_EMAIL_ALERTS!=='true'){
-  return {ok:true,paused:true};
- }
+ // Owner-requested: browsing activity email alerts are enabled again.
  const key=process.env.RESEND_API_KEY;
  if(!key)throw new Error('RESEND_API_KEY is not configured');
  const to='gangsterbougie@gmail.com';
