@@ -120,7 +120,7 @@ export async function adminUpdateCommission(session,action,updates={}) {
   if(row.status==='paid')return {ok:false,error:'Already paid: handle any recovery manually.'};
   row.status='void';row.review_note=String(updates.note||'').trim().slice(0,160);
  }else if(action==='approve_for_payout'){
-  if(!['review_self_referral','review_inactive_affiliate','pending_hold','needs_rates','refund_review'].includes(row.status)||!Number.isInteger(row.commission_total_cents)||row.commission_total_cents<=0)return {ok:false,error:'An order must have a positive eligible commission before approval.'};
+  if(!['review_self_referral','review_inactive_affiliate','pending_hold','needs_rates'].includes(row.status)||row.refund_flag||!Number.isInteger(row.commission_total_cents)||row.commission_total_cents<=0)return {ok:false,error:'An order must have a positive eligible commission before approval.'};
   row.status='approved_for_payout';row.review_note=String(updates.note||'').trim().slice(0,160);
  }else return {ok:false,error:'Invalid action.'};
  row.updated_at=now;await st.setJSON(key,row);return {ok:true,record:row};
@@ -130,7 +130,7 @@ export async function flagRefund(paymentIntent) {
  const results=[];
  for(const row of await listCommissions()){
   if(row.payment_intent!==paymentIntent)continue;
-  row.refund_flag=true;if(row.status==='paid'){row.refund_after_payout=true}else{row.status='refund_review'}
+  row.refund_flag=true;if(row.status==='paid'){row.refund_after_payout=true}else if(row.status!=='void'){row.status='refund_review'}
   row.updated_at=new Date().toISOString();await ledger().setJSON(ledgerKey(row.stripe_session_id),row);results.push(row.stripe_session_id);
  }
  return {ok:true,flagged:results};
