@@ -15,6 +15,17 @@ async function send({to,subject,html}){
 export async function sendVerificationCode({to,code}){
  return send({to,subject:'Your Gangster Bougie verification code',html:`<div style="background:#070707;color:#fff;padding:32px;font-family:Arial,sans-serif"><div style="max-width:560px;margin:auto;border:1px solid #d8a928;border-radius:14px;padding:28px"><h1 style="margin:0 0 14px;color:#d8a928">GANGSTER BOUGIE</h1><p>Use this code to securely access My Orders:</p><div style="font-size:34px;font-weight:800;letter-spacing:8px;margin:24px 0">${esc(code)}</div><p>This code expires in 10 minutes. If you did not request it, you can ignore this email.</p></div></div>`});
 }
+export async function sendAffiliateVerificationCode({to,code}){
+ return send({to,subject:'Your Gangster Bougie affiliate sign-in code',html:`<div style="background:#070707;color:#fff;padding:32px;font-family:Arial,sans-serif"><div style="max-width:560px;margin:auto;border:1px solid #d8a928;border-radius:14px;padding:28px"><h1 style="color:#d8a928">GANGSTER BOUGIE AFFILIATES</h1><p>Your secure affiliate dashboard verification code:</p><div style="font-size:34px;font-weight:800;letter-spacing:8px;margin:24px 0">${esc(code)}</div><p>Expires in 10 minutes. If you did not request this code, ignore this message.</p></div></div>`});
+}
+
+export async function sendAffiliateApplicationNotice({name,email,channel=''}){
+ return send({to:'gangsterbougie@gmail.com',subject:'Gangster Bougie: new affiliate application',html:`<div style="background:#080808;color:#fff;padding:26px;font-family:Arial,sans-serif"><h2 style="color:#d8a928">NEW AFFILIATE APPLICATION</h2><p><strong>Name:</strong> ${esc(name)}</p><p><strong>Email:</strong> ${esc(email)}</p><p><strong>Profile:</strong> ${esc(channel||'Not provided')}</p><p>Review in your secure Gangster Bougie affiliate administration page. Approval and commissions are manual.</p></div>`});
+}
+export async function sendAffiliateApprovalNotice({to,name,code}){
+ return send({to,subject:'You are approved — Gangster Bougie Affiliates',html:`<div style="background:#080808;color:#fff;padding:26px;font-family:Arial,sans-serif"><h2 style="color:#d8a928">WELCOME TO GANGSTER BOUGIE AFFILIATES</h2><p>Hi ${esc(name)},</p><p>Your affiliate application has been approved.</p><p><strong>Your referral code:</strong> <span style="color:#d8a928;font-weight:bold">${esc(code)}</span></p><p>Share this code or your unique link to earn fixed commissions on qualifying sales. Commissions are held for 30 days and paid manually after review.</p><p>Sign in at <a href="https://gangsterbougie.com/affiliate.html" style="color:#d8a928">Gangster Bougie Affiliates</a> to see your referral link and activity.</p></div>`});
+}
+
 export async function sendOrderConfirmation(order){
  const rows=(order.items||[]).map(x=>`<tr><td style="padding:8px 0">${esc(x.name)}${x.selection?' — '+esc(x.selection):''}</td><td style="padding:8px 0;text-align:right">× ${esc(x.quantity)}</td></tr>`).join('');
  const money=n=>Number.isFinite(Number(n))?(Number(n)/100).toLocaleString('en-US',{style:'currency',currency:order.currency||'USD'}):'';

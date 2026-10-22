@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gangster Bougie Affiliates</title>
+<style>
+:root{color-scheme:dark;--gold:#d8a928;--line:#58451c;--muted:#b8b8b8}*{box-sizing:border-box}body{background:radial-gradient(ellipse at top,#29200a,#090909 58%);color:white;font:16px/1.5 Arial,sans-serif;margin:0;min-height:100vh}header{padding:22px max(20px,calc((100vw - 940px)/2));border-bottom:1px solid var(--line)}h1,h2{margin:0 0 14px}h1{font-size:clamp(26px,5vw,42px);letter-spacing:1px}h2{color:var(--gold);font-size:21px}main{max-width:960px;margin:30px auto;padding:0 18px 48px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px}.panel{background:#101010;border:1px solid var(--line);border-radius:15px;padding:24px;margin-bottom:20px}p,.small{color:var(--muted)}label{display:block;margin:12px 0 5px;font-weight:600}input{display:block;background:#0b0b0b;color:white;border:1px solid #887034;padding:12px;width:100%;border-radius:8px;font-size:16px}button,.action{display:inline-block;padding:12px 19px;margin:12px 8px 0 0;color:#111;background:var(--gold);border:1px solid var(--gold);border-radius:999px;font-weight:700;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}a{color:var(--gold)}.secondary{color:var(--gold);background:transparent}table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:11px 7px;text-align:left;border-bottom:1px solid #3b341f;vertical-align:top}.scroll{overflow:auto}#affiliatePanel[hidden],#verifyForm[hidden]{display:none!important}.message{min-height:22px;margin:10px 0;font-size:14px}.code{font-size:23px;font-weight:bold;letter-spacing:2px;color:var(--gold)}.pill{display:inline-block;border:1px solid var(--line);padding:3px 10px;border-radius:12px}.total{font-weight:700;font-size:24px;color:var(--gold)}
+</style></head><body>
+<header><a href="/" aria-label="Return to Gangster Bougie store">← Back to Store</a><div style="margin-top:16px;color:var(--gold);font-weight:800;letter-spacing:3px">GANGSTER BOUGIE</div></header>
+<main><h1>Affiliate Program</h1><p>Share your favorite Gangster Bougie looks, earn fixed commissions on qualifying sales, and track your progress. No customer discount is currently attached to referral codes.</p>
+<div class="grid">
+<section class="panel"><h2>Apply to join</h2><p>Applications are reviewed before referral codes are activated.</p>
+<form id="applyForm"><label for="name">Your name</label><input id="name" required maxlength="100" autocomplete="name"><label for="email">Email</label><input id="email" type="email" required autocomplete="email"><label for="channel">Social media profile or website (optional)</label><input id="channel" maxlength="240" placeholder="Instagram, TikTok, website, etc."><button type="submit">Submit Application</button></form><div id="applyMsg" class="message" role="status"></div></section>
+<section class="panel"><h2>Affiliate sign-in</h2><p>Already approved? Sign in with a six-digit code sent to your email.</p>
+<form id="signForm"><label for="signEmail">Approved affiliate email</label><input id="signEmail" type="email" required autocomplete="email"><button type="submit">Email Sign-In Code</button></form><form id="verifyForm" hidden><label for="verifyCode">Six-digit code</label><input id="verifyCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code"><button type="submit">Open Dashboard</button></form><div id="signMsg" class="message" role="status"></div></section>
+</div>
+<section class="panel" id="affiliateExclusions"><h2>Which products earn commissions?</h2>
+<p>Commissions apply to eligible Gangster Bougie products at the fixed rates shown in your affiliate dashboard. Some items are temporarily excluded because their production and delivery costs are higher. This keeps the program sustainable, and we review product eligibility periodically.</p>
+<p><strong>Items currently excluded from affiliate commissions:</strong></p>
+<ul><li>Men’s basketball rib shorts (Onyx/Gold and Cream/Gold)</li><li>Crowned Luxury crew socks</li><li>Stainless steel gym bottles (12 oz and 18 oz)</li><li>Mini wrap bandanas</li></ul>
+<p>These products may still be purchased through your referral link, but they earn <strong>$0 commission</strong>. If an order includes other eligible items, you still earn the regular commission on those items.</p>
+</section>
+<section id="affiliatePanel" class="panel" hidden><h2>Your Affiliate Dashboard</h2><p id="hello"></p><div style="margin:14px 0">Referral code: <span class="code" id="myCode"></span></div><label for="myLink">Shareable referral link</label><input id="myLink" readonly><button type="button" id="copyLink">Copy Referral Link</button><button type="button" class="secondary" id="signOut">Sign Out</button><p class="small">Commissions are recorded after a verified customer payment, reviewed for refunds, and held for 30 days before manual payout. Amounts are shown in USD. No automatic payouts.</p><p id="balance" class="total"></p><h2>Current commission rates</h2><p class="small">Fixed rates for eligible products, before the 30-day holding period. Excluded products are listed above; other items may still be awaiting rate approval.</p><div class="scroll"><table><thead><tr><th>Product</th><th>Commission per sale</th></tr></thead><tbody id="rateRows"></tbody></table></div><h2 style="margin-top:24px">Your referral sales</h2><div class="scroll"><table><thead><tr><th>Order</th><th>Items</th><th>Commission</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<p class="small">Affiliate participation is subject to approval. Self-referrals, refunded or fraudulent purchases, and cancelled transactions are not eligible. Product-specific commission amounts will be available once confirmed.</p>
+</main><script>
+(function(){
+ const $=id=>document.getElementById(id),api='/.netlify/functions/affiliate';let email='';
+ function msg(id,v){$(id).textContent=v}
+ function money(cents){return cents==null?'Pending rate review':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100)}
+ function element(tag,value){let n=document.createElement(tag);n.textContent=String(value==null?'':value);return n}
+ async function request(body){let r=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),j=await r.json();if(!r.ok)throw Error(j.error||'Request failed.');return j}
+ $('applyForm').addEventListener('submit',async e=>{e.preventDefault();let btn=e.currentTarget.querySelector('button');btn.disabled=true;try{let res=await request({action:'apply',name:$('name').value,email:$('email').value,channel:$('channel').value});msg('applyMsg',res.message);e.target.reset()}catch(err){msg('applyMsg',err.message)}finally{btn.disabled=false}});
+ $('signForm').addEventListener('submit',async e=>{e.preventDefault();email=$('signEmail').value.trim();let btn=e.currentTarget.querySelector('button');btn.disabled=true;try{let res=await request({action:'request_code',email});msg('signMsg',res.message);$('verifyForm').hidden=false}catch(err){msg('signMsg',err.message)}finally{btn.disabled=false}});
+ $('verifyForm').addEventListener('submit',async e=>{e.preventDefault();let btn=e.currentTarget.querySelector('button');btn.disabled=true;try{let res=await request({action:'verify_code',email,code:$('verifyCode').value.trim()});sessionStorage.setItem('gbAffiliateToken',res.token);await load()}catch(err){msg('signMsg',err.message)}finally{btn.disabled=false}});
+ async function load(){let token=sessionStorage.getItem('gbAffiliateToken');if(!token)return;let r=await fetch(api,{headers:{Authorization:'Bearer '+token}}),j=await r.json();if(!r.ok){sessionStorage.removeItem('gbAffiliateToken');throw Error(j.error||'Sign in again.')}let a=j.affiliate;
+ $('affiliatePanel').hidden=false;$('hello').textContent='Welcome, '+a.name+'.';$('myCode').textContent=a.code;
+ $('myLink').value=location.origin+'/?ref='+encodeURIComponent(a.code);$('rows').replaceChildren();
+ $('rateRows').replaceChildren();for(let x of j.rates||[]){let r=document.createElement('tr');r.appendChild(element('td',x.name));r.appendChild(element('td',money(x.cents)));$('rateRows').appendChild(r)}
+ let total=0;
+ for(let v of j.records){if(v.status==='paid'||v.status==='approved_for_payout'||v.status==='pending_hold')total+=v.commission_total_cents||0;
+ let tr=document.createElement('tr'),values=[v.order_number,v.items.map(x=>x.name+' × '+x.quantity+(x.excluded?' (excluded — $0)':'')).join('; '),money(v.commission_total_cents),v.status.replace(/_/g,' ')];
+ values.forEach(x=>tr.appendChild(element('td',x)));$('rows').appendChild(tr)}
+ $('balance').textContent='Recorded eligible commissions: '+money(total);
+ msg('signMsg','Signed in successfully.');}
+ $('copyLink').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('myLink').value);$('copyLink').textContent='Copied!'}catch(_){$('myLink').select()}});
+ $('signOut').addEventListener('click',()=>{sessionStorage.removeItem('gbAffiliateToken');$('affiliatePanel').hidden=true;msg('signMsg','Signed out.')});
+ if(sessionStorage.getItem('gbAffiliateToken'))load().catch(err=>msg('signMsg',err.message));
+})();
+</script></body></html>

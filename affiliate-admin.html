@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gangster Bougie | Affiliate Admin</title>
+<style>:root{color-scheme:dark;--gold:#d8a928;--muted:#b9b9b9}*{box-sizing:border-box}body{margin:0;background:#090909;color:#fff;font:15px/1.5 Arial,sans-serif}header,main{max-width:1140px;margin:auto;padding:24px}header{border-bottom:1px solid #53451d}h1{font-size:26px}h2{color:var(--gold);font-size:20px}.panel{border:1px solid #5f4b1f;border-radius:13px;background:#121212;padding:20px;margin:20px 0}input,select{color:#fff;background:#161616;border:1px solid #7a6332;padding:10px;border-radius:7px;font-size:15px;max-width:100%}input{width:100%}label{display:block;margin:7px 0;font-size:14px}button{background:var(--gold);color:#111;border:0;border-radius:7px;padding:9px 12px;font-weight:700;margin:5px 3px;cursor:pointer}button:disabled{opacity:.5}.secondary{background:#333;color:#fff}.danger{background:#a84242;color:#fff}.scroll{overflow:auto}table{border-collapse:collapse;min-width:720px;width:100%}td,th{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid #363023;font-size:13px}small,p{color:var(--muted)}#workspace[hidden]{display:none}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}strong{color:#fff}code{color:var(--gold)}</style></head><body>
+<header><a href="/" style="color:var(--gold)">← Store</a><h1>Gangster Bougie | Affiliate Administration</h1><p>Private owner controls. All payouts are manual.</p></header><main>
+<section class="panel" id="login"><h2>Owner access</h2><p>Enter the separate affiliate administration secret configured in Netlify. It stays in this browser tab only.</p><form id="authForm"><label for="adminSecret">Admin access secret</label><input id="adminSecret" type="password" autocomplete="off" minlength="24" required><button type="submit">Open Admin</button></form><p id="authMsg" role="status"></p></section>
+<div id="workspace" hidden><button type="button" id="refresh">Refresh Records</button><button type="button" id="lock" class="secondary">Lock Admin</button><p id="state" role="status"></p>
+<section class="panel"><h2>Eligible affiliate commission rates by product type</h2><p>Women's sports bras, leggings, and workout shorts each share one fixed rate across colours and designs. Other eligible products have their own rates. Thin-margin items are explicitly excluded and always earn $0. Enter a fixed amount in USD. These amounts are private; no commission is payable for an unconfigured product. Only set rates after checking Printify costs and your margins.</p><form id="rateForm" class="grid"><label>Product or shared garment type<input id="rateName" list="products" required><datalist id="products"></datalist></label><label>Commission per item (USD)<input id="rateDollars" type="number" min="0" max="1000" step=".01" required placeholder="4.00"></label><div style="align-self:end"><button type="submit">Save Commission Amount</button></div></form><p id="unconfigured" class="small" role="status"></p><div id="rates"></div></section>
+<section class="panel" id="costReview"><h2>Printify costs & commission recommendations</h2>
+<p>Pull production costs for all 51 products directly from your Printify account, including each enabled size/colour. The estimate uses the highest product cost, conservative US/Canada first-item shipping, customer shipping contributions, and an <strong>estimated 4.5% + US$0.30 per item processing allowance</strong>. This is a cautious planning assumption, NOT the actual Stripe fee. Nothing is automatically approved or paid.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="syncPrintifyCosts">Sync all Printify costs</button><button type="button" id="approvePrintifyCosts" disabled>Approve all reviewed proposals</button></div>
+<p id="costState" role="status">No verified cost report has been loaded yet.</p><p class="small"><strong>Temporarily excluded:</strong> Basketball rib shorts (both designs), crew socks, gym bottles (both sizes), mini wrap bandanas. These remain sellable and show $0 on referred orders. Production and shipping costs make them unsuitable for commissions at present.</p><h3 style="color:var(--gold)">Shared garment commissions</h3><p class="small">For each women's garment type, the proposed rate uses the lowest safe commission among all its patterns and colours. No separate payouts by design.</p><div class="scroll"><table><thead><tr><th>Garment type</th><th>Designs covered</th><th>Safe shared commission</th><th>Minimum estimated profit kept</th><th>Status</th></tr></thead><tbody id="sharedRateRows"></tbody></table></div>
+<div class="scroll"><table><thead><tr><th>Product</th><th>Retail</th><th>Highest Printify cost</th><th>Highest shipping subsidy</th><th>Estimated payment fee</th><th>Estimated net profit</th><th>20% target</th><th>Suggested fixed commission</th><th>You keep after commission</th><th>Review status</th></tr></thead><tbody id="costRows"></tbody></table></div>
+<p><small>All prices and estimated costs are in US dollars. Suggested commissions round down to whole dollars, except that a near-$1 target may round to $1 when at least $4 profit remains before payout (for example, our agreed leggings case). No proposal is accepted until you review and approve it. Products with missing costs or inadequate margins must be resolved individually.</small></p>
+</section>
+<section class="panel"><h2>Affiliate applications</h2><div class="scroll"><table><thead><tr><th>Applicant</th><th>Email / channel</th><th>Status</th><th>Referral code</th><th>Actions</th></tr></thead><tbody id="applicants"></tbody></table></div></section>
+<section class="panel"><h2>Affiliate commissions and manual payments</h2><p>After the 30-day holding period, review the sale and any refunds before sending payment yourself. Only then mark it paid here.</p><div class="scroll"><table><thead><tr><th>Order / affiliate</th><th>Products</th><th>Commission</th><th>Hold until</th><th>Status</th><th>Actions</th></tr></thead><tbody id="commissions"></tbody></table></div></section>
+</div></main><script>
+(function(){
+ const $=id=>document.getElementById(id);let secret='';
+ const money=n=>n==null?'RATE NEEDED':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
+ const verifiedMoney=n=>n==null?'NOT VERIFIED':money(n);
+ function td(text){let cell=document.createElement('td');cell.textContent=String(text==null?'':text);return cell}
+ function button(label,action,payload,klass=''){let b=document.createElement('button');b.type='button';b.textContent=label;b.className=klass;b.addEventListener('click',async()=>{if(['mark_paid','void','approve_for_payout','suspend','reject'].includes(action)&&!confirm('Confirm '+label+'?'))return;let note='';if(action==='mark_paid'){const value=prompt('Enter your actual manual payout confirmation/reference (for example, e-transfer confirmation number). Do not mark paid until you have sent payment.');if(value===null)return;note=value.trim();if(note.length<4){$('state').textContent='Enter a payment reference at least four characters long.';return}}b.disabled=true;try{await call('POST',{action,...payload,...(action==='mark_paid'?{note}:{})});await refresh()}catch(err){$('state').textContent=err.message}finally{b.disabled=false}});return b}
+ async function call(method='GET',body){let r=await fetch('/.netlify/functions/affiliate-admin',{method,headers:{Authorization:'Bearer '+secret,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})}),j=await r.json();if(!r.ok)throw Error(j.error||'Request failed');return j}
+ function showRates(rows,labels){let box=$('rates');box.replaceChildren();let sorted=rows.slice().sort((a,b)=>a.name.localeCompare(b.name));let p=document.createElement('p');p.textContent='Configured product types: '+sorted.length;box.append(p);for(let r of sorted){let line=document.createElement('div');line.style.padding='4px 0';line.textContent=(labels?.[r.name]||r.name)+' — '+money(r.cents);box.append(line)}}
+ function showCosts(rows,catalog,excludedNames=[],retailPrices={}){
+ const byName=Object.fromEntries((rows||[]).map(x=>[x.name,x]));const body=$('costRows');body.replaceChildren();
+ const fresh=Date.now()-14*86400000;let ready=0;const excluded=new Set(excludedNames||[]);
+ for(const name of catalog||[]){
+  const x=byName[name],r=document.createElement('tr'),nonpayable=excluded.has(name);
+  const retail=x?.retail_cents??retailPrices[name];
+  const excludedStatus= !x?'Excluded — not synced':
+   x.estimated_profit_cents==null?'Excluded — costs NOT VERIFIED: '+(x.reason||x.status):
+   x.estimated_profit_cents<=0?'Excluded — LOSS RISK; review selling price':
+   x.estimated_profit_cents<500?'Excluded — THIN MARGIN; review selling price':'Excluded — verified costs; no payout';
+  const vals=[name,verifiedMoney(retail),verifiedMoney(x?.production_high_cents),
+   verifiedMoney(x?.gb_shipping_subsidy_cents),verifiedMoney(x?.processing_allowance_cents),
+   verifiedMoney(x?.estimated_profit_cents),verifiedMoney(x?.twenty_percent_cents),
+   nonpayable?'$0.00 — EXCLUDED':money(x?.proposed_commission_cents),
+   nonpayable?verifiedMoney(x?.estimated_profit_cents):verifiedMoney(x?.estimated_retained_after_commission_cents),
+   nonpayable?excludedStatus:!x?'Not synced':x.status==='proposal_ready'?
+    (x.rounding_note==='minimum_1_dollar_exception'?'Proposal — $1 minimum exception; review':'Proposal — review'):(x.reason||x.status)];
+  vals.forEach(v=>r.append(td(v)));body.append(r);
+  if(!nonpayable&&x?.status==='proposal_ready'&&x.proposed_commission_cents>0&&Date.parse(x.checked_at)>=fresh)ready++;
+ }
+ const eligibleTotal=(catalog||[]).filter(name=>!excluded.has(name)).length;
+ $('costState').textContent=ready+'/'+eligibleTotal+' eligible products have recent positive proposals; '+excluded.size+' products are excluded from commissions. '+
+  (ready===eligibleTotal?'Review the suggested payouts before approving.':'Missing or unverified costs for eligible products must be resolved before approval.');
+ $('approvePrintifyCosts').disabled=eligibleTotal===0||ready!==eligibleTotal;
+ }
+ function showGroupedRates(costs,members,labels){
+  const target=$('sharedRateRows');target.replaceChildren();
+  const byName=new Map((costs||[]).map(r=>[r.name,r]));
+  for(const [key,names] of Object.entries(members||{})){
+   if(names.length<=1)continue;
+   const records=names.map(n=>byName.get(n)),ready=records.every(r=>r?.status==='proposal_ready'&&r?.proposed_commission_cents>0&&
+    Number.isFinite(Date.parse(r.checked_at))&&Date.now()-Date.parse(r.checked_at)<=14*86400000);
+   const groupRate=ready?Math.min(...records.map(r=>r.proposed_commission_cents)):null;
+   const retained=ready?Math.min(...records.map(r=>r.estimated_profit_cents-groupRate)):null;
+   const row=document.createElement('tr');
+   [labels[key]||key,names.length,ready?money(groupRate):'Not ready',ready?money(retained):'—',ready?'Ready for review':'Awaiting all verified costs'].forEach(v=>row.append(td(v)));
+   target.append(row);
+  }
+ }
+ function showApplicants(rows){let body=$('applicants');body.replaceChildren();for(let a of rows){let tr=document.createElement('tr');[a.name,a.email+(a.channel?' | '+a.channel:''),a.status,a.code||'Not assigned'].forEach(v=>tr.appendChild(td(v)));let actions=td('');if(a.status!=='approved')actions.append(button('Approve','approve',{affiliate_id:a.id}));if(a.status==='approved')actions.append(button('Suspend','suspend',{affiliate_id:a.id},'secondary'));if(a.status==='pending')actions.append(button('Reject','reject',{affiliate_id:a.id},'danger'));if(a.status==='suspended')actions.append(button('Reactivate','reactivate',{affiliate_id:a.id}));tr.append(actions);body.append(tr)}}
+ function showCommissions(rows,affiliates){let body=$('commissions');body.replaceChildren();let names=Object.fromEntries(affiliates.map(a=>[a.id,a.name+' ('+a.code+')']));for(let r of rows){let tr=document.createElement('tr');[r.order_number+' | '+(names[r.affiliate_id]||r.affiliate_code),r.items.map(x=>x.name+' × '+x.quantity+(x.excluded?' [EXCLUDED — $0]':x.rate_cents==null?' [RATE NEEDED]':'')).join('; '),money(r.commission_total_cents),new Date(r.hold_until).toLocaleDateString('en-CA'),(r.status==='excluded_only'?'excluded items only — no payout':r.status.replace(/_/g,' '))+(r.refund_after_payout?' — refunded after payout':'')].forEach(v=>tr.append(td(v)));let actions=td('');let base={stripe_session_id:r.stripe_session_id};if(['needs_rates','pending_hold','review_self_referral','review_inactive_affiliate','refund_review'].includes(r.status))actions.append(button('Recalculate','recalculate',base));if(['review_self_referral','review_inactive_affiliate','refund_review','pending_hold','needs_rates'].includes(r.status))actions.append(button('Approve Review','approve_for_payout',base,'secondary'));if(['pending_hold','approved_for_payout'].includes(r.status)&&Date.parse(r.hold_until)<=Date.now()&&r.commission_total_cents>0)actions.append(button('Mark Manually Paid','mark_paid',base));if(r.status!=='paid'&&r.status!=='void')actions.append(button('Void','void',base,'danger'));tr.append(actions);body.append(tr)}}
+ async function refresh(){let d=await call(),a=d.affiliates||[],c=d.commissions||[];showApplicants(a);showCommissions(c,a);showRates(d.rates||[],d.rate_labels||{});showCosts(d.printify_costs||[],d.cost_products||[],d.excluded_cost_products||[],d.retail_prices||{});showGroupedRates(d.printify_costs||[],d.rate_members||{},d.rate_labels||{});let names=new Set([...(d.catalog_products||[]),...(d.rates||[]).map(x=>x.name)]);$('products').replaceChildren();for(let name of [...names].sort()){let o=document.createElement('option');o.value=name;$('products').append(o)}const configured=new Set((d.rates||[]).map(r=>r.name));const missing=(d.catalog_products||[]).filter(n=>!configured.has(n));$('unconfigured').textContent=missing.length+' product types still need a fixed commission rate: '+(missing.length?missing.join(' • '):'none');$('state').textContent=a.length+' affiliates • '+c.length+' commission records • '+(d.rates||[]).length+' product rates. No automated payouts.';return d}
+ $('authForm').addEventListener('submit',async e=>{e.preventDefault();secret=$('adminSecret').value;$('adminSecret').value='';try{await refresh();$('login').hidden=true;$('workspace').hidden=false}catch(err){$('authMsg').textContent=err.message;secret=''}});
+ $('refresh').addEventListener('click',()=>refresh().catch(e=>$('state').textContent=e.message));
+ $('syncPrintifyCosts').addEventListener('click',async()=>{
+  const btn=$('syncPrintifyCosts');btn.disabled=true;$('approvePrintifyCosts').disabled=true;
+  try{const initial=await refresh();let offset=0,remaining=(initial.cost_products||[]).length;while(offset<remaining){
+   $('costState').textContent='Verifying Printify costs… '+offset+'/'+remaining+' products processed.';
+   const res=await call('POST',{action:'sync_printify_costs',offset});
+   if(!res.ok||res.next_offset<=offset)throw Error(res.error||'Cost sync did not advance.');
+   offset=res.next_offset;remaining=res.total;
+  }await refresh();
+  }catch(error){$('costState').textContent='Printify sync stopped: '+error.message+' — review Netlify configuration or retry.'}
+  finally{btn.disabled=false}
+ });
+ $('approvePrintifyCosts').addEventListener('click',async()=>{
+  if(!confirm('You have reviewed every physical product and the shared garment-family commission rates. Apply those fixed rates to the affiliate program?'))return;
+  const btn=$('approvePrintifyCosts');btn.disabled=true;
+  try{const initial=await refresh();let offset=0,total=(initial.catalog_products||[]).length;while(offset<total){
+   $('costState').textContent='Saving approved commission rates… '+offset+'/'+total+'.';
+   const res=await call('POST',{action:'approve_all_cost_rates',offset});
+   if(!res.ok||res.next_offset<=offset)throw Error(res.error||'Rate activation stopped.');
+   offset=res.next_offset;total=res.total;
+  }await refresh();$('costState').textContent=total+' fixed commission rates saved. Confirm the configured rates above.';
+  }catch(error){$('costState').textContent='Commission approval stopped: '+error.message}
+  finally{if(btn.disabled)await refresh().catch(()=>{})}
+ });
+
+ $('lock').addEventListener('click',()=>{secret='';$('workspace').hidden=true;$('login').hidden=false});
+ $('rateForm').addEventListener('submit',async e=>{e.preventDefault();let name=$('rateName').value.trim(),value=Number($('rateDollars').value);if(!Number.isFinite(value))return;try{await call('POST',{action:'set_rate',name,cents:Math.round(value*100)});$('rateForm').reset();await refresh()}catch(err){$('state').textContent=err.message}});
+})();
+</script></body></html>
